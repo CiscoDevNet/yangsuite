@@ -1,0 +1,4 @@
+``ysfilemanager.filemanager.dir_repository``
+============================================
+
+.. automodule:: ysfilemanager.filemanager.dir_repository

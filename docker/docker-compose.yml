@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  yangsuite:
+    build: .
+    restart: always
+    ports:
+      - "8480:8480"
+    environment:
+      - MEDIA_ROOT=/ys-data
+      - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
+    volumes:
+      - ./data:/ys-data
+    command: /setuser.sh

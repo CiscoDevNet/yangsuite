@@ -1,0 +1,66 @@
+Locking and unlocking datastores
+================================
+
+While performing edit-config operation, you may wish to lock the datastore
+temporarily to avoid conflicting changes being introduced from another source.
+YANG Suite makes it easy to do so while you have a session open to a device.
+
+Locking a datastore(s)
+----------------------
+
+1. Before acquiring the lock, you must have an active NETCONF session with the
+   device. First, choose a device and select "Open device window".
+   A window will be opened showing that there is not currently a session with
+   this device.
+
+   .. image:: images/device-window-no-session.png
+      :alt: Screenshot showing the device session window with no active session.
+
+2. Click "Start Session" and after a moment you will see that a session is
+   now active between YANG Suite and the given device.
+
+   .. image:: images/device-window-with-session.png
+      :alt: Screenshot showing a window indicating that NETCONF session has started.
+
+3. Once the session is open, you can acquire a lock on any datastore supported
+   by the selected device, simply by clicking the appropriate button at the
+   top of the window.
+
+   .. image:: images/lock.png
+      :alt: Screenshot showing the "candidate", "running", and "startup" buttons.
+
+4. You will see a message reporting whether the lock was successful, and if it
+   was, the button will now change appearance to reflect this change.
+
+   .. image:: images/lock-msg.png
+      :alt: Screenshot showing a log message indicating successful locking and
+            the "running" button now showing a locked state.
+
+Repeat steps 3-4 to lock an additional datastore with the same device.
+Once the required datastore is locked successfully, you can proceed with your
+get-config and edit-config operations.
+
+If the selected datastore is already locked by some other user when you try to
+acquire the lock, YANG Suite will retry its attempt to gain the lock on the
+datastore till the specified retry timer expires or the lock is acquired. Below screenshot
+shows the lock retry messages being displayed.
+
+.. image:: images/lock-retry.png
+   :alt: Screenshot showing Lock retry messages.
+
+Unlocking a datastore(s)
+------------------------
+
+Any locks are automatically unlocked when the NETCONF session is ended,
+either by clicking the "End Session" button or by closing the session window.
+
+If you wish to unlock a datastore while maintaining the session, simply
+click the locked datastore button to unlock it.
+
+.. image:: images/unlock.png
+      :alt: Screenshot showing the "candidate", "running", and "startup" buttons.
+
+A message will be appended to the window showing whether the unlock operation was successful or not.
+
+.. image:: images/unlock-msg.png
+   :alt: Screenshot showing the unlock message.

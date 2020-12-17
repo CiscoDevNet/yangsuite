@@ -1,0 +1,67 @@
+
+*.py[co]
+.DS_Store
+build/
+dist/
+__pycache__/
+*.egg-info/
+.eggs/
+.venv/
+.vscode
+
+# Directory created by install_yangsuite.sh
+yang-suite-latest/
+yangsuite-latest/
+
+
+# Don't commit user-created files
+db.sqlite3
+data/
+local_settings.py
+
+# Don't commit derived documentation files
+*/static/*/docs/
+
+# Unit test and coverage reports
+.tox
+htmlcov/
+.coverage
+coverage.xml
+
+# Don't commit demo file
+yangsuite/mode.py
+
+## Build generated
+build/
+DerivedData/
+
+## Various settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## Other
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Don't commit temp files
+*.swp
+*~
+.DS_Store

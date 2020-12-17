@@ -1,0 +1,30 @@
+Copying YANG modules via SCP from a server to a YANG repository
+===============================================================
+
+If your YANG model files are not on your local filesystem but are instead
+in a directory on a server somewhere, you can instruct YANG Suite to copy
+the files from the remote server via SCP.
+
+1. On the
+   `"Setup → YANG files and repositories" </filemanager/repository/manage/>`_
+   page, after selecting the desired repository, in the
+   "Add modules to repository" section, select the "SCP" tab.
+
+2. Enter the host name or IP address, SSH username and password credentials,
+   and the directory path where the desired YANG file(s) are located on
+   the remote host.
+
+   .. image:: images/scp_parameters.png
+      :alt: Screenshot showing an example of populated SCP parameters
+
+3. Select "Copy YANG files".
+
+4. You will see a progress bar animating while the SSH session is established
+   and the files are copied from the remote host to the YANG Suite server.
+   When complete, a pop-up dialog will summarize the results.
+
+   .. image:: images/repo_add_results.png
+      :alt: Screenshot showing dialog summarizing results of YANG module
+            copy from remote server to repository
+
+5. You can now continue as described at :doc:`create_repository`.

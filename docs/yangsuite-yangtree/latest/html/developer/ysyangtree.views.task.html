@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysyangtree.views.task &mdash; yangsuite-yangtree 1.19.1.post0.dev3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysyangtree.views.utilities" href="ysyangtree.views.utilities.html" />
+    <link rel="prev" title="ysyangtree.utilities" href="ysyangtree.utilities.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-yangtree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.19.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Working with YANG Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ysyangtree developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.apps.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.context.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.context</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.tasks.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.tasks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.utilities.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.utilities</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.task</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.views.utilities.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.utilities</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.views.yangtree.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.yangtree</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.ymodels.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.ymodels</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-yangtree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">ysyangtree developer documentation</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.task</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysyangtree.views.task.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysyangtree.views.task">
+<span id="ysyangtree-views-task"></span><h1><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.task</span></code><a class="headerlink" href="#module-ysyangtree.views.task" title="Permalink to this headline">¶</a></h1>
+<p>Task handling Django APIs for all transports.</p>
+<dl class="function">
+<dt id="ysyangtree.views.task.save_task">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">save_task</code><span class="sig-paren">(</span><em>request</em>, <em>jsondata</em><span class="sig-paren">)</span><a class="headerlink" href="#ysyangtree.views.task.save_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a collection of task objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>request</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/2.0/ref/request-response/#django.http.HttpRequest" title="(in Django v2.0)"><em>django.http.HttpRequest</em></a>) – HTTP request</li>
+<li><strong>jsondata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – <p>Parsed from request.body, with expected keys:</p>
+<ul>
+<li>name (str): Name of task</li>
+<li>description (str): Description of task</li>
+<li>category (str): User defined category</li>
+<li>autogenerated (bool): Whether this is an auto-generated replay or
+a manually constructed one.</li>
+<li>devices (list): Devices this task was tested on</li>
+<li>images (list): Images this task was tested on</li>
+<li>segments (dict): All information needed to form multiple RPCs</li>
+<li>overwrite (bool): Whether to overwrite an existing replay if any.</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.change_category">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">change_category</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#change_category"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.change_category" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move one or more replays into a different category.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.del_task">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">del_task</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#del_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.del_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete task.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of task to delete</li>
+<li><strong>names</strong><strong>[</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – List of tasks to delete</li>
+<li><strong>category</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Category containing all task(s) to delete</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.delete_category">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">delete_category</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#delete_category"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.delete_category" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a given category and its associated replays.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.get_category_list">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">get_category_list</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#get_category_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.get_category_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of replay categories.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>generated_only</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – If ‘true’, only list categories that contain
+at least one autogenerated replay.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.get_replay_variables">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">get_replay_variables</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#get_replay_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.get_replay_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of variables used in a specific replay.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of replay.</li>
+<li><strong>category</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Category of replay</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">JsonResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.get_task">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">get_task</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#get_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.get_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a task or list of tasks and return json.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of task. If omitted, get a listing of tasks instead.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.get_task_list">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">get_task_list</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#get_task_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.get_task_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of tasks for a category.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.get_top_replay_dir">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">get_top_replay_dir</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#get_top_replay_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.get_top_replay_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get top directory containing replay categories.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.reset_top_replay_dir">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">reset_top_replay_dir</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#reset_top_replay_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.reset_top_replay_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set top replay directory back to default.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.save_task_data">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">save_task_data</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#save_task_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.save_task_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing replay with new contents.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of task.</li>
+<li><strong>category</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Category of task</li>
+<li><strong>task</strong> (<em>JSON</em>) – Task to be saved</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.views.task.set_top_replay_dir">
+<code class="descclassname">ysyangtree.views.task.</code><code class="descname">set_top_replay_dir</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/views/task.html#set_top_replay_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.views.task.set_top_replay_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set top directory containing replay categories.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysyangtree.views.utilities.html" class="btn btn-neutral float-right" title="ysyangtree.views.utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysyangtree.utilities.html" class="btn btn-neutral" title="ysyangtree.utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.19.1.post0.dev3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

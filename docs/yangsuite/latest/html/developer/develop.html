@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>YANG Suite developer documentation &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Project structure and design guidelines" href="design_guidelines.html" />
+    <link rel="prev" title="Developer documentation" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">YANG Suite developer documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-a-development-environment">Setting up a development environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#design-and-style-guidelines">Design and style guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-new-application">Creating a new application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-your-work">Testing your work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generating-documentation">Generating documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jenkins-ci">Jenkins CI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#release-process">Release process</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="design_guidelines.html">Project structure and design guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc_tooling.html">Documentation tooling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_process.html">Release process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Building and publishing YANG Suite Docker images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_new_application.html">Creating a new application from our template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">Auto user registration for YangSuite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer documentation</a> &raquo;</li>
+        
+      <li>YANG Suite developer documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/develop.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="yang-suite-developer-documentation">
+<h1>YANG Suite developer documentation<a class="headerlink" href="#yang-suite-developer-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="setting-up-a-development-environment">
+<h2>Setting up a development environment<a class="headerlink" href="#setting-up-a-development-environment" title="Permalink to this headline">¶</a></h2>
+<p>Since YANG Suite has a number of separate apps, it’s generally easiest
+for developers to work from a baseline virtualenv install
+as described in the README.</p>
+<p>Running YANG Suite with your work-in-progress application code is as simple as
+installing the application workspace into your virtualenv in “editable” mode,
+then executing <code class="docutils literal notranslate"><span class="pre">yangsuite</span></code>.</p>
+<p>Each YANG Suite plugin uses the <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/pkg_resources.html#entry-points">entry points</a> Python packaging feature to
+register for discovery by the yangsuite core application.
+For this feature to work, the plugin must provide a <code class="docutils literal notranslate"><span class="pre">.egg-info</span></code> directory
+containing metadata; this directory is normally included when installing
+the package.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><em>If and only if</em> your application is not installed into the virtualenv
+at all (which may be the case when you’re working on a new application,
+but will likely <strong>not</strong> be the case if you’re developing a fix or feature
+for an existing application plugin), then you can make your application
+discoverable by YANG Suite without actually installing it - just add your
+application workspace into the <code class="docutils literal notranslate"><span class="pre">$PYTHONPATH</span></code> and execute
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">build</span></code> to create the <code class="docutils literal notranslate"><span class="pre">.egg-info</span></code> directory.</p>
+<p class="last"><em>This will not work if the application is already installed into your
+virtualenv, as the virtualenv’s installed packages ALWAYS take precedence
+over anything in your ``$PYTHONPATH``.</em></p>
+</div>
+<p>What you will want to do is install your application into the virtualenv in
+what’s called “editable” mode, which essentially makes it installed (so
+YANG suite can discover it) but lets the installation automatically reflect
+your ongoing changes to the workspace (not needing to manually re-install
+after each change you make). This is simple to do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>source $VIRTUALENV/bin/activate
+cd $MY_APP_WORKSPACE
+pip install --editable .
+</pre></div>
+</div>
+<p>Then simply start your YANG Suite server as usual:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$INSTALLED_YANGSUITE_DIR/start.sh
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>source $VIRTUALENV/bin/activate
+yangsuite
+</pre></div>
+</div>
+<p>If your application does not show up, make sure your <code class="docutils literal notranslate"><span class="pre">default_app_config</span></code> is
+correctly set up in <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code>.</p>
+<p>If your changes require modifications to multiple applications, you can simply
+install each of them as editable following the same procedure as above.</p>
+</div>
+<div class="section" id="design-and-style-guidelines">
+<h2>Design and style guidelines<a class="headerlink" href="#design-and-style-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Refer to <a class="reference internal" href="design_guidelines.html"><span class="doc">the design guidelines</span></a> for specifics.</p>
+</div>
+<div class="section" id="creating-a-new-application">
+<h2>Creating a new application<a class="headerlink" href="#creating-a-new-application" title="Permalink to this headline">¶</a></h2>
+<p>If you’re looking to create a new application plugin rather than working on
+an existing app or on <code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> itself, refer to
+<a class="reference internal" href="create_new_application.html"><span class="doc">the documentation on creating a new application from the provided template</span></a>.</p>
+</div>
+<div class="section" id="testing-your-work">
+<h2>Testing your work<a class="headerlink" href="#testing-your-work" title="Permalink to this headline">¶</a></h2>
+<p>We use <a class="reference external" href="http://tox.readthedocs.io/en/latest/">tox</a>, <a class="reference external" href="https://pypi.python.org/pypi/unittest2">unittest2</a>, <a class="reference external" href="https://pypi.python.org/pypi/django-webtest">django-webtest</a>, and <a class="reference external" href="http://flake8.readthedocs.io/en/latest/">flake8</a> to automate various tests.
+To run the whole test suite, you only need to install tox as it will
+handle the other dependencies; however if you plan to run individual
+tests you may need to manually install unittest2 and flake8 as well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">tox</span>
+<span class="c1"># if you plan to run individual tests manually instead of through tox:</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">unittest2</span> <span class="n">django</span><span class="o">-</span><span class="n">webtest</span> <span class="n">flake8</span>
+</pre></div>
+</div>
+<p>The configuration file is <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> if you need to make any changes.</p>
+<p>Run all tests, including checking compatibility with both Python 3.5 and
+Python 3.6, as well as static analysis, and report summary of code coverage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tox</span>
+</pre></div>
+</div>
+<p>After running the above, to view detailed code coverage in HTML format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">htmlcov</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>You can run individual tox “environments” with <code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">&lt;envname&gt;,&lt;envname&gt;</span></code>,
+for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run only code analysis</span>
+<span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">static_analysis</span>
+<span class="c1"># Run tests under python 3.6 only and report resulting code coverage</span>
+<span class="n">tox</span> <span class="o">-</span><span class="n">e</span> <span class="n">py36</span><span class="p">,</span><span class="n">stats</span>
+</pre></div>
+</div>
+<p>You can also run individual test operations as described below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Perform code analysis of a single file (you must have installed flake8)</span>
+<span class="n">flake8</span> <span class="n">yangsuite</span><span class="o">/</span><span class="n">urls</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># Run all test scripts for this repository (must have installed unittest2)</span>
+<span class="n">PYTHONPATH</span><span class="o">=.</span> <span class="n">python</span> <span class="n">yangsuite</span><span class="o">/</span><span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">test</span>
+<span class="c1"># Run a specific test script (you must have installed unittest2)</span>
+<span class="n">PYTHONPATH</span><span class="o">=.</span> <span class="n">python</span> <span class="n">yangsuite</span><span class="o">/</span><span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">test</span> <span class="o">-</span><span class="n">p</span> <span class="n">test_doctests</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generating-documentation">
+<h2>Generating documentation<a class="headerlink" href="#generating-documentation" title="Permalink to this headline">¶</a></h2>
+<p>You can generate HTML documentation based on these files plus the
+<code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> APIs as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">sphinx</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_sphinx</span> <span class="o">-</span><span class="n">b</span> <span class="n">html</span>
+<span class="nb">open</span> <span class="n">build</span><span class="o">/</span><span class="n">sphinx</span><span class="o">/</span><span class="n">html</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="jenkins-ci">
+<h2>Jenkins CI<a class="headerlink" href="#jenkins-ci" title="Permalink to this headline">¶</a></h2>
+<p>Using Jenkins, Tox is also run periodically and as triggered by commits
+pushed to the wwwin-github repo. Status and results:
+<a class="reference external" href="https://engci-jenkins-sjc2.cisco.com/jenkins/job/team_yangsuite/">https://engci-jenkins-sjc2.cisco.com/jenkins/job/team_yangsuite/</a></p>
+</div>
+<div class="section" id="release-process">
+<h2>Release process<a class="headerlink" href="#release-process" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="release_process.html"><span class="doc">release process for new YANG Suite versions</span></a> is
+documented separately.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="design_guidelines.html" class="btn btn-neutral float-right" title="Project structure and design guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Developer documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,384 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Coding with yangsuite-filemanager &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysfilemanager.filemanager" href="ysfilemanager.filemanager.html" />
+    <link rel="prev" title="yangsuite-filemanager developer documentation" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">yangsuite-filemanager developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Coding with yangsuite-filemanager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#simple-use-case-un-managed-directory">Simple use case - un-managed directory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-use-case-managed-repository">Intermediate use case - managed repository</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-and-managing-a-managed-repository">Creating and managing a managed repository</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-an-existing-managed-repository">Using an existing managed repository</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-use-case-yang-module-sets">Advanced use case - YANG module sets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-and-updating-a-yang-set-using-the-ysmutableyangset-class">Creating and updating a YANG set using the YSMutableYangSet class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-an-existing-yang-set-with-the-ysyangset-class">Using an existing YANG set with the YSYangSet class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.filemanager.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.apps.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.quickparser.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.scp_importer.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.scp_importer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">yangsuite-filemanager developer documentation</a> &raquo;</li>
+        
+      <li>Coding with yangsuite-filemanager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/working_with_filemanager.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="coding-with-yangsuite-filemanager">
+<h1>Coding with yangsuite-filemanager<a class="headerlink" href="#coding-with-yangsuite-filemanager" title="Permalink to this headline">¶</a></h1>
+<p>Depending on your use case and requirements, there are several different ways
+to work with YANG files using yangsuite-filemanager.</p>
+<p>First, you should understand that all of the classes defined in
+the <a class="reference internal" href="ysfilemanager.filemanager.html#module-ysfilemanager.filemanager" title="ysfilemanager.filemanager"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a> submodule are subclasses of <a class="reference external" href="https://github.com/mbj4668/pyang/wiki/Documentation">pyang</a> ‘s
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pyang.Repository</span></code> class. These classes provide varying degrees of
+additional functionality for various use cases, but fundamentally they each
+represent a collection of YANG modules that pyang can consume.</p>
+<div class="section" id="simple-use-case-un-managed-directory">
+<h2>Simple use case - un-managed directory<a class="headerlink" href="#simple-use-case-un-managed-directory" title="Permalink to this headline">¶</a></h2>
+<p>In this use case:</p>
+<ul class="simple">
+<li>You have a directory full of YANG files in some arbitrary location.</li>
+<li>The directory and its files will not be actively managed by YANG Suite,
+but might instead represent a workspace, a Git repository, or some other
+source of files that you are managing on your own.</li>
+<li>You do <em>not</em> need the ability to modify the contents of this directory
+(adding/removing/updating files) through YANG Suite APIs.</li>
+</ul>
+<p>For this use case, you can use the simple
+<a class="reference internal" href="ysfilemanager.filemanager.dir_repository.html#ysfilemanager.filemanager.dir_repository.YSYangDirectoryRepository" title="ysfilemanager.filemanager.dir_repository.YSYangDirectoryRepository"><code class="xref py py-class docutils literal notranslate"><span class="pre">YSYangDirectoryRepository</span></code></a>
+class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangDirectoryRepository</span>
+<span class="n">repo</span> <span class="o">=</span> <span class="n">YSYangDirectoryRepository</span><span class="p">(</span><span class="n">some_directory_path</span><span class="p">)</span>
+
+<span class="c1"># As in pyang, repo.modules is a list of (name, revision, handle) tuples</span>
+<span class="n">module_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">modules</span><span class="p">]</span>
+
+<span class="n">first_handle</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+<span class="c1"># first_module_text will be the body of the YANG module in question</span>
+<span class="n">first_module_text</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">get_module_from_handle</span><span class="p">(</span><span class="n">first_handle</span><span class="p">)</span>
+
+<span class="c1"># Get the names of the modules that make use of the ietf-interfaces module</span>
+<span class="n">users</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">modules_using</span><span class="p">(</span><span class="s2">&quot;ietf-interfaces&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Refer to the API documentation for additional examples.</p>
+</div>
+<div class="section" id="intermediate-use-case-managed-repository">
+<h2>Intermediate use case - managed repository<a class="headerlink" href="#intermediate-use-case-managed-repository" title="Permalink to this headline">¶</a></h2>
+<p>In this use case:</p>
+<ul class="simple">
+<li>You want YANG Suite to store and manage your YANG files.</li>
+<li>You want to work with <em>all</em> of a given set of files and are not interested
+in selecting only a subset of the files to work with for improved performance.</li>
+</ul>
+<p>For this use case, you can use
+<a class="reference internal" href="ysfilemanager.filemanager.repository.html#ysfilemanager.filemanager.repository.YSYangRepository" title="ysfilemanager.filemanager.repository.YSYangRepository"><code class="xref py py-class docutils literal notranslate"><span class="pre">YSYangRepository</span></code></a>.</p>
+<div class="section" id="creating-and-managing-a-managed-repository">
+<h3>Creating and managing a managed repository<a class="headerlink" href="#creating-and-managing-a-managed-repository" title="Permalink to this headline">¶</a></h3>
+<p>You can create a new repository, belonging to a particular YANG Suite user,
+and then add files from various sources to the repository to be managed
+by YANG Suite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="n">repo</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">)</span>
+<span class="n">repo</span><span class="o">.</span><span class="n">add_yang_files</span><span class="p">(</span><span class="n">some_directory_path_containing_files</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">repo</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>YSYangRepository supports all of the APIs of YSYangDirectoryRepository as
+shown in the previous section, plus a number of additional APIs - refer to
+the API documentation for more examples.</p>
+</div>
+<div class="section" id="using-an-existing-managed-repository">
+<h3>Using an existing managed repository<a class="headerlink" href="#using-an-existing-managed-repository" title="Permalink to this headline">¶</a></h3>
+<p>Once a repository has been created and added to YANG Suite, you can easily
+load it for use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="n">repo</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also list existing repositories to search for the one you want:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="n">all_repos</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="o">.</span><span class="n">all_repos</span><span class="p">()</span>
+<span class="c1"># all_repos = {&#39;user1&#39;: [{repodata}, {repodata}], &#39;user2&#39;: [...], ...}</span>
+<span class="k">for</span> <span class="n">user</span><span class="p">,</span> <span class="n">user_repos</span> <span class="ow">in</span> <span class="n">all_repos</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">repodata</span> <span class="ow">in</span> <span class="n">user_repos</span><span class="p">:</span>
+        <span class="n">repo</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">repodata</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="advanced-use-case-yang-module-sets">
+<h2>Advanced use case - YANG module sets<a class="headerlink" href="#advanced-use-case-yang-module-sets" title="Permalink to this headline">¶</a></h2>
+<p>In many cases, a managed repository may contain a large number of related
+modules, but you may only need to work with a subset of these modules
+at any given time. This is what we have YANG module sets (“yangsets”) for.</p>
+<p>In this use case:</p>
+<ul class="simple">
+<li>You want YANG Suite to store and manage your YANG files.</li>
+<li>You have many related YANG modules, but for efficiency’s sake, only want
+to work with various subsets of these modules at any given time</li>
+</ul>
+<p>For this use case, you can use the
+<a class="reference internal" href="ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">YSMutableYangSet</span></code></a> and
+<a class="reference internal" href="ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet" title="ysfilemanager.filemanager.yangset.YSYangSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">YSYangSet</span></code></a> classes.</p>
+<div class="section" id="creating-and-updating-a-yang-set-using-the-ysmutableyangset-class">
+<h3>Creating and updating a YANG set using the YSMutableYangSet class<a class="headerlink" href="#creating-and-updating-a-yang-set-using-the-ysmutableyangset-class" title="Permalink to this headline">¶</a></h3>
+<p>Given an existing managed repository, you can create an associated YANG set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSMutableYangSet</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">YSMutableYangSet</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">,</span> <span class="n">modulenames</span><span class="p">,</span> <span class="n">repository</span><span class="o">=</span><span class="n">repo_slug</span><span class="p">)</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can also change the contents of an existing set to replace or add to
+the set of modules from the associated repository that are included in the set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSMutableYangSet</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">YSMutableYangSet</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">)</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ietf-yang-types&#39;</span><span class="p">,</span> <span class="s1">&#39;ietf-inet-types&#39;</span><span class="p">]</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">modules</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;ietf-interfaces&#39;</span><span class="p">]</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-an-existing-yang-set-with-the-ysyangset-class">
+<h3>Using an existing YANG set with the YSYangSet class<a class="headerlink" href="#using-an-existing-yang-set-with-the-ysyangset-class" title="Permalink to this headline">¶</a></h3>
+<p>You can list existing sets that are available for a given user in order to
+find the one you wish to load:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangSet</span>
+<span class="k">for</span> <span class="n">setdata</span> <span class="ow">in</span> <span class="n">YSYangSet</span><span class="o">.</span><span class="n">user_yangsets</span><span class="p">(</span><span class="n">owner</span><span class="p">):</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">YSYangSet</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setdata</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+    <span class="k">break</span>
+</pre></div>
+</div>
+<p>Similarly you can get the sets that are associated to a given repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ysfilemanager</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="n">repo</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">)</span>
+<span class="n">available_sets</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">associated_yangsets</span><span class="p">()</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">available_sets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysfilemanager.filemanager.html" class="btn btn-neutral float-right" title="ysfilemanager.filemanager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="yangsuite-filemanager developer documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.filemanager.yangset &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/index.html">yangsuite-filemanager developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysfilemanager.filemanager.yangset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysfilemanager.filemanager.yangset</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">_YSYangSetBase</span>
+<span class="kn">from</span> <span class="nn">.repository</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">yangset_path</span><span class="p">,</span> <span class="n">merge_user_set</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="YSYangSet"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet">[docs]</a><span class="k">class</span> <span class="nc">YSYangSet</span><span class="p">(</span><span class="n">_YSYangSetBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Repository containing a specific subset of YANG modules.</span>
+
+<span class="sd">    Unlike a pyang.FileRepository or a YSYangRepository, a YSYangSet contains</span>
+<span class="sd">    specific files, rather than simply providing all YANG files in a given</span>
+<span class="sd">    directory(s).</span>
+
+<span class="sd">    In general use in YANGSuite, a user may have many YSYangSets, all of which</span>
+<span class="sd">    operate against a given YSYangRepository, but each of which describes a</span>
+<span class="sd">    different subset of interesting files within that repository.</span>
+
+<span class="sd">    Instances of this class are immutable (modules cannot be added to or</span>
+<span class="sd">    removed from this set once initialized). This is intentional as this class</span>
+<span class="sd">    is designed for consumption by users (YSContext, etc.). When defining a new</span>
+<span class="sd">    set or editing an existing set, use the YSMutableYangSet class instead.</span>
+
+<span class="sd">    Ways to create a YSYangSet instance:</span>
+
+<span class="sd">    - load() - by owner and name (instance saved by YSMutableYangSet.write())</span>
+<span class="sd">    - from_file() - by path to the file written by YSMutableYangSet.write()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Additional public methods and properties</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">,</span> <span class="n">modules</span><span class="p">,</span> <span class="n">repository</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reponame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a YSYangSet.</span>
+
+<span class="sd">        This should not generally be called directly -- instead, use the</span>
+<span class="sd">        appropriate constructor API such as load() or from_file().</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          owner (str): User owning this set definition</span>
+<span class="sd">          setname (str): Name of this set, for saving/loading purposes.</span>
+<span class="sd">          modules (list): List of [absfilepath], [module, revision],</span>
+<span class="sd">            or [module, revision, absfilepath] lists of interest.</span>
+<span class="sd">          reponame (str): Name of repository to find files in</span>
+<span class="sd">          repository (str): Slug for repository to find files in</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setname</span> <span class="o">=</span> <span class="n">setname</span>
+        <span class="k">if</span> <span class="n">reponame</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">repository</span><span class="p">:</span>
+            <span class="c1"># Assume same owner as yangset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reponame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">reponame</span>
+        <span class="k">elif</span> <span class="n">repository</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">reponame</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reponame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">reponame</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Either repository or reponame must be given&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YSYangSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">modules</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">datastore_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Datetime when the underlying yangset definition was last changed.</span>
+
+<span class="sd">        Note that although the instance is otherwise immutable, a change</span>
+<span class="sd">        to the underlying JSON file (via YSMutableYangSet) will result</span>
+<span class="sd">        in a live update to ``self.datastore_mtime``. This is key to the</span>
+<span class="sd">        ``is_stale`` API.</span>
+
+<span class="sd">        If this time exists and is newer than ``self.mtime``, that means that</span>
+<span class="sd">        this instance has become stale (no longer in sync with the underlying</span>
+<span class="sd">        yangset and repository definition) and hence ``is_stale`` will be True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">yangset_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sorted list of (mod, rev, path) that this YSYangSet contains.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">slug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">merge_user_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">)</span>
+
+    <span class="nd">@modules</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given various input formats, sanitize to the format pyang wants.</span>
+
+<span class="sd">        Note that while a YSYangRepository can contain multiple revisions</span>
+<span class="sd">        of the same module, a YSYangSet can only contain one revision of any</span>
+<span class="sd">        given module. RFC 6020, 7.1.5::</span>
+
+<span class="sd">            Multiple revisions of the same module MUST NOT be imported</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          values (list):</span>
+<span class="sd">            - [(mod, rev, path), (mod, rev, path)] - will be used as-is</span>
+<span class="sd">            - [(mod, rev), (mod, rev)] - as returned from load();</span>
+<span class="sd">              paths will be looked up in owner file repository</span>
+<span class="sd">            - [path, path, path] - as from list_yang_files();</span>
+<span class="sd">              module/revision will be determined from file name/contents.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          RuntimeError: if trying to change the modules once already set</span>
+<span class="sd">            (use a YSMutableYangSet if such changes are intended)</span>
+<span class="sd">          ValueError: if:</span>
+<span class="sd">            1. any entry in the values list is not understood</span>
+<span class="sd">            2. multiple revisions of any given module are present</span>
+<span class="sd">            Note that an error is NOT raised if unable to locate the specified</span>
+<span class="sd">            module file(s) in the repository. (TODO, should it be?)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;YSYangSet modules list is immutable and &quot;</span>
+                               <span class="s2">&quot;may not be changed once set.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">module_names</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">missing_file_errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">input_errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">multirev_errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">item</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Not a string - is it a list, tuple, or other iterable?</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">item</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rev</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span>
+                    <span class="k">elif</span> <span class="n">length</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">rev</span> <span class="o">=</span> <span class="n">item</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rev</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">TypeError</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="c1"># Dunno what it is, then</span>
+                    <span class="n">input_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+                    <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">rev</span> <span class="o">==</span> <span class="s1">&#39;unknown&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rev</span><span class="p">:</span>
+                <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">latest_rev</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">path</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">==</span> <span class="n">rev</span><span class="p">:</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">p</span>
+                        <span class="k">break</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="n">latest_rev</span><span class="p">:</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">p</span>
+                        <span class="n">latest_rev</span> <span class="o">=</span> <span class="n">r</span>
+                        <span class="c1"># keep going, we might find a newer revision</span>
+                <span class="k">elif</span> <span class="n">path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">==</span> <span class="n">path</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">n</span>
+                    <span class="n">rev</span> <span class="o">=</span> <span class="n">r</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">rev</span><span class="p">:</span>
+                <span class="n">rev</span> <span class="o">=</span> <span class="n">latest_rev</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+                <span class="n">missing_file_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">missing_file_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">module_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">multirev_errors</span><span class="p">:</span>
+                    <span class="c1"># First pair of revisions</span>
+                    <span class="n">multirev_errors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">module_names</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">rev</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># A third, fourth, etc. additional revision</span>
+                    <span class="n">multirev_errors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rev</span><span class="p">)</span>
+            <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="n">module_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">rev</span>
+
+        <span class="k">if</span> <span class="n">missing_file_errors</span><span class="p">:</span>
+            <span class="c1"># TODO, raise ValueError?</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;The following modules referenced by yangset &quot;</span><span class="si">{0}</span><span class="s1">&quot; &#39;</span>
+                      <span class="s1">&#39;were not found in repository &quot;</span><span class="si">{1}</span><span class="s1">&quot;:</span><span class="se">\n</span><span class="s1">  </span><span class="si">{2}</span><span class="s1">&#39;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reponame</span><span class="p">,</span>
+                              <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_file_errors</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">input_errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Some entries were not understood:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{0}</span><span class="s2">&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_errors</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">multirev_errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;YANG set may not contain multiple revisions of the same &quot;</span>
+                <span class="s2">&quot;module!</span><span class="se">\n</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">revs</span><span class="p">))</span>
+                              <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">revs</span> <span class="ow">in</span> <span class="n">multirev_errors</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YSYangSet.load"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load the requested saved yangset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          owner (str): Owner of the named yangset.</span>
+<span class="sd">          setname (str): Name of the yangset to locate.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          YSYangSet: instance reconstructed from storage.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">          OSError: if the given yangset doesn&#39;t exist</span>
+<span class="sd">          ValueError: if parameters are invalid or the yangset is corrupted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">owner</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">setname</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;owner and setname parameters must not be empty!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">yangset_path</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="YSYangSet.delete"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet.delete">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete the specified yangset.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          owner (str): Owner of the named yangset.</span>
+<span class="sd">          setname (str): Name of the yangset to locate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">setname</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Deleting the user repository implicit yangset&quot;</span>
+                             <span class="s2">&quot; is not permitted.&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">yangset_path</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSYangSet.from_file"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">src</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load the given YangSet descriptor file into a YSYangSet instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          src (str): Path to yangset descriptor file.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">          OSError: if the given file does not exist</span>
+<span class="sd">          ValueError: if the file is not valid JSON</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">src</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EINVAL</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EINVAL</span><span class="p">),</span> <span class="n">src</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>   <span class="c1"># e.g. json.decoder.JSONDecodeError</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Source &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a valid JSON file.&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loaded </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="YSYangSet.user_yangsets"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet.user_yangsets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">user_yangsets</span><span class="p">(</span><span class="n">owner</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get data for all yangsets owned by the given user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          owner (str): Username</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          list: [{&#39;name&#39;: &#39;display name&#39;, &#39;slug&#39;: &#39;owner+display-name&#39;}, ...]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># As of 0.6.0, yangsuite.get_path will auto-create user directories -</span>
+        <span class="c1"># so we want to make sure the user actually exists before creating it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;users_dir&#39;</span><span class="p">),</span> <span class="n">owner</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No such user&quot;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;yangsets_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">owner</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)):</span>
+            <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+                <span class="c1"># Get &#39;un-slugified&#39; set name from file contents</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;setname&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">merge_user_set</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;setname&#39;</span><span class="p">]),</span>
+                    <span class="p">})</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>   <span class="c1"># e.g. json.decoder.JSONDecodeError</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in loading yangset </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="YSYangSet.all_yangsets"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet.all_yangsets">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">all_yangsets</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Get data about all yangsets for all users.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          dict: {&#39;user1&#39;: [{&#39;name&#39;: &#39;Foo&#39;, &#39;slug&#39;: &#39;foo}, {...}], &#39;user2&#39;: ...}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sets</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">usersdir</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;users_dir&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">usersdir</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">usersdir</span><span class="p">,</span> <span class="n">user</span><span class="p">)):</span>
+                <span class="n">sets</span><span class="p">[</span><span class="n">user</span><span class="p">]</span> <span class="o">=</span> <span class="n">YSYangSet</span><span class="o">.</span><span class="n">user_yangsets</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Skipping non-directory &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">usersdir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sets</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Private methods</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Equality test, overriding _YSYangSetBase logic to add setname check.</span>
+
+<span class="sd">        Since we slugify setnames on the back end, two sets may have differing</span>
+<span class="sd">        name strings and still be equal if their names slugify to the</span>
+<span class="sd">        same result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">yangset_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">)</span> <span class="o">==</span>
+                <span class="n">yangset_path</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">setname</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;String representation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;YANG set &#39;</span><span class="si">{0}</span><span class="s2">&#39; owned by &#39;</span><span class="si">{1}</span><span class="s2">&#39; (</span><span class="si">{2}</span><span class="s2"> modules)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+``ysfilemanager.views.upload``
+==============================
+
+.. automodule:: ysfilemanager.views.upload

@@ -1,0 +1,567 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Release process &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building and publishing YANG Suite Docker images" href="docker.html" />
+    <link rel="prev" title="Documentation tooling" href="doc_tooling.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="develop.html">YANG Suite developer documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_guidelines.html">Project structure and design guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc_tooling.html">Documentation tooling</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Release process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#branching-model">Branching model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#is-develop-passing-all-unit-tests">Is <code class="docutils literal notranslate"><span class="pre">develop</span></code> passing all unit tests?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#is-your-new-code-dependent-on-new-code-in-other-plugins">Is your new code dependent on new code in other plugins?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#are-any-other-plugins-dependent-on-this-one">Are any other plugins dependent on this one?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#do-you-need-to-update-any-documentation-or-help-pages">Do you need to update any documentation or help pages?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-new-release">Creating a new release</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-commit-in-the-master-branch">Create a commit in the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#run-unit-tests">Run unit tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#select-a-new-release-version-number">Select a new release version number</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-an-annotated-git-tag-for-this-version">Create an annotated Git tag for this version</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#publish-the-new-release">Publish the new release</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update-the-develop-branch-post-release">Update the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch post-release</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#manually-publishing-a-release">Manually publishing a release</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#build-the-package-as-a-python-wheel">Build the package as a Python wheel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#check-your-pypirc-file">Check your pypirc file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-twine">Install <code class="docutils literal notranslate"><span class="pre">twine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#publish-the-wheel-to-our-pypi-repository">Publish the wheel to our PyPI repository</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#notify-users-of-the-new-release">Notify users of the new release</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Building and publishing YANG Suite Docker images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_new_application.html">Creating a new application from our template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">Auto user registration for YangSuite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer documentation</a> &raquo;</li>
+        
+      <li>Release process</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/release_process.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="release-process">
+<h1>Release process<a class="headerlink" href="#release-process" title="Permalink to this headline">¶</a></h1>
+<p>Process for releasing a new official version of <code class="docutils literal notranslate"><span class="pre">yangsuite</span></code>.
+A similar model generally applies to individual application plugins.</p>
+<div class="section" id="branching-model">
+<h2>Branching model<a class="headerlink" href="#branching-model" title="Permalink to this headline">¶</a></h2>
+<p>YANG Suite follows a branching model similar to <a class="reference external" href="http://nvie.com/posts/a-successful-git-branching-model/">Vincent Driessen’s model</a>.
+In brief, the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch should only be committed to as part of the
+release of a new official version (see below). Commits by maintainers not
+requiring significant review are committed to <code class="docutils literal notranslate"><span class="pre">develop</span></code>, and feature
+development work is done in a dedicated feature branch and then proposed as a
+pull request against <code class="docutils literal notranslate"><span class="pre">develop</span></code>.</p>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You <strong>MUST</strong> check all of these things before creating the release!</p>
+</div>
+<div class="section" id="is-develop-passing-all-unit-tests">
+<h3>Is <code class="docutils literal notranslate"><span class="pre">develop</span></code> passing all unit tests?<a class="headerlink" href="#is-develop-passing-all-unit-tests" title="Permalink to this headline">¶</a></h3>
+<p>We <strong>MUST NOT</strong> release a version that does not pass testing. If the latest
+commit on the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch either 1) fails a locally invoked <code class="docutils literal notranslate"><span class="pre">tox</span></code> run
+or 2) is showing failures in Jenkins, then you <strong>MUST</strong> triage and fix the
+failure(s) before the branch can be considered ready for release.</p>
+</div>
+<div class="section" id="is-your-new-code-dependent-on-new-code-in-other-plugins">
+<h3>Is your new code dependent on new code in other plugins?<a class="headerlink" href="#is-your-new-code-dependent-on-new-code-in-other-plugins" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Make sure the other plugin has a published release containing the new code.
+(Your release <strong>MUST NOT</strong> depend on a bleeding-edge / unreleased version
+of a different plugin)</li>
+<li>You <strong>MUST</strong> ensure that your <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> specifies the other plugin and
+its appropriate <strong>release</strong> version number as a minimum requirement.
+In other words, your <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> must include a dependency like
+<code class="docutils literal notranslate"><span class="pre">yangsuite-filemanager</span> <span class="pre">&gt;=</span> <span class="pre">1.2.0</span></code>, <strong>NOT</strong>
+<code class="docutils literal notranslate"><span class="pre">yangsuite-filemanager</span> <span class="pre">&gt;=</span> <span class="pre">1.1.5.post0.dev12</span></code>. If necessary, make this
+fix in your <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch before beginning the release process.</li>
+</ol>
+</div>
+<div class="section" id="are-any-other-plugins-dependent-on-this-one">
+<h3>Are any other plugins dependent on this one?<a class="headerlink" href="#are-any-other-plugins-dependent-on-this-one" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>If at all possible, you <strong>SHOULD</strong> remain backwards-compatible with previous
+releases.</li>
+<li>If this release will remove or significantly alter any API used by others,
+you <strong>MUST</strong>, following <a class="reference external" href="http://semver.org/">Semantic Versioning</a> guidelines, make this a new
+<strong>MAJOR</strong> release (e.g., <code class="docutils literal notranslate"><span class="pre">1.x.y</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">2.0.0</span></code>) in order to avoid
+breakages.</li>
+</ol>
+</div>
+<div class="section" id="do-you-need-to-update-any-documentation-or-help-pages">
+<h3>Do you need to update any documentation or help pages?<a class="headerlink" href="#do-you-need-to-update-any-documentation-or-help-pages" title="Permalink to this headline">¶</a></h3>
+<p>You <strong>MUST</strong> verify that any help pages, README files, docstrings, and other
+documentation accurately describe any new or altered features in this release.</p>
+</div>
+</div>
+<div class="section" id="creating-a-new-release">
+<h2>Creating a new release<a class="headerlink" href="#creating-a-new-release" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create-a-commit-in-the-master-branch">
+<h3>Create a commit in the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch<a class="headerlink" href="#create-a-commit-in-the-master-branch" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned above, development work is done in the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch,
+but releases should <strong>always</strong> happen from <code class="docutils literal notranslate"><span class="pre">master</span></code>. Hence, a key step is
+delivering the desired content to <code class="docutils literal notranslate"><span class="pre">master</span></code>. Assuming the desired release
+content is the latest version of <code class="docutils literal notranslate"><span class="pre">develop</span></code>, we need to get this content into
+the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check with the upstream repository to see if there is new code in</span>
+<span class="c1"># any branch, and also if there are any new tags (see below)</span>
+<span class="n">git</span> <span class="n">fetch</span> <span class="o">--</span><span class="n">tag</span>
+<span class="c1"># Make sure your local &quot;develop&quot; branch matches upstream latest</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="n">develop</span>
+<span class="n">git</span> <span class="n">pull</span>
+<span class="c1"># Make sure your local &quot;master&quot; branch is up-to-date as well</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="n">git</span> <span class="n">pull</span>
+
+<span class="c1"># Now merge the latest develop content into master as a new commit</span>
+<span class="n">git</span> <span class="n">merge</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">ff</span> <span class="n">develop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-unit-tests">
+<h3>Run unit tests<a class="headerlink" href="#run-unit-tests" title="Permalink to this headline">¶</a></h3>
+<p>Run <code class="docutils literal notranslate"><span class="pre">tox</span></code> to execute the full set of unit tests as one last sanity check.
+All tests <strong>MUST</strong> pass.</p>
+</div>
+<div class="section" id="select-a-new-release-version-number">
+<h3>Select a new release version number<a class="headerlink" href="#select-a-new-release-version-number" title="Permalink to this headline">¶</a></h3>
+<p>Since you already made your repository aware of all existing upstream tags
+as part of the <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span> <span class="pre">--tag</span></code> command above, you can now quickly check
+which versions are already defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span>
+<span class="c1"># example output:</span>
+<span class="c1"># v0.2.0</span>
+<span class="c1"># v0.2.1</span>
+<span class="c1"># v0.3.0</span>
+</pre></div>
+</div>
+<p>Based on the latest version number tagged so far, and the content of the new
+release you are creating, select a new version number to update to, following
+<a class="reference external" href="http://semver.org/">Semantic Versioning</a> guidelines. For ease of reference throughout the
+remainder of this document, we’ll call this selected version NEW_VERSION,
+e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">NEW_VERSION</span><span class="o">=</span><span class="mf">0.3</span><span class="o">.</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-an-annotated-git-tag-for-this-version">
+<h3>Create an annotated Git tag for this version<a class="headerlink" href="#create-an-annotated-git-tag-for-this-version" title="Permalink to this headline">¶</a></h3>
+<p>Now it is time to add a Git tag identifying this latest commit in <code class="docutils literal notranslate"><span class="pre">master</span></code>
+as your selected new release version number:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="o">-</span><span class="n">a</span> <span class="s2">&quot;v$NEW_VERSION&quot;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Note the leading ‘v’. For the <code class="docutils literal notranslate"><span class="pre">versioneer</span></code> library to correctly auto-number
+subsequent development versions (<code class="docutils literal notranslate"><span class="pre">$NEW_VERSION.post0.dev1</span></code>, etc.),
+the ‘v’ <strong>must</strong> be present.
+In other words, version 0.3.0 must be tag <code class="docutils literal notranslate"><span class="pre">'v0.3.0'</span></code>, <em>not</em> <code class="docutils literal notranslate"><span class="pre">'0.3.0'</span></code>!</p>
+</div>
+<p>This will open your text editor prompting for a tag annotation, very similar
+to the commit comments you normally add.</p>
+<p><strong>The text of this annotation will be included in the release announcement.</strong>
+You should treat this annotation as the user-facing release note for this
+release. Highlight key bug fixes and features in this release. A generally
+applicable template is something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Version</span> <span class="mf">0.3</span><span class="o">.</span><span class="mi">1</span>
+<span class="o">=============</span>
+
+<span class="n">Features</span><span class="p">:</span>
+
+<span class="o">-</span> <span class="n">feature</span> <span class="n">foobar</span> <span class="p">(</span><span class="c1">#27) is now supported</span>
+<span class="o">-</span> <span class="o">...</span>
+
+<span class="n">Fixes</span><span class="p">:</span>
+
+<span class="o">-</span> <span class="n">no</span> <span class="n">longer</span> <span class="n">incorrectly</span> <span class="n">groks</span> <span class="n">the</span> <span class="n">xyzzy</span> <span class="p">(</span><span class="c1">#21)</span>
+<span class="o">-</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>After committing the tag annotation, confirm that the version numbering,
+as detected by <code class="docutils literal notranslate"><span class="pre">versioneer</span></code> and reported by Python, is updated correctly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">version</span>
+<span class="mf">0.3</span><span class="o">.</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>If you see the old version number still, or a non-release version number (e.g.
+<code class="docutils literal notranslate"><span class="pre">0.3.1.post0.dev</span></code>), then you have either named the tag incorrectly (did you
+remember the leading ‘v’?) or tagged the wrong commit.</p>
+<div class="section" id="if-you-make-a-mistake">
+<h4>If you make a mistake<a class="headerlink" href="#if-you-make-a-mistake" title="Permalink to this headline">¶</a></h4>
+<p>If you inadvertently created the wrong tag, or tagged the wrong branch or
+commit, it’s easy to remove the tag, <em>so long as you haven’t yet pushed the
+tag upstream</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="o">--</span><span class="n">delete</span> <span class="n">mybadtag</span>
+</pre></div>
+</div>
+<p>If you <em>have</em> already pushed the tag upstream, it is possible but <strong>risky</strong>
+to delete it from upstream as well as locally.
+See the “Discussion” section of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">help</span> <span class="pre">tag</span></code> for details and reasons why.</p>
+</div>
+</div>
+<div class="section" id="publish-the-new-release">
+<h3>Publish the new release<a class="headerlink" href="#publish-the-new-release" title="Permalink to this headline">¶</a></h3>
+<p>Push the commit and tag upstream:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">follow</span><span class="o">-</span><span class="n">tags</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You may wish to wait for Jenkins to run, validate the new release,
+and send out the automated release announcement before proceeding
+to the following steps.</p>
+</div>
+</div>
+<div class="section" id="update-the-develop-branch-post-release">
+<h3>Update the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch post-release<a class="headerlink" href="#update-the-develop-branch-post-release" title="Permalink to this headline">¶</a></h3>
+<p>Now that you’ve created a new release, you must also update the <code class="docutils literal notranslate"><span class="pre">develop</span></code>
+branch to inherit from this release instead of the previous one.
+This is needed to ensure new development versions have the new
+version number as their base:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">develop</span>
+<span class="n">git</span> <span class="n">merge</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">ff</span> <span class="n">master</span>
+</pre></div>
+</div>
+<p>Check that the versioning of <code class="docutils literal notranslate"><span class="pre">develop</span></code> is now correct. It should now be
+the release version plus <code class="docutils literal notranslate"><span class="pre">.post0.dev1</span></code>, indicating the first development
+commit post-release:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">version</span>
+<span class="mf">0.3</span><span class="o">.</span><span class="mf">1.</span><span class="n">post0</span><span class="o">.</span><span class="n">dev1</span>
+</pre></div>
+</div>
+<p>Push the updated <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch upstream as well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Jenkins will handle things from here as far as building and uploading the
+new release to our PyPI server. If for some reason Jenkins fails to do so,
+continue to the <a class="reference internal" href="#manually-publishing-a-release">Manually publishing a release</a> section below.</p>
+</div>
+</div>
+</div>
+<div class="section" id="manually-publishing-a-release">
+<h2>Manually publishing a release<a class="headerlink" href="#manually-publishing-a-release" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Normally the release will be automatically published by Jenkins after you
+follow the above steps. You should only need to follow this section if
+something goes wrong in Jenkins.</p>
+</div>
+<div class="section" id="build-the-package-as-a-python-wheel">
+<h3>Build the package as a Python wheel<a class="headerlink" href="#build-the-package-as-a-python-wheel" title="Permalink to this headline">¶</a></h3>
+<p>Pre-clean your workspace to remove any prior builds or packages,
+just to be safe:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span>
+</pre></div>
+</div>
+<p>Make sure you are working out of the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and the version number
+is as expected:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">version</span>
+</pre></div>
+</div>
+<p>If all is well, now build the new package and package it into a wheel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span>
+</pre></div>
+</div>
+<p>The new wheel will be in the <code class="docutils literal notranslate"><span class="pre">./dist/</span></code> directory and should be named with
+your package name and the new release tag, something along the lines of
+<code class="docutils literal notranslate"><span class="pre">PACKAGE_NAME-RELEASE_VERSION-py2.py3-none-any.whl</span></code>.</p>
+</div>
+<div class="section" id="check-your-pypirc-file">
+<h3>Check your pypirc file<a class="headerlink" href="#check-your-pypirc-file" title="Permalink to this headline">¶</a></h3>
+<p>Make sure you have our internal repository, <code class="docutils literal notranslate"><span class="pre">yang-suite-dev-pypi-local</span></code>,
+set up in your <code class="docutils literal notranslate"><span class="pre">~/.pypirc</span></code> file, as we are not yet publishing our code to the
+public PyPI server at <a class="reference external" href="https://pypi.python.org/pypi">https://pypi.python.org/pypi</a>.</p>
+<p>Reach out to <a class="reference external" href="mailto:yang-suite-dev&#37;&#52;&#48;cisco&#46;com">yang-suite-dev<span>&#64;</span>cisco<span>&#46;</span>com</a> if you need the password for publishing
+to our repository.</p>
+<p>Example pypirc content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">distutils</span><span class="p">]</span>
+<span class="n">index</span><span class="o">-</span><span class="n">servers</span> <span class="o">=</span>
+    <span class="n">pypi</span>
+    <span class="n">yang</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">pypi</span><span class="o">-</span><span class="n">local</span>
+
+<span class="p">[</span><span class="n">pypi</span><span class="p">]</span>
+<span class="o">...</span>
+
+<span class="p">[</span><span class="n">yang</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">pypi</span><span class="o">-</span><span class="n">local</span><span class="p">]</span>
+<span class="n">repository</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">engci</span><span class="o">-</span><span class="n">maven</span><span class="o">-</span><span class="n">master</span><span class="o">.</span><span class="n">cisco</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">artifactory</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">pypi</span><span class="o">/</span><span class="n">yang</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">pypi</span><span class="o">-</span><span class="n">local</span>
+<span class="n">username</span><span class="p">:</span> <span class="n">yang</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">deployer</span>
+<span class="n">password</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">PASSWORD</span> <span class="n">GOES</span> <span class="n">HERE</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-twine">
+<h3>Install <code class="docutils literal notranslate"><span class="pre">twine</span></code><a class="headerlink" href="#install-twine" title="Permalink to this headline">¶</a></h3>
+<p>We recomment using <a class="reference external" href="https://pypi.python.org/pypi/twine">twine</a> to publish the package as it streamlines some of the
+rough edges of using the built-in <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">upload</span></code> command.
+Make sure you have the latest version installed in your virtualenv:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">twine</span> <span class="o">--</span><span class="n">upgrade</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="publish-the-wheel-to-our-pypi-repository">
+<h3>Publish the wheel to our PyPI repository<a class="headerlink" href="#publish-the-wheel-to-our-pypi-repository" title="Permalink to this headline">¶</a></h3>
+<p>Upload the wheel you just built to our release repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">twine</span> <span class="n">upload</span> <span class="o">--</span><span class="n">repository</span> <span class="n">yang</span><span class="o">-</span><span class="n">suite</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">pypi</span><span class="o">-</span><span class="n">local</span> <span class="o">./</span><span class="n">dist</span><span class="o">/*.</span><span class="n">whl</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="notify-users-of-the-new-release">
+<h3>Notify users of the new release<a class="headerlink" href="#notify-users-of-the-new-release" title="Permalink to this headline">¶</a></h3>
+<p>Send an email notification to <code class="docutils literal notranslate"><span class="pre">yang-suite-users&#64;cisco.com</span></code> and
+<code class="docutils literal notranslate"><span class="pre">yang-suite-support&#64;cisco.com</span></code> announcing the new release and its key
+features and fixes. An example template, similar to what Jenkins uses,
+would be as follows.</p>
+<p>Subject: <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">release:</span> <span class="pre">{{</span> <span class="pre">project</span> <span class="pre">}}</span> <span class="pre">version</span> <span class="pre">{{</span> <span class="pre">version</span> <span class="pre">}}</span></code></p>
+<p>Body:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="n">new</span> <span class="n">version</span> <span class="n">of</span> <span class="p">{{</span> <span class="n">project</span> <span class="p">}},</span> <span class="p">{{</span> <span class="n">version</span> <span class="p">}},</span> <span class="n">has</span> <span class="n">been</span> <span class="n">released</span><span class="o">.</span>
+<span class="n">Release</span> <span class="n">notes</span> <span class="n">are</span> <span class="k">as</span> <span class="n">follows</span><span class="p">:</span>
+
+<span class="p">{{</span> <span class="n">tag_annotation</span> <span class="p">}}</span>
+
+<span class="n">To</span> <span class="n">update</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">YANG</span> <span class="n">Suite</span> <span class="n">install</span><span class="p">,</span> <span class="n">simply</span> <span class="n">run</span> <span class="n">the</span> <span class="n">setup_yangsuite</span>
+<span class="n">script</span> <span class="n">again</span><span class="o">.</span>  <span class="n">It</span> <span class="n">will</span> <span class="n">detect</span> <span class="n">the</span> <span class="n">new</span> <span class="n">version</span> <span class="ow">and</span> <span class="n">update</span> <span class="n">your</span> <span class="n">instance</span>
+<span class="n">without</span> <span class="n">losing</span> <span class="nb">any</span> <span class="n">of</span> <span class="n">your</span> <span class="n">previous</span> <span class="n">settings</span><span class="p">,</span> <span class="n">repositories</span><span class="p">,</span> <span class="ow">or</span> <span class="n">yangsets</span><span class="o">.</span>
+<span class="n">Be</span> <span class="n">sure</span> <span class="ow">and</span> <span class="n">refresh</span> <span class="n">your</span> <span class="n">browser</span><span class="o">.</span>
+
+        <span class="n">Thanks</span><span class="p">,</span>
+
+            <span class="n">YANG</span> <span class="n">Suite</span> <span class="n">development</span> <span class="n">team</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="docker.html" class="btn btn-neutral float-right" title="Building and publishing YANG Suite Docker images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="doc_tooling.html" class="btn btn-neutral" title="Documentation tooling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

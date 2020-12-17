@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysdevices.devprofile &mdash; yangsuite-devices 2.8.0.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysdevices.plugin" href="ysdevices.plugin.html" />
+    <link rel="prev" title="ysdevices.apps" href="ysdevices.apps.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-devices
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Device Profiles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ysdevices developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="migration-from-1.0.html">Migrating your code from ysdevices 1.x to 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.apps.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.apps</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysdevices.devprofile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.plugin.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.plugin</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.views.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-devices</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">ysdevices developer documentation</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysdevices.devprofile</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysdevices.devprofile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysdevices.devprofile">
+<span id="ysdevices-devprofile"></span><h1><code class="docutils literal notranslate"><span class="pre">ysdevices.devprofile</span></code><a class="headerlink" href="#module-ysdevices.devprofile" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ysdevices.devprofile.YSDeviceProfile">
+<em class="property">class </em><code class="descclassname">ysdevices.devprofile.</code><code class="descname">YSDeviceProfile</code><span class="sig-paren">(</span><em>data=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Representation of a targeted device and properties related to its usage.</p>
+<p>Per-protocol properties are defined by protocol-specific plugins, accessed
+as instance property <code class="docutils literal notranslate"><span class="pre">&lt;instance&gt;.&lt;protocol&gt;</span></code>. If data is provided for
+an undefined plugin, the raw data will be accessible as
+<code class="docutils literal notranslate"><span class="pre">&lt;instance&gt;.extra_data[&lt;protocol&gt;]</span></code>. <code class="xref py py-mod docutils literal notranslate"><span class="pre">ysdevices.plugin</span></code> provides the
+abstract class <a class="reference internal" href="ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin" title="ysdevices.plugin.YSDeviceProtocolPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">YSDeviceProtocolPlugin</span></code></a> and a
+“base functionality” plugin, <a class="reference internal" href="ysdevices.plugin.html#ysdevices.plugin.BasePlugin" title="ysdevices.plugin.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a>,
+while all other plugins are optional.</p>
+<p>Properties are individually readable by name, and the entire profile
+can be converted back to a data dictionary by calling <a class="reference internal" href="#ysdevices.devprofile.YSDeviceProfile.dict" title="ysdevices.devprofile.YSDeviceProfile.dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict()</span></code></a>.
+Changes can be validated and applied by calling <a class="reference internal" href="#ysdevices.devprofile.YSDeviceProfile.update" title="ysdevices.devprofile.YSDeviceProfile.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update()</span></code></a>.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;profile_name&#39;</span><span class="p">:</span> <span class="s1">&#39;n9k-110&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="s1">&#39;10.122.84.110&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="s1">&#39;30&#39;</span><span class="p">},</span>
+<span class="gp">... </span><span class="s1">&#39;mystery&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">8080</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span> <span class="o">=</span> <span class="n">YSDeviceProfile</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span>
+<span class="go">&#39;n9k-110&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">timeout</span>
+<span class="go">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">extra_data</span>
+<span class="go">{&#39;mystery&#39;: {&#39;port&#39;: 8080}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+<span class="go">&#39;Device profile &quot;n9k-110&quot;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>  
+<span class="go">{&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="go"> &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="go"> &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="go"> &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="go"> &#39;description&#39;: &#39;&#39;,</span>
+<span class="go"> &#39;encrypted_password&#39;: ...</span>
+<span class="go"> &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="go"> &#39;timeout&#39;: 30,</span>
+<span class="go"> &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="go"> &#39;variables&#39;: {}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>  
+<span class="go">{&#39;base&#39;: {&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="go">          &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;description&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;encrypted_password&#39;: ...</span>
+<span class="go">          &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="go">          &#39;timeout&#39;: 30,</span>
+<span class="go">          &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="go">          &#39;variables&#39;: {}},</span>
+<span class="go"> &#39;mystery&#39;: {&#39;port&#39;: 8080},</span>
+<span class="go"> &#39;ssh&#39;: {&#39;address&#39;: &#39;&#39;,</span>
+<span class="go">         &#39;delay_factor&#39;: 1.0,</span>
+<span class="go">         &#39;device_variant&#39;: &#39;generic_termserver&#39;,</span>
+<span class="go">         &#39;enabled&#39;: False,</span>
+<span class="go">         &#39;encrypted_password&#39;: ...</span>
+<span class="go">         &#39;port&#39;: 22,</span>
+<span class="go">         &#39;secure&#39;: False,</span>
+<span class="go">         &#39;timeout&#39;: &#39;&#39;,</span>
+<span class="go">         &#39;username&#39;: &#39;&#39;}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;profile_name&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}})</span>
+<span class="gp">... </span>
+<span class="gp">... </span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">YSDeviceProfileValidationError</span>:
+<span class="go">{&#39;base&#39;: {&#39;profile_name&#39;: &#39;This is a required field&#39;}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">profile2</span> <span class="o">=</span> <span class="n">YSDeviceProfile</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">profile2</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span>  
+<span class="go">{&#39;base&#39;: {&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="go">          &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;description&#39;: &#39;&#39;,</span>
+<span class="go">          &#39;encrypted_password&#39;: ...</span>
+<span class="go">          &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="go">          &#39;timeout&#39;: 30,</span>
+<span class="go">          &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="go">          &#39;variables&#39;: {}},</span>
+<span class="go"> &#39;mystery&#39;: {&#39;port&#39;: 8080},</span>
+<span class="go"> &#39;ssh&#39;: {&#39;address&#39;: &#39;&#39;,</span>
+<span class="go">         &#39;delay_factor&#39;: 1.0,</span>
+<span class="go">         &#39;device_variant&#39;: &#39;generic_termserver&#39;,</span>
+<span class="go">         &#39;enabled&#39;: False,</span>
+<span class="go">         &#39;encrypted_password&#39;: ...</span>
+<span class="go">         &#39;port&#39;: 22,</span>
+<span class="go">         &#39;secure&#39;: False,</span>
+<span class="go">         &#39;timeout&#39;: &#39;&#39;,</span>
+<span class="go">         &#39;username&#39;: &#39;&#39;}}</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="ysdevices.devprofile.YSDeviceProfile.check_reachability">
+<code class="descname">check_reachability</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.check_reachability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.check_reachability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the described device is currently accessible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – Dictionary of {&lt;method&gt;: {status: &lt;boolean&gt;, reason: &lt;string&gt;}}
+entries, plus the key ‘status’: &lt;boolean&gt; for the aggregate result.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.data_format">
+<em class="property">classmethod </em><code class="descname">data_format</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.data_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.data_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dict representation of possible profile data and its constraints.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>OrderedDict</em> –<p>of form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="n">label</span><span class="p">:</span> <span class="s1">&#39;Basic info&#39;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s1">&#39;profile_name&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">...</span>
+      <span class="p">},</span>
+      <span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+        <span class="n">required</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">...</span>
+      <span class="p">},</span>
+      <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="o">...</span> <span class="p">},</span>
+      <span class="o">...</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="s1">&#39;netconf&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="n">label</span><span class="p">:</span> <span class="s1">&#39;NETCONF&#39;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">YSDeviceProtocolPlugin.data_format()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.delete">
+<em class="property">classmethod </em><code class="descname">delete</code><span class="sig-paren">(</span><em>name</em>, <em>user=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the given profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Device name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> – (bool success/failure, str message)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysdevices.devprofile.YSDeviceProfile.dict">
+<code class="descname">dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation of this profile, suitable for saving.</p>
+<p>Note this includes the encrypted form of passwords, not the plaintext.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – <code class="docutils literal notranslate"><span class="pre">{'base':</span> <span class="pre">{</span> <span class="pre">base</span> <span class="pre">data</span> <span class="pre">},</span> <span class="pre">'netconf':</span> <span class="pre">{</span> <span class="pre">netconf</span> <span class="pre">data</span> <span class="pre">},</span> <span class="pre">etc.}</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.discover_plugins">
+<em class="property">classmethod </em><code class="descname">discover_plugins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.discover_plugins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.discover_plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically populate the <a class="reference internal" href="#ysdevices.devprofile.YSDeviceProfile.plugins" title="ysdevices.devprofile.YSDeviceProfile.plugins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plugins</span></code></a> dictionary.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.from_file">
+<em class="property">classmethod </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the given JSON file and read it into a YSDeviceProfile.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.from_xml">
+<em class="property">classmethod </em><code class="descname">from_xml</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the given legacy XML file and read into a YSDeviceProfile.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.get">
+<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the given profile if it exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Device profile name or slug</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">YSDeviceProfile</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ysdevices.devprofile.YSDeviceProfile.list">
+<em class="property">classmethod </em><code class="descname">list</code><span class="sig-paren">(</span><em>require_feature=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the sorted list of devices in the given directory.</p>
+<ol class="arabic simple">
+<li>TODO: This should take a user or context as an optional parameter,
+and filter to only include the devices available to said user
+if given.</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>require_feature</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – If specified, only list profiles that support
+the given feature, such as “netconf”.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of dicts <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">name,</span> <span class="pre">key:</span> <span class="pre">key_slug,</span> <span class="pre">description:</span> <span class="pre">desc}</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysdevices.devprofile.YSDeviceProfile.plugins">
+<code class="descname">plugins</code><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of known plugin classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysdevices.devprofile.YSDeviceProfile.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update this profile’s data with the given extra data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#ysdevices.devprofile.YSDeviceProfileValidationError" title="ysdevices.devprofile.YSDeviceProfileValidationError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">YSDeviceProfileValidationError</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysdevices.devprofile.YSDeviceProfile.upload">
+<code class="descname">upload</code><span class="sig-paren">(</span><em>device_key</em>, <em>file_info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.upload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save file associated to this device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Info needed to save file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysdevices.devprofile.YSDeviceProfile.write">
+<code class="descname">write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save this profile for later retrieval.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> – (bool success/failure, str message)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="ysdevices.devprofile.YSDeviceProfileValidationError">
+<em class="property">exception </em><code class="descclassname">ysdevices.devprofile.</code><code class="descname">YSDeviceProfileValidationError</code><span class="sig-paren">(</span><em>errors</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/devprofile.html#YSDeviceProfileValidationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.devprofile.YSDeviceProfileValidationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></p>
+<p>Exception raised when attempting to create or modify a YSDeviceProfile.</p>
+<p>Aggregates all errors encountered in initializing each parameter,
+similar to a Django Form.errors attribute.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysdevices.plugin.html" class="btn btn-neutral float-right" title="ysdevices.plugin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysdevices.apps.html" class="btn btn-neutral" title="ysdevices.apps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews and the other members of yang-suite-dev@cisco.com.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.8.0.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

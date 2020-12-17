@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.quickparser &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysfilemanager.scp_importer" href="ysfilemanager.scp_importer.html" />
+    <link rel="prev" title="ysfilemanager.apps" href="ysfilemanager.apps.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">yangsuite-filemanager developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="working_with_filemanager.html">Coding with yangsuite-filemanager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.filemanager.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.apps.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.apps</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.scp_importer.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.scp_importer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">yangsuite-filemanager developer documentation</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysfilemanager.quickparser.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysfilemanager.quickparser">
+<span id="ysfilemanager-quickparser"></span><h1><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code><a class="headerlink" href="#module-ysfilemanager.quickparser" title="Permalink to this headline">¶</a></h1>
+<p>Quick and dirty parsing of YANG files to extract module and dependency info.</p>
+<p>Heavily based on symd - at present symd itself doesn’t meet our needs for
+several reasons:</p>
+<ol class="arabic simple">
+<li>symd uses a global variable ‘G’ to store its network graph, which will
+of course not work in our multi-user environment</li>
+<li>symd automatically imports matplotlib, which is a pretty beefy package</li>
+<li>symd presumes output to console or file, rather than providing clean
+APIs for use as a library.</li>
+</ol>
+<p>In any case, we’re only actually using a very small subset of symd,
+so we can just implement our own version of that functionality here.</p>
+<p>Again, this is <em>quick and dirty</em> parsing focused on very basic information
+including module name and revision and imports/includes. If you want more
+thorough, more foolproof parsing, use pyang or something like it instead.</p>
+<p>This is NOT an attempt at implementing a full YANG parser like pyang,
+and there are known cases where it <em>will</em> fail:</p>
+<ul>
+<li><p class="first">YANG string concatenation - per the RFC, the following strings
+are all equivalent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hello</span>
+<span class="s2">&quot;hello&quot;</span>
+<span class="s1">&#39;hello&#39;</span>
+<span class="s2">&quot;hel&quot;</span> <span class="o">+</span> <span class="s2">&quot;lo&quot;</span>
+<span class="s1">&#39;hel&#39;</span> <span class="o">+</span> <span class="s2">&quot;lo&quot;</span>
+</pre></div>
+</div>
+<p>The regexps used here will handle variant quoting but <em>not</em> concats.</p>
+</li>
+<li><p class="first">Extra or missing line wraps - per the RFC, these are both valid:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="s2">&quot;foo&quot;</span> <span class="p">{</span>
+  <span class="kn">import</span> <span class="nn">bar</span> <span class="p">{</span>
+    <span class="n">prefix</span> <span class="n">bar</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">module</span>
+    <span class="s2">&quot;foo&quot;</span>
+<span class="p">{</span> <span class="kn">import</span> <span class="nn">bar</span> <span class="p">{</span> <span class="n">prefix</span> <span class="n">bar</span><span class="p">;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>but our regexps above only handle the former (albeit much more
+commonly seen) format.</p>
+</li>
+<li><p class="first">Comments - some modules (e.g., tailf-common) have comments that
+contain examples; since we’re doing line-by-line checking with no
+parser state machine, we don’t ignore the comment’s contents and may
+pick up the comment lines as part of the perceived schema.</p>
+</li>
+</ul>
+<dl class="data">
+<dt id="ysfilemanager.quickparser.AUGMENT_STATEMENT">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">AUGMENT_STATEMENT</code><em class="property"> = re.compile('^augment[ \t]+[&quot;\']?([-a-zA-Z0-9_.:/]+)[&quot;\']?[ \\t]*(?:;|\\{|$|\\+)')</em><a class="headerlink" href="#ysfilemanager.quickparser.AUGMENT_STATEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching the YANG ‘augment’ statement syntax.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.IDENTIFIER">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">IDENTIFIER</code><em class="property"> = '[&quot;\']?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;\']?'</em><a class="headerlink" href="#ysfilemanager.quickparser.IDENTIFIER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching YANG ‘identifier’ syntax w/ optional quoting.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.IMPORT_STATEMENT">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">IMPORT_STATEMENT</code><em class="property"> = re.compile('^import[ \t]+[&quot;\']?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;\']?[ \t]*(?:$|\\+|\\{[ \t]*(?:prefix[ \t]+[&quot;\']?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;\']?)?)')</em><a class="headerlink" href="#ysfilemanager.quickparser.IMPORT_STATEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching the YANG ‘import’ statement syntax.</p>
+<p>May include inline ‘prefix …’ substatement.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.INCLUDE_STATEMENT">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">INCLUDE_STATEMENT</code><em class="property"> = re.compile('^include[ \t]+[&quot;\']?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;\']?[ \\t]*(?:;|\\{|$|\\+)')</em><a class="headerlink" href="#ysfilemanager.quickparser.INCLUDE_STATEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching the YANG ‘include’ statement syntax.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.MODULE_STATEMENT">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">MODULE_STATEMENT</code><em class="property"> = re.compile('^(sub)?module[ \t]+[&quot;\']?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;\']?[ \\t]*(?:\\{|$|\\+)')</em><a class="headerlink" href="#ysfilemanager.quickparser.MODULE_STATEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching the YANG ‘module’ or ‘submodule’ syntax.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.PREFIX_IDENTIFIER_TOKEN">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">PREFIX_IDENTIFIER_TOKEN</code><em class="property"> = re.compile('([a-zA-Z_][-a-zA-Z0-9_.]*):([a-zA-Z_][-a-zA-Z0-9_.]*)')</em><a class="headerlink" href="#ysfilemanager.quickparser.PREFIX_IDENTIFIER_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching a prefixed identifier token.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ysfilemanager.quickparser.REVISION_STATEMENT">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">REVISION_STATEMENT</code><em class="property"> = re.compile('^revision[ \t]+[\'&quot;]?(\\d{4}-\\d{2}-\\d{2})[\'&quot;]?[ \\t]*(?:;|\\{|$|\\+)')</em><a class="headerlink" href="#ysfilemanager.quickparser.REVISION_STATEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression matching the YANG ‘revision’ statement syntax.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.quickparser.module_listing">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">module_listing</code><span class="sig-paren">(</span><em>filepaths</em>, <em>assume_correct_name=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/quickparser.html#module_listing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.quickparser.module_listing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of files, return a list of (name, revision) tuples.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filepaths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of .yang file paths, such as returned by
+<a class="reference internal" href="ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.list_yang_files" title="ysfilemanager.filemanager.utility.list_yang_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">list_yang_files()</span></code></a></li>
+<li><strong>assume_correct_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – See <a class="reference internal" href="#ysfilemanager.quickparser.name_and_revision_from_file" title="ysfilemanager.quickparser.name_and_revision_from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">name_and_revision_from_file()</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – [(name, rev, path), (name, rev, path), …]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.quickparser.name_and_revision_from_file">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">name_and_revision_from_file</code><span class="sig-paren">(</span><em>path</em>, <em>assume_correct_name=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/quickparser.html#name_and_revision_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.quickparser.name_and_revision_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quickly retrieve the module name and revision from a YANG file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to file to inspect</li>
+<li><strong>assume_correct_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, assume that <code class="docutils literal notranslate"><span class="pre">foo&#64;bar.yang</span></code> has
+already been confirmed to describe module ‘foo’ revision ‘bar’ and
+don’t bother (re)checking the file contents.
+If False, trust no-one!</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>tuple</em> – (name, revision). If the YANG file has no defined revision
+(acceptable per the RFC), then revision will be ‘unknown’.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#OSError" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code></a> – if the file does not exist</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – if unable to determine the name.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.quickparser.quick_parse">
+<code class="descclassname">ysfilemanager.quickparser.</code><code class="descname">quick_parse</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/quickparser.html#quick_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.quickparser.quick_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quickly parse a YANG file for info about it and its relation to others.</p>
+<p>See also <code class="xref py py-func docutils literal notranslate"><span class="pre">symd.parse_yang_module()</span></code></p>
+<p>As noted in the module docstring, this is NOT an attempt at implementing
+a full YANG parser like pyang, and there are known corner cases where it
+<em>will</em> fail. But it’s a lot less heavy than pyang.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – YANG file to attempt to parse.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – with keys:<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">name</span></code> - name of this module</li>
+<li><code class="docutils literal notranslate"><span class="pre">kind</span></code> - <code class="docutils literal notranslate"><span class="pre">'module'</span></code> or <code class="docutils literal notranslate"><span class="pre">'submodule'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">imports</span></code> - dict of {module: prefix} this imports</li>
+<li><code class="docutils literal notranslate"><span class="pre">includes</span></code> - list of submodules this includes</li>
+<li><code class="docutils literal notranslate"><span class="pre">revisions</span></code> - list of revisions declared in this module,
+in reverse chronological order</li>
+<li><code class="docutils literal notranslate"><span class="pre">augments</span></code> - list of modules this augments</li>
+<li><code class="docutils literal notranslate"><span class="pre">belongs-to</span></code> - if this is a submodule, the name of the parent module</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IOError</span></code></a> – if the file does not contain a ‘module’ statement</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysfilemanager.scp_importer.html" class="btn btn-neutral float-right" title="ysfilemanager.scp_importer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysfilemanager.apps.html" class="btn btn-neutral" title="ysfilemanager.apps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

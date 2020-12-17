@@ -1,0 +1,8 @@
+``ysyangtree.views.task``
+=========================
+
+.. automodule:: ysyangtree.views.task
+   :members:
+
+   .. autofunction:: save_task(request, jsondata)
+

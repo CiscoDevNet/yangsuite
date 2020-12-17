@@ -1,0 +1,143 @@
+YANG Suite developer documentation
+""""""""""""""""""""""""""""""""""
+
+Setting up a development environment
+====================================
+
+Since YANG Suite has a number of separate apps, it's generally easiest
+for developers to work from a baseline virtualenv install
+as described in the README.
+
+Running YANG Suite with your work-in-progress application code is as simple as
+installing the application workspace into your virtualenv in "editable" mode,
+then executing ``yangsuite``.
+
+Each YANG Suite plugin uses the `entry points`_ Python packaging feature to
+register for discovery by the yangsuite core application.
+For this feature to work, the plugin must provide a ``.egg-info`` directory
+containing metadata; this directory is normally included when installing
+the package.
+
+.. note::
+
+   *If and only if* your application is not installed into the virtualenv
+   at all (which may be the case when you're working on a new application,
+   but will likely **not** be the case if you're developing a fix or feature
+   for an existing application plugin), then you can make your application
+   discoverable by YANG Suite without actually installing it - just add your
+   application workspace into the ``$PYTHONPATH`` and execute
+   ``python setup.py build`` to create the ``.egg-info`` directory.
+
+   *This will not work if the application is already installed into your
+   virtualenv, as the virtualenv's installed packages ALWAYS take precedence
+   over anything in your ``$PYTHONPATH``.*
+
+What you will want to do is install your application into the virtualenv in
+what's called "editable" mode, which essentially makes it installed (so
+YANG suite can discover it) but lets the installation automatically reflect
+your ongoing changes to the workspace (not needing to manually re-install
+after each change you make). This is simple to do::
+
+  source $VIRTUALENV/bin/activate
+  cd $MY_APP_WORKSPACE
+  pip install --editable .
+
+Then simply start your YANG Suite server as usual::
+
+  $INSTALLED_YANGSUITE_DIR/start.sh
+
+or::
+
+  source $VIRTUALENV/bin/activate
+  yangsuite
+
+If your application does not show up, make sure your ``default_app_config`` is
+correctly set up in ``__init__.py``.
+
+If your changes require modifications to multiple applications, you can simply
+install each of them as editable following the same procedure as above.
+
+Design and style guidelines
+===========================
+
+Refer to :doc:`the design guidelines <design_guidelines>` for specifics.
+
+Creating a new application
+==========================
+
+If you're looking to create a new application plugin rather than working on
+an existing app or on ``yangsuite`` itself, refer to
+:doc:`the documentation on creating a new application from the provided template
+<create_new_application>`.
+
+Testing your work
+=================
+
+We use tox_, unittest2_, django-webtest_, and flake8_ to automate various tests.
+To run the whole test suite, you only need to install tox as it will
+handle the other dependencies; however if you plan to run individual
+tests you may need to manually install unittest2 and flake8 as well.
+
+::
+
+    pip install tox
+    # if you plan to run individual tests manually instead of through tox:
+    pip install unittest2 django-webtest flake8
+
+The configuration file is ``tox.ini`` if you need to make any changes.
+
+Run all tests, including checking compatibility with both Python 3.5 and
+Python 3.6, as well as static analysis, and report summary of code coverage::
+
+    tox
+
+After running the above, to view detailed code coverage in HTML format::
+
+    open htmlcov/index.html
+
+You can run individual tox "environments" with ``tox -e <envname>,<envname>``,
+for example::
+
+    # Run only code analysis
+    tox -e static_analysis
+    # Run tests under python 3.6 only and report resulting code coverage
+    tox -e py36,stats
+
+You can also run individual test operations as described below::
+
+
+    # Perform code analysis of a single file (you must have installed flake8)
+    flake8 yangsuite/urls.py
+    # Run all test scripts for this repository (must have installed unittest2)
+    PYTHONPATH=. python yangsuite/manage.py test
+    # Run a specific test script (you must have installed unittest2)
+    PYTHONPATH=. python yangsuite/manage.py test -p test_doctests.py
+
+Generating documentation
+========================
+
+You can generate HTML documentation based on these files plus the
+``yangsuite`` APIs as follows::
+
+    pip install sphinx
+    python setup.py build_sphinx -b html
+    open build/sphinx/html/index.html
+
+Jenkins CI
+==========
+
+Using Jenkins, Tox is also run periodically and as triggered by commits
+pushed to the wwwin-github repo. Status and results:
+https://engci-jenkins-sjc2.cisco.com/jenkins/job/team_yangsuite/
+
+Release process
+===============
+
+The :doc:`release process for new YANG Suite versions <release_process>` is
+documented separately.
+
+.. _tox: http://tox.readthedocs.io/en/latest/
+.. _unittest2: https://pypi.python.org/pypi/unittest2
+.. _django-webtest: https://pypi.python.org/pypi/django-webtest
+.. _flake8: http://flake8.readthedocs.io/en/latest/
+.. _`entry points`: https://setuptools.readthedocs.io/en/latest/pkg_resources.html#entry-points

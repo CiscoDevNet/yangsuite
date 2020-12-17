@@ -1,0 +1,35 @@
+Exploring YANG Models
+=====================
+
+For you to explore YANG, the YANG Suite server needs YANG files.
+Once you have `provided the files </help/ysfilemanager/create_repository/>`_
+and `defined a YANG module set </help/ysfilemanager/define_yangset/>`_
+using yangsuite-filemanager, you can then explore the structure of the models
+in the YANG set you have created.
+
+1. From the menu bar at the top of this page, select
+   `"Operations → Explore YANG" </yangtree/explore/>`_.
+2. Use the "Select a YANG set" menu to select the YANG set you wish to explore.
+3. Begin typing in the "Select YANG Module(s)" text box to
+   bring up a menu of modules in this YANG set corresponding to
+   what you have typed.
+4. From this menu, select the desired module(s), then select "Load module(s)."
+5. It may take a short time for YANG Suite to load the module(s),
+   depending on complexity of the module(s) and its dependencies.
+   When ready the root node(s) of the model(s) will appear below in a tree view.
+6. You can now explore the contents of the model(s) using the tree view.
+   Click on any node in the tree to view information about it.
+
+   .. image:: images/yangtree.png
+      :alt: Screenshot of tree view and node information
+
+7. If you want to see the plain text of a YANG module, you can right-click on
+   any node in the tree and select "View text of module" from the context menu.
+
+   .. image:: images/context-menu.png
+      :alt: Screenshot of context menu
+
+   A new window will open to display the module text.
+
+   .. image:: images/module-text.png
+      :alt: Screenshot of window displaying module text.

@@ -1,0 +1,4 @@
+``ysfilemanager.views.git_views``
+=================================
+
+.. automodule:: ysfilemanager.views.git_views

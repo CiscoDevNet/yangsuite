@@ -1,0 +1,4 @@
+``yangsuite.paths``
+===================
+
+.. automodule:: yangsuite.paths

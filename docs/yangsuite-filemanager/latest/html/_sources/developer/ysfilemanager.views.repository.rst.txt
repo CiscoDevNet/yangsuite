@@ -1,0 +1,4 @@
+``ysfilemanager.views.repository``
+==================================
+
+.. automodule:: ysfilemanager.views.repository

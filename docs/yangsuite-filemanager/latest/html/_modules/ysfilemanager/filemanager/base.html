@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.filemanager.base &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/index.html">yangsuite-filemanager developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysfilemanager.filemanager.base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysfilemanager.filemanager.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># _YSYangSetBase will be a subclass of pyang.repository if available:</span>
+    <span class="kn">from</span> <span class="nn">pyang</span> <span class="kn">import</span> <span class="n">Repository</span>
+
+    <span class="n">ReadError</span> <span class="o">=</span> <span class="n">Repository</span><span class="o">.</span><span class="n">ReadError</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># ...but if not, we can operate on our own just fine</span>
+    <span class="n">Repository</span> <span class="o">=</span> <span class="nb">object</span>
+
+    <span class="k">class</span> <span class="nc">ReadError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">..quickparser</span> <span class="kn">import</span> <span class="n">quick_parse</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_YSYangSetBase"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase">[docs]</a><span class="k">class</span> <span class="nc">_YSYangSetBase</span><span class="p">(</span><span class="n">Repository</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Repository containing a specific subset of YANG modules.</span>
+
+<span class="sd">    This is a private semi-abstract class - users should use one of the</span>
+<span class="sd">    following concrete subclasses:</span>
+
+<span class="sd">    - :class:`.YSYangRepository`</span>
+<span class="sd">    - :class:`.YSYangSet`</span>
+<span class="sd">    - :class:`.YSMutableYangSet`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># APIs required for the pyang.Repository interface</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="_YSYangSetBase.get_modules_and_revisions"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.get_modules_and_revisions">[docs]</a>    <span class="k">def</span> <span class="nf">get_modules_and_revisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the list of modules and revisions contained in this set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          ctx (YSContext): unused, but included in order to match the</span>
+<span class="sd">            :meth:`pyang.Repository.get_modules_and_revisions` API</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of tuples ``(modulename, revision, handle)``, where</span>
+<span class="sd">          ``handle`` is used in the call to :func:`get_module_from_handle` to</span>
+<span class="sd">          retrieve the module. In this implementation, ``handle`` is simply</span>
+<span class="sd">          the absolute file path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase.get_module_from_handle"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.get_module_from_handle">[docs]</a>    <span class="k">def</span> <span class="nf">get_module_from_handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the raw module text from the repository.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          handle (object): Key to locate the module (in this case, the</span>
+<span class="sd">            absolute file path)</span>
+<span class="sd">          *args: Ignored; for compatibility with pyang 1.7.6 and 1.7.7,</span>
+<span class="sd">            which add an extra parameter to this API.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          tuple: ``(ref, format, text)``</span>
+
+<span class="sd">          - ``ref`` is a string which is used to identify the source of</span>
+<span class="sd">            the text for the user, used in error messages. In this</span>
+<span class="sd">            implementation it is the absolute path.</span>
+<span class="sd">          - ``format`` is always &#39;yang&#39; at present</span>
+<span class="sd">          - ``text`` is the raw text data</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          ReadError: if the file cannot be read.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="n">ReadError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">ex</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;yang&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Additional public methods and properties</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">modules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a YANG set instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          owner (str): User owning this set definition</span>
+<span class="sd">          modules (list): List of [module, revision, absfilepath] lists</span>
+<span class="sd">            of interest.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_YSYangSetBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>    <span class="c1"># no-op at present</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">owner</span> <span class="o">=</span> <span class="n">owner</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore_mtime</span>
+        <span class="sd">&quot;&quot;&quot;Datetime when this instance&#39;s contents were last changed.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">datastore_mtime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Datetime when the underlying data store was last modified.</span>
+
+<span class="sd">        Will be None if there is no underlying data store.</span>
+
+<span class="sd">        If this time exists and is newer than ``self.mtime``, that means that</span>
+<span class="sd">        this instance has become stale (no longer in sync with the underlying</span>
+<span class="sd">        datastore) and hence ``is_stale`` will be True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_stale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Has the underlying data been modified since we were inited?&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore_mtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">datastore_mtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">datastore_mtime</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sorted list of (mod, rev, path) that this YSYangSet contains.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span>
+
+    <span class="nd">@modules</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;In this class just take what we&#39;re given.</span>
+
+<span class="sd">        Subclasses may override this method to provide sanitization and such.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+<div class="viewcode-block" id="_YSYangSetBase.module_path"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.module_path">[docs]</a>    <span class="k">def</span> <span class="nf">module_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulename</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the absolute path to the requested module.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          str: Absolute file path, or None if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">found_name</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">modulename</span><span class="p">:</span>
+                <span class="n">found_name</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">revision</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">rev</span> <span class="o">==</span> <span class="n">revision</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">found_name</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Found module </span><span class="si">%s</span><span class="s2"> but not revision </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">modulename</span><span class="p">,</span> <span class="n">revision</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Module </span><span class="si">%s</span><span class="s2"> not found in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">modulename</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">digraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rough approximation of inter-module dependencies within this set.</span>
+
+<span class="sd">        As noted in :func:`quick_parse`, this is a naive approach</span>
+<span class="sd">        focused on speed rather than accuracy; using a proper YANG parser</span>
+<span class="sd">        like :mod:`pyang` would be more accurate but much slower and more</span>
+<span class="sd">        costly in terms of memory consumption.</span>
+
+<span class="sd">        For more accurate results use a true YANG parser like :mod:`pyang`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          :class:`networkx.DiGraph`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_module_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span>
+
+<div class="viewcode-block" id="_YSYangSetBase.validate"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the modules included in this YANG set are complete.</span>
+
+<span class="sd">        Similar to but much less thorough than</span>
+<span class="sd">        :meth:`ysyangtree.YSContext.validate`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of dicts with keys &#39;name&#39;, &#39;revision&#39;,</span>
+<span class="sd">          &#39;in_yangset&#39;, &#39;found&#39;, &#39;usable&#39;, &#39;errors&#39;, &#39;warnings&#39; --</span>
+<span class="sd">          matching :meth:`ysyangtree.YSContext.validate`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dependencies</span><span class="p">()):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;revision&#39;</span><span class="p">:</span> <span class="n">rev</span><span class="p">,</span>
+                <span class="s1">&#39;found&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;in_yangset&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;usable&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s1">&#39;warnings&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;No information available&quot;</span><span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s1">&#39;found&#39;</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;in_yangset&#39;</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;usable&#39;</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;usable&#39;</span><span class="p">],</span>
+            <span class="p">})</span>
+
+            <span class="c1"># Add errors/warnings for things that we already know</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;Not found in YANG set or user repository&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]:</span>
+                <span class="c1"># Unreachable in YSYangSet but possible in YSMutableYangSet</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;Found in user repository but must be added &quot;</span>
+                    <span class="s2">&quot;to the YANG set.&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;usable&#39;</span><span class="p">]:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Error in parsing module&quot;</span><span class="p">)</span>
+            <span class="n">existing_prefixes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_unique_prefixes</span><span class="p">(</span>
+                <span class="n">existing_prefixes</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Now, check for derived errors</span>
+            <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">networkx</span><span class="o">.</span><span class="n">descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_unique_prefixes</span><span class="p">(</span>
+                    <span class="n">existing_prefixes</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;usable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                        <span class="c1"># Not in YSYangSet but possible in YSMutableYangSet</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="s2">&quot;Missing dependency </span><span class="si">{0}</span><span class="s2"> - possibly add </span><span class="si">{0}</span><span class="s2">@</span><span class="si">{1}</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot; from the repository?&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="s2">&quot;Dependency </span><span class="si">{0}</span><span class="s2">@</span><span class="si">{1}</span><span class="s2"> not found!&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">]))</span>
+
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase.extra_dependencies"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.extra_dependencies">[docs]</a>    <span class="k">def</span> <span class="nf">extra_dependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get modules that aren&#39;t in this YANG set but need to be.</span>
+
+<span class="sd">        These are mandatory dependencies - the modules in</span>
+<span class="sd">        this YANG set &#39;import&#39; or &#39;include&#39; these modules, and/or</span>
+<span class="sd">        the submodules in this YANG set &#39;belongs-to&#39; these modules,</span>
+<span class="sd">        and so the set is incomplete without access to them.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of ``(module, revision, path)`` (for modules found in the</span>
+<span class="sd">          repository) or ``(module, &quot;unknown&quot;, None)`` (for modules</span>
+<span class="sd">          altogether missing).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Module </span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2"> is not in the digraph&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># If it&#39;s in self.modules, it must be marked as such</span>
+            <span class="k">assert</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Module </span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2"> not found&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">dependencies</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;submodule&#39;</span><span class="p">:</span>
+                <span class="n">belongs_to</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">belongs_to</span><span class="p">:</span>
+                    <span class="n">dependencies</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">belongs_to</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">dependencies</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Checking </span><span class="si">%d</span><span class="s2"> dependencies of </span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                          <span class="nb">len</span><span class="p">(</span><span class="n">dependencies</span><span class="p">),</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">dependencies</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">dep</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Dependency </span><span class="si">%s</span><span class="s2"> is not in the yangset&quot;</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">dep</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">dep</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Missing dependencies for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase.modules_using"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.modules_using">[docs]</a>    <span class="k">def</span> <span class="nf">modules_using</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the set of known modules that import or include this module.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          module (str): Module name of interest.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          set: of module names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="p">:</span>
+            <span class="c1"># *Should* it be in the digraph?</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">module</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Module &quot;</span><span class="si">%s</span><span class="s1">&quot; in &quot;</span><span class="si">%s</span><span class="s1">&quot;.modules missing from digraph&#39;</span><span class="p">,</span>
+                          <span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">networkx</span><span class="o">.</span><span class="n">ancestors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase.modules_augmenting"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.modules_augmenting">[docs]</a>    <span class="k">def</span> <span class="nf">modules_augmenting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the set of known modules that augment this module.</span>
+
+<span class="sd">        This is a subset of the modules returned by :meth:`modules_using`,</span>
+<span class="sd">        and may overlap with the set returned by</span>
+<span class="sd">        :meth:`modules_deriving_identities_from`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          module (str): Module name of interest</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          set: of module names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules_using</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mod</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">users</span>
+                <span class="k">if</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">mod</span><span class="p">][</span><span class="s1">&#39;augments&#39;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase.modules_deriving_identities_from"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.modules_deriving_identities_from">[docs]</a>    <span class="k">def</span> <span class="nf">modules_deriving_identities_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the set of known modules that derive identities from the module.</span>
+
+<span class="sd">        This is a subset of the modules returned by :meth:`modules_using`,</span>
+<span class="sd">        and may overlap with the set returned by :meth:`modules_augmenting`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          module (str): Module name of interest</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          set: of module names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules_using</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mod</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">users</span>
+                <span class="k">if</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">mod</span><span class="p">][</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">]]</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Private and magic methods</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Equality test.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">owner</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;In python 3, defining __eq__ implies __ne__, but not in python 2.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;String representation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;YANG set owned by &#39;</span><span class="si">{0}</span><span class="s2">&#39; (</span><span class="si">{1}</span><span class="s2"> modules)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">))</span>
+
+    <span class="c1"># The below code is heavily based on symd; at present symd itself doesn&#39;t</span>
+    <span class="c1"># meet our needs for several reasons:</span>
+    <span class="c1"># 1) symd uses a global variable &#39;G&#39; to store its network graph, which will</span>
+    <span class="c1">#    of course not work in our multi-user environment</span>
+    <span class="c1"># 2) symd automatically imports matplotlib, which is a pretty beefy package</span>
+    <span class="c1"># 3) symd presumes output to console or file, rather than providing clean</span>
+    <span class="c1">#    APIs for use as a library.</span>
+    <span class="c1"># In any case, we&#39;re only actually using a very small subset of symd,</span>
+    <span class="c1"># so we can just implement our own version of that functionality here.</span>
+
+<div class="viewcode-block" id="_YSYangSetBase._get_module_graph"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase._get_module_graph">[docs]</a>    <span class="k">def</span> <span class="nf">_get_module_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">potential_modules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a NetworkX directed graph from the given files.</span>
+
+<span class="sd">        Creates a list of yang modules from the specified yang files and stores</span>
+<span class="sd">        them as nodes in a NetworkX directed graph. This function also stores</span>
+<span class="sd">        node attributes (list of imports, tag, revision, ...) for each module</span>
+<span class="sd">        in the NetworkX data structures.</span>
+
+<span class="sd">        See also :func:`symd.get_yang_modules`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          :class:`networkx.DiGraph`: constructed graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">yf</span> <span class="ow">in</span> <span class="n">potential_modules</span><span class="p">:</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s1">&#39;revision&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span>
+                <span class="s1">&#39;found&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">yf</span><span class="p">),</span>
+                <span class="s1">&#39;in_yangset&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">yf</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">,</span>
+                <span class="s1">&#39;usable&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;imports&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s1">&#39;includes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s1">&#39;augments&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s1">&#39;derives-identities-from&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">yf</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">quick_parse</span><span class="p">(</span><span class="n">yf</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ioe</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">ioe</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Mismatch between expected name (</span><span class="si">%s</span><span class="s2">) and &quot;</span>
+                            <span class="s2">&quot;name parsed from </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)?&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rev</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No revision specified for module &#39;</span><span class="si">%s</span><span class="s2">&#39;, file &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                          <span class="n">name</span><span class="p">,</span> <span class="n">yf</span><span class="p">)</span>
+                <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">attr</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;revision&#39;</span><span class="p">:</span> <span class="n">rev</span><span class="p">,</span>
+                <span class="s1">&#39;found&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;usable&#39;</span><span class="p">:</span> <span class="n">attr</span><span class="p">[</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;imports&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;includes&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;augments&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;augments&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;derives-identities-from&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">],</span>
+            <span class="p">})</span>
+
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;submodule&#39;</span><span class="p">:</span>
+                <span class="n">attr</span><span class="p">[</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Since our &#39;import/include&#39; statements do not have associated</span>
+            <span class="c1"># revisions (just module names), our graph nodes are just module</span>
+            <span class="c1"># names, not module@revision.</span>
+            <span class="c1">#</span>
+            <span class="c1"># If we have multiple revisions of a given module, the node&#39;s</span>
+            <span class="c1"># imports are just the superset of all revisions&#39; imports,</span>
+            <span class="c1"># and likewise for augments.</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">:</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">attr</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># Else, update existing node:</span>
+            <span class="n">en</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">en_rev</span> <span class="o">=</span> <span class="n">en</span><span class="p">[</span><span class="s1">&#39;revision&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">en_rev</span> <span class="ow">and</span> <span class="n">rev</span> <span class="ow">and</span> <span class="n">rev</span> <span class="o">&gt;</span> <span class="n">en_rev</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Replacing with newer revision for &quot;</span>
+                          <span class="s2">&quot;module &#39;</span><span class="si">%s</span><span class="s2">&#39; (&#39;</span><span class="si">%s</span><span class="s2">&#39; -&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;)&quot;</span><span class="p">,</span>
+                          <span class="n">name</span><span class="p">,</span> <span class="n">en_rev</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+                <span class="n">en</span><span class="p">[</span><span class="s1">&#39;revision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rev</span>
+                <span class="c1"># Let&#39;s keep the path of the newer revision as well</span>
+                <span class="n">en</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yf</span>
+
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">en</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]:</span>
+                <span class="c1"># Shouldn&#39;t happen, not sure what we should do?</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Module type mismatch for </span><span class="si">%s</span><span class="s2"> - &quot;</span>
+                            <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; has </span><span class="si">%s</span><span class="s2">, &#39;</span><span class="si">%s</span><span class="s2">&#39; has </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">],</span> <span class="n">en_rev</span><span class="p">,</span> <span class="n">en</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">])</span>
+
+            <span class="n">en</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Convert to set then back to list so we don&#39;t duplicate</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;includes&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;augments&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;derives-identities-from&#39;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">en</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">en</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+        <span class="c1"># Graph is now built for all modules in this set.</span>
+        <span class="c1"># Next, what about missing imports?</span>
+        <span class="c1"># See also symd.get_unknown_modules()</span>
+        <span class="n">unknown_attr</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="s1">&#39;module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;revision&#39;</span><span class="p">:</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;found&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;in_yangset&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;usable&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;imports&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;includes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;augments&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;derives-identities-from&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+            <span class="n">deps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;submodule&#39;</span><span class="p">:</span>
+                <span class="n">belongs_to</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">belongs_to</span><span class="p">:</span>
+                    <span class="n">deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">belongs_to</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Module &#39;</span><span class="si">%s</span><span class="s2">&#39;: depends on module &#39;</span><span class="si">%s</span><span class="s2">&#39; that &quot;</span>
+                              <span class="s2">&quot;was not scanned&quot;</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="o">**</span><span class="n">unknown_attr</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">]:</span>
+                        <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">dep</span><span class="p">][</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;submodule&#39;</span>
+                        <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">dep</span><span class="p">][</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># OK, now with found and missing modules, we should be able to</span>
+        <span class="c1"># construct the graph edges for a complete graph.</span>
+        <span class="c1"># See also symd.get_module_dependencies()</span>
+        <span class="k">for</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes_iter</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">][</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_name</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Shouldn&#39;t happen?</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Module &#39;</span><span class="si">%s</span><span class="s2">&#39;: imports unexpected module &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                              <span class="n">node_name</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">][</span><span class="s1">&#39;includes&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">:</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_name</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Shouldn&#39;t happen?</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Module &#39;</span><span class="si">%s</span><span class="s2">&#39;: includes unexpected module &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+                              <span class="n">node_name</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+
+        <span class="c1"># Sanity check</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">yf</span> <span class="ow">in</span> <span class="n">potential_modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Requested module &quot;</span><span class="si">%s</span><span class="s1">&quot; not added to digraph&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="_YSYangSetBase._check_unique_prefixes"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase._check_unique_prefixes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_unique_prefixes</span><span class="p">(</span><span class="n">existing_prefixes</span><span class="o">=</span><span class="p">{},</span> <span class="n">modules</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Verify that additional modules/prefixes don&#39;t collide with existing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          existing_prefixes (dict): map of ``{prefix: module}``.</span>
+<span class="sd">            Will be updated with additional unique prefixes from ``modules``.</span>
+<span class="sd">          modules (dict): map of ``{module: prefix}``</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of error messages, if any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">modules</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">existing_prefixes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span> <span class="o">!=</span> <span class="n">module</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s1">&#39;Prefix collision: This module or its dependencies import &#39;</span>
+                    <span class="s1">&#39;both &quot;</span><span class="si">{0}</span><span class="s1">&quot; and &quot;</span><span class="si">{1}</span><span class="s1">&quot; under the same prefix &quot;</span><span class="si">{2}</span><span class="s1">&quot;, but &#39;</span>
+                    <span class="s1">&#39;each prefix MUST uniquely identify a single module. &#39;</span>
+                    <span class="s1">&#39;One possible cause is using the wrong revision(s) of &#39;</span>
+                    <span class="s2">&quot;this module&#39;s dependencies.&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">existing_prefixes</span><span class="p">[</span><span class="n">prefix</span><span class="p">],</span> <span class="n">module</span><span class="p">,</span> <span class="n">prefix</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">existing_prefixes</span><span class="p">[</span><span class="n">prefix</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="k">return</span> <span class="n">errors</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

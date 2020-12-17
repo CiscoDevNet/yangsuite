@@ -1,0 +1,1124 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysdevices.plugin &mdash; yangsuite-devices 2.8.0.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yangsuite-devices
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">Device Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/index.html">ysdevices developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yangsuite-devices</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysdevices.plugin</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysdevices.plugin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">netmiko</span>
+<span class="kn">import</span> <span class="nn">pexpect</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">netmiko.ssh_dispatcher</span> <span class="kn">import</span> <span class="n">CLASS_MAPPER_BASE</span>
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">.devprofile</span> <span class="kn">import</span> <span class="n">YSDeviceProfile</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">encrypt_plaintext</span><span class="p">,</span> <span class="n">decrypt_ciphertext</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin">[docs]</a><span class="k">class</span> <span class="nc">YSDeviceProtocolPlugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class - subclasses extend YSDeviceProfile for various protocols.</span>
+
+<span class="sd">    A concrete subclass must provide values for :attr:`label` and :attr:`key`</span>
+<span class="sd">    and must at minimum implement :meth:`data_format`. It may optionally</span>
+<span class="sd">    implement :meth:`check_reachability` as well.</span>
+
+<span class="sd">    A subclass must override :meth:`update` and :meth:`dict` if any special</span>
+<span class="sd">    data transformation is required in these methods. A very common case is</span>
+<span class="sd">    where the plugin is storing a password - in this case, :meth:`dict` must</span>
+<span class="sd">    ensure that no plaintext password is exposed, and :meth:`update` must</span>
+<span class="sd">    be able to accept an encrypted password as input.</span>
+
+<span class="sd">    If any properties are inheritable from :class:`BasePlugin`, use the</span>
+<span class="sd">    :meth:`inheritable_property` property constructor as appropriate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Short name of this protocol/plugin, e.g. &quot;NETCONF&quot;.&quot;&quot;&quot;</span>
+
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Key where data belonging to this protocol is stored, e.g. &quot;netconf&quot;.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin.data_format"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin.data_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">data_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dictionary of data key to type / description / constraints.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          OrderedDict</span>
+
+<span class="sd">        For example::</span>
+
+<span class="sd">          {</span>
+<span class="sd">            &#39;username&#39;: {</span>
+<span class="sd">              &#39;type&#39;: &#39;string&#39;,</span>
+<span class="sd">              &#39;description&#39;: &#39;Username used to access the device via NETCONF&#39;,</span>
+<span class="sd">              &#39;minLength&#39;: 1,</span>
+<span class="sd">              &#39;maxLength&#39;: 50,</span>
+<span class="sd">            },</span>
+<span class="sd">            &#39;port&#39;: {</span>
+<span class="sd">              &#39;label&#39;: &#39;NETCONF port&#39;,</span>
+<span class="sd">              &#39;type&#39;: &#39;int&#39;,</span>
+<span class="sd">              &#39;description&#39;: &#39;Port number NETCONF listens on&#39;,</span>
+<span class="sd">              &#39;min&#39;: 0,</span>
+<span class="sd">              &#39;max&#39;: 65535,</span>
+<span class="sd">              &#39;default&#39;: 830,</span>
+<span class="sd">            },</span>
+<span class="sd">          }</span>
+
+<span class="sd">        Data dict keys that are currently understood:</span>
+
+<span class="sd">        label</span>
+<span class="sd">          Human-readable short label (if unspecified, will use the data key)</span>
+<span class="sd">        type</span>
+<span class="sd">          One of &#39;string&#39;, &#39;password&#39;, &#39;int&#39;, &#39;enum&#39;, &#39;boolean&#39;, &#39;float&#39;, or</span>
+<span class="sd">          &#39;dict&#39;</span>
+<span class="sd">        description</span>
+<span class="sd">          Verbose description of this item</span>
+<span class="sd">        default</span>
+<span class="sd">          Initial default value of this item</span>
+<span class="sd">        required</span>
+<span class="sd">          If True, this item is mandatory</span>
+<span class="sd">        choices</span>
+<span class="sd">          For an &#39;enum&#39;, a list of (value, label) tuples</span>
+<span class="sd">        min</span>
+<span class="sd">          Minimum value of an &#39;int&#39; or &#39;float&#39;</span>
+<span class="sd">        max</span>
+<span class="sd">          Maximum value of an &#39;int&#39; or &#39;float&#39;</span>
+<span class="sd">        step</span>
+<span class="sd">          Suggested increment value of an &#39;int&#39; or &#39;float&#39;</span>
+<span class="sd">        minLength</span>
+<span class="sd">          Minimum length of a &#39;string&#39; or &#39;password&#39;</span>
+<span class="sd">        maxLength</span>
+<span class="sd">          Maximum length of a &#39;string&#39; or &#39;password&#39;</span>
+<span class="sd">        keyLabel</span>
+<span class="sd">          Label for keys of a &#39;dict&#39;</span>
+<span class="sd">        valueLabel</span>
+<span class="sd">          Label for values of a &#39;dict&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate this plugin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          profile (YSDeviceProfile): instance owning this plugin instance.</span>
+<span class="sd">          data (dict): Data to initialize with.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profile</span> <span class="o">=</span> <span class="n">profile</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Don&#39;t report errors here, as the usual workflow from YSDeviceProfile</span>
+        <span class="c1"># is to init with empty data, then immediately call update() with the</span>
+        <span class="c1"># actual plugin data to be used.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin.update"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update this plugin&#39;s properties from the given data dictionary.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          dict: ``{key: &#39;error for this key&#39;, key2: &#39;another error&#39;, ...}``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="c1"># Value needs to be updated</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="c1"># Value needs to be initialized to default</span>
+                <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;default&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fmt</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;This is a required field&quot;</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">errors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;This is a required field&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="c1"># Unchanged, presume to still be valid</span>
+                <span class="k">continue</span>
+
+            <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Validate the proposed value</span>
+            <span class="k">if</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;min&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be at least </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="s1">&#39;max&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be at most </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be an integer&#39;</span>
+            <span class="k">elif</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;min&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be at least </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="s1">&#39;max&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]:</span>
+                        <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be at most </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be a number&#39;</span>
+            <span class="k">elif</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be a boolean value&#39;</span>
+            <span class="k">elif</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span>
+                <span class="n">valid_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_values</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be one of </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_values</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">value_key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                        <span class="n">result</span><span class="p">[</span><span class="n">value_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value_key</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">result</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Value must be a dictionary&#39;</span>
+            <span class="k">elif</span> <span class="n">fmt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;upload&#39;</span><span class="p">:</span>
+                <span class="c1"># Stores filename here but file may not exist yet</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># string / password</span>
+                <span class="k">if</span> <span class="s1">&#39;minLength&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;minLength&#39;</span><span class="p">]:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Value must be at least </span><span class="si">{0}</span><span class="s2"> characters long&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;minLength&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="s1">&#39;maxLength&#39;</span> <span class="ow">in</span> <span class="n">fmt</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;maxLength&#39;</span><span class="p">]:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Value must be no more than </span><span class="si">{0}</span><span class="s2"> characters long&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">[</span><span class="s1">&#39;maxLength&#39;</span><span class="p">]))</span>
+
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">error</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin.inheritable_property"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin.inheritable_property">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">inheritable_property</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">docstring</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a property which can be set or uses a base value if unset.</span>
+
+<span class="sd">        Helper method for setting up subclasses.</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">          The property name this is assigned to **MUST** match the base_name::</span>
+
+<span class="sd">            username = inheritable_property(&#39;username&#39;)  # correct</span>
+<span class="sd">            user = inheritable_property(&#39;username&#39;)      # INCORRECT</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          base_name (str): Name of property to inherit from profile.base if</span>
+<span class="sd">            this property is not explicitly set otherwise.</span>
+<span class="sd">          docstring (str): Docstring to attach to this property</span>
+
+<span class="sd">        Examples::</span>
+
+<span class="sd">          username = inheritable_property(&#39;username&#39;)</span>
+
+<span class="sd">          username = inheritable_property(&#39;username&#39;,</span>
+<span class="sd">            docstring=&quot;Login user. If unset, default to profile.base.username&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">base_name</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">base_name</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">base_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">base</span><span class="p">,</span> <span class="n">base_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="k">def</span> <span class="nf">_setter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">base_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getter</span><span class="p">,</span> <span class="n">_setter</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="n">docstring</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin.dict"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin.dict">[docs]</a>    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dictionary representation of this data, suitable for saving.</span>
+
+<span class="sd">        Note that any passwords must be encrypted!</span>
+
+<span class="sd">        At a minimum, any protocol plugin must provide key &#39;enabled&#39;,</span>
+<span class="sd">        a boolean indicating whether this protocol is enabled for this profile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="c1"># Report actual values, not inheritable_property values</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">key</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="YSDeviceProtocolPlugin.check_reachability"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.YSDeviceProtocolPlugin.check_reachability">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_reachability</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">devprofile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the given device is reachable using this protocol.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          devprofile (YSDeviceProfile): Device to check</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          tuple: (str label, bool success/failure, str message)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;check_reachability() is not implemented for plugin &quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span>
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">label</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="BasePlugin"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.BasePlugin">[docs]</a><span class="k">class</span> <span class="nc">BasePlugin</span><span class="p">(</span><span class="n">YSDeviceProtocolPlugin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base shared config of a device profile, plus ping connectivity check.&quot;&quot;&quot;</span>
+
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;General Info&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;base&quot;</span>
+    <span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="BasePlugin.data_format"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.BasePlugin.data_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">data_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;profile_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Profile Name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of this device profile&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;minLength&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Verbose description&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span>
+            <span class="s1">&#39;Address or hostname to use as default for all protocols&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Username used as default for all protocols&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;maxLength&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Password used as default for all protocols&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;maxLength&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span>
+            <span class="s1">&#39;Timeout (in seconds) as default for all protocols&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;variables&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Key/value pairs of data associated with device&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;keyLabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Variable Name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;valueLabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Value&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;certificate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;TLS Root Certificate&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;upload&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Root certificate authority.&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;clientcert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;TLS Client Certificate&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;upload&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Client certificate or chain of certificates&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;clientkey&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;TLS Client Key&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;upload&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Client privte key&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="BasePlugin.update"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.BasePlugin.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">extra_errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s1">&#39;password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;encrypted_password&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">decrypt_ciphertext</span><span class="p">(</span>
+                        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">],</span>
+                        <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">extra_errors</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_errors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">errors</span></div>
+
+<div class="viewcode-block" id="BasePlugin.dict"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.BasePlugin.dict">[docs]</a>    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encrypt_plaintext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="BasePlugin.check_reachability"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.BasePlugin.check_reachability">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_reachability</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">devprofile</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the described device is pingable.</span>
+
+<span class="sd">        Loosely based on https://stackoverflow.com/a/35625078/1281083</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          tuple: (&#39;ping&#39;, pingable, reason) where pingable is True or False,</span>
+<span class="sd">          and reason may be a string explaining any False result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ping parameters vary by OS</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;windows&quot;</span><span class="p">:</span>
+            <span class="n">ping_str</span> <span class="o">=</span> <span class="s2">&quot;-n 1&quot;</span>
+            <span class="n">need_shell</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ping_str</span> <span class="o">=</span> <span class="s2">&quot;-c 1&quot;</span>
+            <span class="n">need_shell</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;ping &#39;</span> <span class="o">+</span> <span class="n">ping_str</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">devprofile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">address</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Calling &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="n">subp</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span>
+                                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                                <span class="n">shell</span><span class="o">=</span><span class="n">need_shell</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">subp</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subp</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;ping&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO - parse output for cleaner detail?</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;ping&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="SshPlugin"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshPlugin">[docs]</a><span class="k">class</span> <span class="nc">SshPlugin</span><span class="p">(</span><span class="n">YSDeviceProtocolPlugin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SSH (Netmiko) params of a device profile plus SSH connectivity check.&quot;&quot;&quot;</span>
+
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;SSH&quot;</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;ssh&quot;</span>
+
+<div class="viewcode-block" id="SshPlugin.data_format"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshPlugin.data_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">data_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[(</span><span class="s1">&#39;cisco_enxr&#39;</span><span class="p">,</span> <span class="s1">&#39;cisco_enxr&#39;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s1">&#39;cisco_sdwan&#39;</span><span class="p">,</span> <span class="s1">&#39;cisco_sdwan&#39;</span><span class="p">)]</span> <span class="o">+</span>
+            <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">CLASS_MAPPER_BASE</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;enabled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Device allows SSH login&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;device_variant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Device variant&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;enum&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span>
+            <span class="s1">&#39;Value specifying platform-dependent behavior of netmiko&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="n">choices</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;generic_termserver&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Address or hostname to access via SSH&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;SSH Port&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Port number for SSH connection to device console&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="mi">65535</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;delay_factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Delay Factor&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s1">&#39;Multiplier for acceptable delays from the device. &#39;</span>
+                <span class="s1">&#39;Set to lower value for faster performance. &#39;</span>
+                <span class="s1">&#39;Set to higher value if timeout errors are seen.&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;step&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Username to access the device via SSH&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;minLength&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Password to access the device via SSH&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;minLength&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Timeout, in seconds, for SSH requests&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;secure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Use SSL Certificate&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="c1"># Inherit the following</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">YSDeviceProtocolPlugin</span><span class="o">.</span><span class="n">inheritable_property</span><span class="p">(</span>
+        <span class="s1">&#39;address&#39;</span><span class="p">,</span>
+        <span class="n">docstring</span><span class="o">=</span><span class="s2">&quot;Address for SSH access, if different from base address&quot;</span><span class="p">)</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">YSDeviceProtocolPlugin</span><span class="o">.</span><span class="n">inheritable_property</span><span class="p">(</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+        <span class="n">docstring</span><span class="o">=</span><span class="s2">&quot;SSH login username, if different from base username&quot;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">YSDeviceProtocolPlugin</span><span class="o">.</span><span class="n">inheritable_property</span><span class="p">(</span>
+        <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+        <span class="n">docstring</span><span class="o">=</span><span class="s2">&quot;SSH login password, if different from base password&quot;</span><span class="p">)</span>
+    <span class="n">timeout</span> <span class="o">=</span> <span class="n">YSDeviceProtocolPlugin</span><span class="o">.</span><span class="n">inheritable_property</span><span class="p">(</span>
+        <span class="s1">&#39;timeout&#39;</span><span class="p">,</span>
+        <span class="n">docstring</span><span class="o">=</span><span class="s2">&quot;SSH connection timeout in seconds, &quot;</span>
+        <span class="s2">&quot;if different from base timeout&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SshPlugin.update"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshPlugin.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;encrypted_password&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">decrypt_ciphertext</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">],</span>
+                    <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SshPlugin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SshPlugin.dict"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshPlugin.dict">[docs]</a>    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SshPlugin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encrypt_plaintext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_password</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="SshPlugin.check_reachability"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshPlugin.check_reachability">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_reachability</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">devprofile</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">ssh</span> <span class="o">=</span> <span class="n">SshSession</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">devprofile</span><span class="p">)</span>
+            <span class="n">is_connected</span> <span class="o">=</span> <span class="n">ssh</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">is_connected</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Connected successfully&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Not reachable&#39;</span>
+            <span class="n">ssh</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SSH&#39;</span><span class="p">,</span> <span class="n">is_connected</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;SSH check failed: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">devprofile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s1">&#39;generic_termserver&#39;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">You may need to properly specify the device variant&quot;</span>
+                        <span class="s2">&quot; rather than treating this as a generic device.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SSH&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">SshSession</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">devprofile</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SshSession"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession">[docs]</a><span class="k">class</span> <span class="nc">SshSession</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Session handling for SSH connections.&quot;&quot;&quot;</span>
+
+    <span class="n">instances</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="SshSession.get"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.get">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve or create an SSH session instance.</span>
+
+<span class="sd">        The key can be a string or a device profile.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          key (str): Device name or uses the base.profile_name as key.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          SshSession</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># accept device name or profile</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">YSDeviceProfile</span><span class="p">):</span>
+            <span class="n">dev_profile</span> <span class="o">=</span> <span class="n">YSDeviceProfile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dev_profile</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s1">&#39;cisco_enxr&#39;</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">SshEnxrSession</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">SshNetmikoSession</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SshSession.destroy"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.destroy">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the session instance from the cache.</span>
+
+<span class="sd">        The key can be a string or a device profile.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          key (str): Device name or uses the base.profile_name as key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">YSDeviceProfile</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span> <span class="o">=</span> <span class="n">YSDeviceProfile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True if session is connected.</span>
+
+<span class="sd">        ** Override this property in subclass. **</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="SshSession.send_config"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.send_config">[docs]</a>    <span class="k">def</span> <span class="nf">send_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI configuration command.</span>
+
+<span class="sd">        ** Override this function in subclass. **</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SshSession.send_exec"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.send_exec">[docs]</a>    <span class="k">def</span> <span class="nf">send_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI exec commmand.</span>
+
+<span class="sd">        ** Override this function in subclass. **</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SshSession.connect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connect to SSH device.</span>
+
+<span class="sd">        ** Override this function in subclass. **</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="SshSession.disconnect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshSession.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disconnect from SSH device.</span>
+
+<span class="sd">        ** Override this function in subclass. **</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Establish a session using a Context Manager.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gracefully close connection on Context Manager exit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SshNetmikoSession"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshNetmikoSession">[docs]</a><span class="k">class</span> <span class="nc">SshNetmikoSession</span><span class="p">(</span><span class="n">SshSession</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Basic wrapper class around Netmiko library.</span>
+
+<span class="sd">    https://github.com/ktbyers/netmiko</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s2">&quot;cisco_sdwan&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">netmiko_device</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;device_type&#39;</span><span class="p">:</span> <span class="s1">&#39;cisco_xe&#39;</span><span class="p">,</span>  <span class="c1"># Using IOS-XE netmiko class</span>
+                <span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="s1">&#39;global_delay_factor&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">delay_factor</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">netmiko_device</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;device_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span><span class="p">,</span>
+                <span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="s1">&#39;global_delay_factor&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">delay_factor</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">secure</span><span class="p">:</span>
+            <span class="n">user_device_path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;user_device_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">cert_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">user_device_path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">certificate</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cert_path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">netmiko_device</span><span class="p">[</span><span class="s2">&quot;use_keys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">netmiko_device</span><span class="p">[</span><span class="s2">&quot;key_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cert_path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;SSH: Certificate &quot;</span><span class="si">{0}</span><span class="s1">&quot; not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">certificate</span>
+                <span class="p">))</span>
+
+        <span class="c1"># Need both global_delay_factor set plus pass in delay_factor for send</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">delay_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return True if session is connected.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SshNetmikoSession.send_config"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshNetmikoSession.send_config">[docs]</a>    <span class="k">def</span> <span class="nf">send_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI configuration command.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">          kwargs (dict): Optional Netmiko arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s2">&quot;cisco_sdwan&quot;</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_config_set</span><span class="p">(</span>
+                    <span class="n">cmd</span><span class="p">,</span> <span class="n">exit_config_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">delay_factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span><span class="p">,</span>
+                    <span class="n">config_mode_command</span><span class="o">=</span><span class="s1">&#39;config-transaction&#39;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_config_set</span><span class="p">(</span>
+                    <span class="n">cmd</span><span class="p">,</span> <span class="n">delay_factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;Failed.*config.*mode&quot;</span><span class="p">,</span>
+                         <span class="n">exc</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Can happen if the delay_factor is too small for a slow device</span>
+                <span class="n">exc</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+                            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">You might need to increase the SSH &#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39;&quot;delay factor&quot; configured for this &#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39;device profile.&#39;</span><span class="p">,)</span>
+            <span class="k">raise</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s2">&quot;cisco_sdwan&quot;</span><span class="p">):</span>
+            <span class="c1"># SDWAN - need to send commit then explicitly exit config mode</span>
+            <span class="n">command_string</span> <span class="o">=</span> <span class="s2">&quot;commit&quot;</span>
+            <span class="n">error_marker</span> <span class="o">=</span> <span class="s2">&quot;Failed to&quot;</span>
+            <span class="n">alt_error_marker</span> <span class="o">=</span> <span class="s2">&quot;One or more commits have occurred from other&quot;</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">config_mode</span><span class="p">(</span><span class="n">config_command</span><span class="o">=</span><span class="s1">&#39;config-transaction&#39;</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_command_expect</span><span class="p">(</span>
+                <span class="n">command_string</span><span class="p">,</span>
+                <span class="n">strip_prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strip_command</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">delay_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">error_marker</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Commit failed with the &quot;</span> <span class="o">+</span>
+                    <span class="s2">&quot;following errors:</span><span class="se">\n\n</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">alt_error_marker</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                <span class="c1"># Other commits occurred, don&#39;t proceed with commit</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_command_timing</span><span class="p">(</span>
+                    <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="n">strip_prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">strip_command</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">delay_factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Commit failed with the &quot;</span> <span class="o">+</span>
+                    <span class="s2">&quot;following errors:</span><span class="se">\n\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="n">output</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">exit_config_mode</span><span class="p">(</span><span class="n">exit_config</span><span class="o">=</span><span class="s2">&quot;end&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">device_variant</span> <span class="o">==</span> <span class="s2">&quot;cisco_xr&quot;</span><span class="p">):</span>
+            <span class="c1"># IOS XR - need to send commit then explicitly exit config mode</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">exit_config_mode</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="SshNetmikoSession.send_exec"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshNetmikoSession.send_exec">[docs]</a>    <span class="k">def</span> <span class="nf">send_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI exec commmand.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">          kwargs (dict): Optional Netmiko arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">delay_factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delay_factor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SshNetmikoSession.connect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshNetmikoSession.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connect to Netmiko.&quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;SSH CONNECTION:</span><span class="se">\n</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">:</span><span class="si">{2}</span><span class="se">\n</span><span class="s2">user: </span><span class="si">{3}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">username</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="o">=</span> <span class="n">netmiko</span><span class="o">.</span><span class="n">ConnectHandler</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">netmiko_device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span></div>
+
+<div class="viewcode-block" id="SshNetmikoSession.disconnect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshNetmikoSession.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disconnect from Netmiko device.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="SshEnxrSession"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshEnxrSession">[docs]</a><span class="k">class</span> <span class="nc">SshEnxrSession</span><span class="p">(</span><span class="n">SshSession</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles calls to Cisco IOS XR EnXR simulator.</span>
+
+<span class="sd">    http://enwiki.cisco.com/EnXR</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return True if session is connected.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span>
+
+    <span class="nd">@connected</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_connected</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="n">is_connected</span>
+
+    <span class="k">def</span> <span class="nf">_flush_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Spawn a new pexpect between send calls.</span>
+
+<span class="sd">        The NETCONF plugin on same EnXR simulator uses a proxy executable.</span>
+<span class="sd">        When the NETCONF proxy is used, the CLI changes do not show up in</span>
+<span class="sd">        the pexpect pty unless it is closed and a new one is spawned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">spawn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spawn</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Using pexpect for all commands.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_flush_connection</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">before</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span>
+        <span class="k">except</span> <span class="n">pexpect</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;EVxR CLI failed </span><span class="si">%s</span><span class="se">\n\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">,</span>
+                       <span class="n">cmd</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s1">&#39;Command TIMEOUT&#39;</span>
+
+<div class="viewcode-block" id="SshEnxrSession.send_config"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshEnxrSession.send_config">[docs]</a>    <span class="k">def</span> <span class="nf">send_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI configuration command.</span>
+
+<span class="sd">        If command does not start with &quot;conf&quot;, that will be prepended.</span>
+<span class="sd">        If command does not end in &quot;commit end&quot; it will be appended.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">          kwargs (dict): Optional arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;conf&#39;</span><span class="p">):</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;conf</span><span class="se">\r\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">cmd</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cmd</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;commit&#39;</span><span class="p">):</span>
+                <span class="n">cmd</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">commit</span><span class="se">\r\n</span><span class="s1">end</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">end</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SshEnxrSession.send_exec"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshEnxrSession.send_exec">[docs]</a>    <span class="k">def</span> <span class="nf">send_exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send any CLI exec commmand.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cmd (str): Configuration CLI command.</span>
+<span class="sd">          kwargs (dict): Optional arguments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (str): CLI response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SshEnxrSession.connect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshEnxrSession.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connect to EnXR.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          kwargs (dict):</span>
+<span class="sd">            spawn (str): Spawn parameter for pexpect (default &quot;exec&quot;).</span>
+<span class="sd">            prompt (str): Expect parameter for pexpect (default &quot;:ios#&quot;).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          (bool): True if connection is successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spawn</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">,</span> <span class="s1">&#39;exec&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;prompt&#39;</span><span class="p">,</span> <span class="s1">&#39;:ios#&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">pexpect</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spawn</span><span class="p">)</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="k">except</span> <span class="n">pexpect</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;EnXR connect failed </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;EnXR connect failed </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span></div>
+
+<div class="viewcode-block" id="SshEnxrSession.disconnect"><a class="viewcode-back" href="../../developer/ysdevices.plugin.html#ysdevices.plugin.SshEnxrSession.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Disconnect from EnXR.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          (bool): True if disconnect is successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;EnXR disconnect failed </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">dev_profile</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews and the other members of yang-suite-dev@cisco.com.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'2.8.0.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

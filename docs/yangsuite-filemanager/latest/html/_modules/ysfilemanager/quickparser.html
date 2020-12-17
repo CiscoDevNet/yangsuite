@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.quickparser &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/index.html">yangsuite-filemanager developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysfilemanager.quickparser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysfilemanager.quickparser</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Quick and dirty parsing of YANG files to extract module and dependency info.</span>
+
+<span class="sd">Heavily based on symd - at present symd itself doesn&#39;t meet our needs for</span>
+<span class="sd">several reasons:</span>
+
+<span class="sd">1. symd uses a global variable &#39;G&#39; to store its network graph, which will</span>
+<span class="sd">   of course not work in our multi-user environment</span>
+<span class="sd">2. symd automatically imports matplotlib, which is a pretty beefy package</span>
+<span class="sd">3. symd presumes output to console or file, rather than providing clean</span>
+<span class="sd">   APIs for use as a library.</span>
+
+<span class="sd">In any case, we&#39;re only actually using a very small subset of symd,</span>
+<span class="sd">so we can just implement our own version of that functionality here.</span>
+
+<span class="sd">Again, this is *quick and dirty* parsing focused on very basic information</span>
+<span class="sd">including module name and revision and imports/includes. If you want more</span>
+<span class="sd">thorough, more foolproof parsing, use pyang or something like it instead.</span>
+
+<span class="sd">This is NOT an attempt at implementing a full YANG parser like pyang,</span>
+<span class="sd">and there are known cases where it *will* fail:</span>
+
+<span class="sd">- YANG string concatenation - per the RFC, the following strings</span>
+<span class="sd">  are all equivalent::</span>
+
+<span class="sd">      hello</span>
+<span class="sd">      &quot;hello&quot;</span>
+<span class="sd">      &#39;hello&#39;</span>
+<span class="sd">      &quot;hel&quot; + &quot;lo&quot;</span>
+<span class="sd">      &#39;hel&#39; + &quot;lo&quot;</span>
+
+<span class="sd">  The regexps used here will handle variant quoting but *not* concats.</span>
+
+<span class="sd">- Extra or missing line wraps - per the RFC, these are both valid::</span>
+
+<span class="sd">      module &quot;foo&quot; {</span>
+<span class="sd">        import bar {</span>
+<span class="sd">          prefix bar;</span>
+<span class="sd">        }</span>
+<span class="sd">      }</span>
+
+<span class="sd">      module</span>
+<span class="sd">          &quot;foo&quot;</span>
+<span class="sd">      { import bar { prefix bar; } }</span>
+
+<span class="sd">  but our regexps above only handle the former (albeit much more</span>
+<span class="sd">  commonly seen) format.</span>
+
+<span class="sd">- Comments - some modules (e.g., tailf-common) have comments that</span>
+<span class="sd">  contain examples; since we&#39;re doing line-by-line checking with no</span>
+<span class="sd">  parser state machine, we don&#39;t ignore the comment&#39;s contents and may</span>
+<span class="sd">  pick up the comment lines as part of the perceived schema.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="name_and_revision_from_file"><a class="viewcode-back" href="../../developer/ysfilemanager.quickparser.html#ysfilemanager.quickparser.name_and_revision_from_file">[docs]</a><span class="k">def</span> <span class="nf">name_and_revision_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">assume_correct_name</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Quickly retrieve the module name and revision from a YANG file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      path (str): Path to file to inspect</span>
+<span class="sd">      assume_correct_name (bool): If True, assume that ``foo@bar.yang`` has</span>
+<span class="sd">        already been confirmed to describe module &#39;foo&#39; revision &#39;bar&#39; and</span>
+<span class="sd">        don&#39;t bother (re)checking the file contents.</span>
+<span class="sd">        If False, trust no-one!</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      tuple: (name, revision). If the YANG file has no defined revision</span>
+<span class="sd">      (acceptable per the RFC), then revision will be &#39;unknown&#39;.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      OSError: if the file does not exist</span>
+<span class="sd">      ValueError: if unable to determine the name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EINVAL</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EINVAL</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rev</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">assume_correct_name</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Checking contents of </span><span class="si">%s</span><span class="s2"> to find module name/revision&quot;</span><span class="p">,</span>
+                  <span class="n">path</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># quick_parse will either return name and revs or raise an error</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">quick_parse</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">rev</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Error in parsing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="c1"># fallthrough</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="c1"># assume_correct_name == True, or quick_parse failed.</span>
+        <span class="c1"># Either way, fall back to checking filename.</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="o">!=</span> <span class="s1">&#39;.yang&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">{0}</span><span class="s2">&#39; is probably not a YANG file?&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+        <span class="c1"># Hope file is correctly named as name[@revision].yang</span>
+        <span class="k">if</span> <span class="s1">&#39;@&#39;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">rev</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">rev</span> <span class="o">=</span> <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="module_listing"><a class="viewcode-back" href="../../developer/ysfilemanager.quickparser.html#ysfilemanager.quickparser.module_listing">[docs]</a><span class="k">def</span> <span class="nf">module_listing</span><span class="p">(</span><span class="n">filepaths</span><span class="p">,</span> <span class="n">assume_correct_name</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given a list of files, return a list of (name, revision) tuples.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      filepaths (list): List of .yang file paths, such as returned by</span>
+<span class="sd">        :func:`.list_yang_files`</span>
+<span class="sd">      assume_correct_name (bool): See :func:`name_and_revision_from_file`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      list: [(name, rev, path), (name, rev, path), ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">filepaths</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Skipping non-file &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">rev</span> <span class="o">=</span> <span class="n">name_and_revision_from_file</span><span class="p">(</span>
+            <span class="n">filepath</span><span class="p">,</span> <span class="n">assume_correct_name</span><span class="o">=</span><span class="n">assume_correct_name</span><span class="p">)</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">filepath</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># Regular expressions for NAIVE, QUICK and DIRTY parsing of YANG files</span>
+<span class="c1">#</span>
+
+<span class="n">IDENTIFIER</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;[&quot;&#39;]?([a-zA-Z_][-a-zA-Z0-9_.]*)[&quot;&#39;]?&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching YANG &#39;identifier&#39; syntax w/ optional quoting.&quot;&quot;&quot;</span>
+
+<span class="n">_SUBSTMT_MAND</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;[ \t]*(?:\{|$|\+)&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;End of a YANG statement with at least one mandatory sub-statement.&quot;&quot;&quot;</span>
+
+<span class="n">_SUBSTMT_OPT</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;[ \t]*(?:;|\{|$|\+)&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;End of a YANG statement with optional but no mandatory sub-statements.&quot;&quot;&quot;</span>
+
+<span class="n">_SUBSTMT_NONE</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;[ \t]*(?:;|$)&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;End of a YANG statement with no sub-statements allowed.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;module&#39; has mandatory sub-statements</span>
+<span class="n">MODULE_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^(sub)?module[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span> <span class="n">_SUBSTMT_MAND</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching the YANG &#39;module&#39; or &#39;submodule&#39; syntax.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;revision&#39; has only optional sub-statements</span>
+<span class="n">REVISION_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^revision[ \t]+[&#39;&quot;]?(\d{4}-\d{2}-\d{2})[&#39;&quot;]?&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">_SUBSTMT_OPT</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching the YANG &#39;revision&#39; statement syntax.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;import&#39; has mandatory sub-statement</span>
+<span class="n">IMPORT_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^import[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span>
+    <span class="sd">&#39;&#39;&#39;[ \t]*(?:$|\+|\{[ \t]*(?:prefix[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span> <span class="s2">&quot;)?)&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching the YANG &#39;import&#39; statement syntax.</span>
+
+<span class="sd">May include inline &#39;prefix ...&#39; substatement.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;prefix&#39; has no sub-statements</span>
+<span class="n">PREFIX_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^prefix[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span><span class="p">)</span>   <span class="c1"># TODO: + _SUBSTMT_NONE ?</span>
+
+<span class="c1"># &#39;include&#39; has only optional sub-statements</span>
+<span class="n">INCLUDE_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^include[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span> <span class="n">_SUBSTMT_OPT</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching the YANG &#39;include&#39; statement syntax.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;augment&#39; has only optional sub-statements</span>
+<span class="n">AUGMENT_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^augment[ \t]+[&quot;&#39;]?([-a-zA-Z0-9_.:/]+)[&quot;&#39;]?&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">_SUBSTMT_OPT</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching the YANG &#39;augment&#39; statement syntax.&quot;&quot;&quot;</span>
+
+<span class="n">PREFIX_IDENTIFIER_TOKEN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;([a-zA-Z_][-a-zA-Z0-9_.]*):([a-zA-Z_][-a-zA-Z0-9_.]*)&#39;&#39;&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Regular expression matching a prefixed identifier token.&quot;&quot;&quot;</span>
+
+<span class="c1"># &#39;belongs-to&#39; has mandatory &#39;prefix&#39; sub-statement</span>
+<span class="n">BELONGS_TO_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^belongs-to[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span> <span class="n">_SUBSTMT_MAND</span><span class="p">)</span>
+
+<span class="c1"># &#39;identity&#39; has only optional sub-statements</span>
+<span class="n">IDENTITY_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^identity[ \t]+&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">IDENTIFIER</span> <span class="o">+</span> <span class="n">_SUBSTMT_OPT</span><span class="p">)</span>
+
+<span class="c1"># &#39;base&#39; has no sub-statements</span>
+<span class="n">BASE_STATEMENT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sd">&#39;&#39;&#39;^base[ \t]+[&quot;&#39;]?([-a-zA-Z0-9_.:]+)[&quot;&#39;]?&#39;&#39;&#39;</span> <span class="o">+</span> <span class="n">_SUBSTMT_NONE</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="quick_parse"><a class="viewcode-back" href="../../developer/ysfilemanager.quickparser.html#ysfilemanager.quickparser.quick_parse">[docs]</a><span class="k">def</span> <span class="nf">quick_parse</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Quickly parse a YANG file for info about it and its relation to others.</span>
+
+<span class="sd">    See also :func:`symd.parse_yang_module`</span>
+
+<span class="sd">    As noted in the module docstring, this is NOT an attempt at implementing</span>
+<span class="sd">    a full YANG parser like pyang, and there are known corner cases where it</span>
+<span class="sd">    *will* fail. But it&#39;s a lot less heavy than pyang.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      path (str): YANG file to attempt to parse.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      dict: with keys:</span>
+
+<span class="sd">      - ``name`` - name of this module</span>
+<span class="sd">      - ``kind`` - ``&#39;module&#39;`` or ``&#39;submodule&#39;``</span>
+<span class="sd">      - ``imports`` - dict of {module: prefix} this imports</span>
+<span class="sd">      - ``includes`` - list of submodules this includes</span>
+<span class="sd">      - ``revisions`` - list of revisions declared in this module,</span>
+<span class="sd">        in reverse chronological order</span>
+<span class="sd">      - ``augments`` - list of modules this augments</span>
+<span class="sd">      - ``belongs-to`` - if this is a submodule, the name of the parent module</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      IOError: if the file does not contain a &#39;module&#39; statement</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;kind&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;imports&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">&#39;includes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;revisions&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;augments&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+        <span class="s1">&#39;belongs-to&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s1">&#39;derives-identities-from&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="n">import_prefixes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">import_unknown_prefixes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">readahead</span><span class="p">():</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># Note that we do character checks (quick!) before</span>
+            <span class="c1"># regexp matching (slow!)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="c1"># Any chance of &#39;module&#39; or &#39;submodule&#39;?</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;ms&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">MODULE_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;sub&#39;</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;submodule&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;module&#39;</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;i&#39;</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">IMPORT_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="c1"># In tailf-common, there&#39;s some example code in a comment</span>
+                    <span class="c1"># with &#39;import x&#39; that we falsely pick up. There shouldn&#39;t</span>
+                    <span class="c1"># be a real module named &#39;x&#39; in any case.</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">][</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="c1"># Can we determine the prefix we assign to the import?</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                        <span class="c1"># Inline prefix statement (import foo { prefix bar })</span>
+                        <span class="n">import_prefixes</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">][</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Prefix statement is probably on next line:</span>
+                        <span class="n">line2</span> <span class="o">=</span> <span class="n">readahead</span><span class="p">()</span>
+                        <span class="n">match2</span> <span class="o">=</span> <span class="n">PREFIX_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line2</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">match2</span><span class="p">:</span>
+                            <span class="n">import_prefixes</span><span class="p">[</span><span class="n">match2</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">][</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">match2</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">import_unknown_prefixes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="k">continue</span>
+
+                <span class="n">match</span> <span class="o">=</span> <span class="n">INCLUDE_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="c1"># In CISCO-FIREWALL-TC, there&#39;s a line of text in a</span>
+                    <span class="c1"># description that is simply &quot;include them.&quot;.</span>
+                    <span class="c1"># Don&#39;t be fooled by this.</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;them.&quot;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="k">continue</span>
+
+                <span class="n">match</span> <span class="o">=</span> <span class="n">IDENTITY_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="c1"># Base statement is *usually* on the next line:</span>
+                    <span class="n">line2</span> <span class="o">=</span> <span class="n">readahead</span><span class="p">()</span>
+                    <span class="n">match2</span> <span class="o">=</span> <span class="n">BASE_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line2</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">match2</span><span class="p">:</span>
+                        <span class="c1"># Is it a prefixed base?</span>
+                        <span class="n">match3</span> <span class="o">=</span> <span class="n">PREFIX_IDENTIFIER_TOKEN</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">match2</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">match3</span><span class="p">:</span>
+                            <span class="n">pfx</span> <span class="o">=</span> <span class="n">match3</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">import_prefixes</span><span class="p">:</span>
+                                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                    <span class="n">import_prefixes</span><span class="p">[</span><span class="n">pfx</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                                    <span class="n">import_unknown_prefixes</span><span class="p">)</span>
+                    <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">REVISION_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">AUGMENT_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">augment_target</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="c1"># Examples:</span>
+                    <span class="c1"># /ocif:interfaces/ocif:interface/lag:aggregation</span>
+                    <span class="c1"># /ocif:interfaces/ocif:interface/eth:ethernet</span>
+                    <span class="k">for</span> <span class="n">pfx</span><span class="p">,</span> <span class="n">ident</span> <span class="ow">in</span> <span class="n">PREFIX_IDENTIFIER_TOKEN</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                            <span class="n">augment_target</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">pfx</span> <span class="ow">in</span> <span class="n">import_prefixes</span><span class="p">:</span>
+                            <span class="c1"># We know we augment this module</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;augments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">import_prefixes</span><span class="p">[</span><span class="n">pfx</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Augmenting a module we can&#39;t determine,</span>
+                            <span class="c1"># so flag all the modules we aren&#39;t sure about</span>
+                            <span class="c1"># as possible augment targets</span>
+                            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;augments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">import_unknown_prefixes</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span> <span class="ow">and</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;submodule&#39;</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">BELONGS_TO_STATEMENT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;belongs-to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;No module statement found in </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">]:</span>
+        <span class="c1"># pyang reports &#39;unknown&#39; rather than None for no revision found.</span>
+        <span class="c1"># Would prefer None but it&#39;s easier to follow their lead.</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;unknown&#39;</span><span class="p">]</span>
+
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;includes&#39;</span><span class="p">])</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;augments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;augments&#39;</span><span class="p">])</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;revisions&#39;</span><span class="p">])))</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

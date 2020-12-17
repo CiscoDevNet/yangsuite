@@ -1,0 +1,730 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysdevices.devprofile &mdash; yangsuite-devices 2.8.0.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yangsuite-devices
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">Device Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/index.html">ysdevices developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yangsuite-devices</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysdevices.devprofile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysdevices.devprofile</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">iter_entry_points</span>
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_path</span><span class="p">,</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">encrypt_plaintext</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="YSDeviceProfileValidationError"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfileValidationError">[docs]</a><span class="k">class</span> <span class="nc">YSDeviceProfileValidationError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when attempting to create or modify a YSDeviceProfile.</span>
+
+<span class="sd">    Aggregates all errors encountered in initializing each parameter,</span>
+<span class="sd">    similar to a Django Form.errors attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="n">errors</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YSDeviceProfileValidationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="YSDeviceProfile"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile">[docs]</a><span class="k">class</span> <span class="nc">YSDeviceProfile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Representation of a targeted device and properties related to its usage.</span>
+
+<span class="sd">    Per-protocol properties are defined by protocol-specific plugins, accessed</span>
+<span class="sd">    as instance property ``&lt;instance&gt;.&lt;protocol&gt;``. If data is provided for</span>
+<span class="sd">    an undefined plugin, the raw data will be accessible as</span>
+<span class="sd">    ``&lt;instance&gt;.extra_data[&lt;protocol&gt;]``. :mod:`ysdevices.plugin` provides the</span>
+<span class="sd">    abstract class :class:`~ysdevices.plugin.YSDeviceProtocolPlugin` and a</span>
+<span class="sd">    &quot;base functionality&quot; plugin, :class:`~ysdevices.plugin.BasePlugin`,</span>
+<span class="sd">    while all other plugins are optional.</span>
+
+<span class="sd">    Properties are individually readable by name, and the entire profile</span>
+<span class="sd">    can be converted back to a data dictionary by calling :meth:`dict`.</span>
+<span class="sd">    Changes can be validated and applied by calling :meth:`update`.</span>
+
+<span class="sd">    Examples::</span>
+
+<span class="sd">      &gt;&gt;&gt; data = {&#39;base&#39;: {&#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="sd">      ... &#39;description&#39;: &#39;&#39;, &#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="sd">      ... &#39;username&#39;: &#39;admin&#39;, &#39;password&#39;: &#39;foo&#39;, &#39;timeout&#39;: &#39;30&#39;},</span>
+<span class="sd">      ... &#39;mystery&#39;: {&#39;port&#39;: 8080}}</span>
+<span class="sd">      &gt;&gt;&gt; profile = YSDeviceProfile(data=data)</span>
+<span class="sd">      &gt;&gt;&gt; profile.base.profile_name</span>
+<span class="sd">      &#39;n9k-110&#39;</span>
+<span class="sd">      &gt;&gt;&gt; profile.base.timeout</span>
+<span class="sd">      30</span>
+<span class="sd">      &gt;&gt;&gt; profile.extra_data</span>
+<span class="sd">      {&#39;mystery&#39;: {&#39;port&#39;: 8080}}</span>
+<span class="sd">      &gt;&gt;&gt; str(profile)</span>
+<span class="sd">      &#39;Device profile &quot;n9k-110&quot;&#39;</span>
+<span class="sd">      &gt;&gt;&gt; import pprint</span>
+<span class="sd">      &gt;&gt;&gt; pprint.pprint(profile.base.dict())  # doctest: +ELLIPSIS</span>
+<span class="sd">      {&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="sd">       &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="sd">       &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="sd">       &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="sd">       &#39;description&#39;: &#39;&#39;,</span>
+<span class="sd">       &#39;encrypted_password&#39;: ...</span>
+<span class="sd">       &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="sd">       &#39;timeout&#39;: 30,</span>
+<span class="sd">       &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="sd">       &#39;variables&#39;: {}}</span>
+<span class="sd">      &gt;&gt;&gt; pprint.pprint(profile.dict())  # doctest: +ELLIPSIS</span>
+<span class="sd">      {&#39;base&#39;: {&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="sd">                &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;description&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;encrypted_password&#39;: ...</span>
+<span class="sd">                &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="sd">                &#39;timeout&#39;: 30,</span>
+<span class="sd">                &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="sd">                &#39;variables&#39;: {}},</span>
+<span class="sd">       &#39;mystery&#39;: {&#39;port&#39;: 8080},</span>
+<span class="sd">       &#39;ssh&#39;: {&#39;address&#39;: &#39;&#39;,</span>
+<span class="sd">               &#39;delay_factor&#39;: 1.0,</span>
+<span class="sd">               &#39;device_variant&#39;: &#39;generic_termserver&#39;,</span>
+<span class="sd">               &#39;enabled&#39;: False,</span>
+<span class="sd">               &#39;encrypted_password&#39;: ...</span>
+<span class="sd">               &#39;port&#39;: 22,</span>
+<span class="sd">               &#39;secure&#39;: False,</span>
+<span class="sd">               &#39;timeout&#39;: &#39;&#39;,</span>
+<span class="sd">               &#39;username&#39;: &#39;&#39;}}</span>
+<span class="sd">      &gt;&gt;&gt; profile.update({&#39;base&#39;: {&#39;profile_name&#39;: &#39;&#39;}})</span>
+<span class="sd">      ... # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">      ... # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">      Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">      YSDeviceProfileValidationError:</span>
+<span class="sd">      {&#39;base&#39;: {&#39;profile_name&#39;: &#39;This is a required field&#39;}}</span>
+<span class="sd">      &gt;&gt;&gt; profile2 = YSDeviceProfile(data=profile.dict())</span>
+<span class="sd">      &gt;&gt;&gt; pprint.pprint(profile2.dict())  # doctest: +ELLIPSIS</span>
+<span class="sd">      {&#39;base&#39;: {&#39;address&#39;: &#39;10.122.84.110&#39;,</span>
+<span class="sd">                &#39;certificate&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;clientcert&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;clientkey&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;description&#39;: &#39;&#39;,</span>
+<span class="sd">                &#39;encrypted_password&#39;: ...</span>
+<span class="sd">                &#39;profile_name&#39;: &#39;n9k-110&#39;,</span>
+<span class="sd">                &#39;timeout&#39;: 30,</span>
+<span class="sd">                &#39;username&#39;: &#39;admin&#39;,</span>
+<span class="sd">                &#39;variables&#39;: {}},</span>
+<span class="sd">       &#39;mystery&#39;: {&#39;port&#39;: 8080},</span>
+<span class="sd">       &#39;ssh&#39;: {&#39;address&#39;: &#39;&#39;,</span>
+<span class="sd">               &#39;delay_factor&#39;: 1.0,</span>
+<span class="sd">               &#39;device_variant&#39;: &#39;generic_termserver&#39;,</span>
+<span class="sd">               &#39;enabled&#39;: False,</span>
+<span class="sd">               &#39;encrypted_password&#39;: ...</span>
+<span class="sd">               &#39;port&#39;: 22,</span>
+<span class="sd">               &#39;secure&#39;: False,</span>
+<span class="sd">               &#39;timeout&#39;: &#39;&#39;,</span>
+<span class="sd">               &#39;username&#39;: &#39;&#39;}}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="YSDeviceProfile.list"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.list">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">require_feature</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the sorted list of devices in the given directory.</span>
+
+<span class="sd">        1) TODO: This should take a user or context as an optional parameter,</span>
+<span class="sd">           and filter to only include the devices available to said user</span>
+<span class="sd">           if given.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          require_feature (str): If specified, only list profiles that support</span>
+<span class="sd">            the given feature, such as &quot;netconf&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of dicts ``{name: name, key: key_slug, description: desc}``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;devices_dir&#39;</span><span class="p">)</span>
+        <span class="n">dev_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.devprofile&quot;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;profile_name&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">require_feature</span> <span class="ow">and</span> <span class="n">require_feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Skipping </span><span class="si">%s</span><span class="s2">; it doesn&#39;t support </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                                  <span class="n">name</span><span class="p">,</span> <span class="n">require_feature</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">description</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">dev_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span>
+                                     <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">})</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                    <span class="n">dev_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span>
+                                     <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;(an error occurred while &#39;</span>
+                                     <span class="s1">&#39;reading this profile)&#39;</span><span class="p">})</span>
+            <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.xml&quot;</span><span class="p">:</span>  <span class="c1"># Legacy format</span>
+                <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;desc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">dev_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span>
+                                 <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">})</span>
+        <span class="n">dev_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Device profile list (filter: </span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">require_feature</span><span class="p">,</span> <span class="n">dev_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dev_list</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.get"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.get">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load the given profile if it exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          name (str): Device profile name or slug</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          YSDeviceProfile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">legacy_profile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;devices_dir&#39;</span><span class="p">),</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.xml&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.from_file"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the given JSON file and read it into a YSDeviceProfile.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">file_path</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;devicekey&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]:</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;clientcert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;devicekey&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.from_xml"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.from_xml">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open the given legacy XML file and read into a YSDeviceProfile.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">file_path</span><span class="p">)</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">device_profile</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">parse_bool_str</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;XML lets a boolean be &#39;true&#39;, &#39;false&#39;, &#39;0&#39;, or &#39;1&#39;.</span>
+
+<span class="sd">            Furthermore, Jinja2 represents a python bool as &#39;True&#39; or &#39;False&#39;</span>
+<span class="sd">            when writing XML. Sigh.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">              string (str): XML value string to parse</span>
+<span class="sd">            Returns:</span>
+<span class="sd">              bool: True or False</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="ow">or</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span> <span class="ow">or</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;false&#39;</span> <span class="ow">or</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;False&#39;</span> <span class="ow">or</span> <span class="n">string</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unexpected truth value &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">device_profile</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;profile&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;profile_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_profile</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;desc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">device_info</span> <span class="o">=</span> <span class="n">device_profile</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;device-info&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># not defined in XML profile, use default</span>
+        <span class="n">encpwd</span> <span class="o">=</span> <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encpwd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encpwd</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pwd</span> <span class="o">=</span> <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encrypt_plaintext</span><span class="p">(</span>
+                <span class="n">pwd</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">])</span>
+
+        <span class="n">netconf</span> <span class="o">=</span> <span class="n">device_profile</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;netconf&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;enabled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_bool_str</span><span class="p">(</span><span class="n">netconf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">))</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;device_variant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;platform&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;port&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">netconf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;port&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ignore_keys&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;ignore_keys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_bool_str</span><span class="p">(</span>
+                <span class="n">device_info</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;ignore_keys&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netconf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">netconf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">encpwd</span> <span class="o">=</span> <span class="n">netconf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encpwd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encpwd</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pwd</span> <span class="o">=</span> <span class="n">netconf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;encrypted_password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">encrypt_plaintext</span><span class="p">(</span>
+                <span class="n">pwd</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;netconf&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.delete"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.delete">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete the given profile.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          name (str): Device name</span>
+<span class="sd">        Returns:</span>
+<span class="sd">          tuple: (bool success/failure, str message)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">legacy_profile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;devices_dir&#39;</span><span class="p">),</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.xml&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">profile</span><span class="p">):</span>
+            <span class="n">cert_removed</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">devprofile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+            <span class="n">certificate</span> <span class="o">=</span> <span class="n">devprofile</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;certificate&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">clientcert</span> <span class="o">=</span> <span class="n">devprofile</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;clientcert&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">clientkey</span> <span class="o">=</span> <span class="n">devprofile</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;clientkey&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">certificate</span> <span class="ow">and</span> <span class="n">user</span><span class="p">:</span>
+                <span class="n">user_device_path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span>
+                    <span class="s1">&#39;user_devices_dir&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">user</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                      <span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">certificate</span><span class="p">)):</span>
+                    <span class="n">cert_removed</span> <span class="o">=</span> <span class="s1">&#39; Certificate &quot;</span><span class="si">{0}</span><span class="s1">&quot; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">certificate</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">certificate</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                      <span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">clientcert</span><span class="p">)):</span>
+                    <span class="n">cert_removed</span> <span class="o">=</span> <span class="s1">&#39; Certificate &quot;</span><span class="si">{0}</span><span class="s1">&quot; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">clientcert</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">clientcert</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                      <span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">clientkey</span><span class="p">)):</span>
+                    <span class="n">cert_removed</span> <span class="o">=</span> <span class="s1">&#39; Certificate &quot;</span><span class="si">{0}</span><span class="s1">&quot; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">clientkey</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_device_path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">clientkey</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Profile &quot;</span><span class="si">{0}</span><span class="s1">&quot; </span><span class="si">{1}</span><span class="s1">deleted&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">cert_removed</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Profile &quot;</span><span class="si">{0}</span><span class="s1">&quot; deleted&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;No such profile &quot;</span><span class="si">{0}</span><span class="s1">&quot; found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.write"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save this profile for later retrieval.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          tuple: (bool success/failure, str message)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Profile has no defined name&quot;</span><span class="p">)</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict</span><span class="p">(),</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">legacy_profile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;devices_dir&#39;</span><span class="p">),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span> <span class="o">+</span> <span class="s1">&#39;.xml&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Deleting legacy profile file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">legacy_profile</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">legacy_profile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Profile &quot;</span><span class="si">{0}</span><span class="s1">&quot; saved&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">))</span></div>
+
+    <span class="n">_plugins</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate a YSDeviceProfile with the given data dictionary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">YSDeviceProfileValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Device profile &quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">profile_name</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plugins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dictionary of known plugin classes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">discover_plugins</span><span class="p">()</span>
+
+<div class="viewcode-block" id="YSDeviceProfile.discover_plugins"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.discover_plugins">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">discover_plugins</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dynamically populate the :attr:`plugins` dictionary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">entry_point</span> <span class="ow">in</span> <span class="n">iter_entry_points</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s1">&#39;ysdevices.plugins&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">plugin</span> <span class="o">=</span> <span class="n">entry_point</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span><span class="p">[</span><span class="n">entry_point</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">plugin</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in loading device plugin </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                              <span class="n">entry_point</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.dict"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.dict">[docs]</a>    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dictionary representation of this profile, suitable for saving.</span>
+
+<span class="sd">        Note this includes the encrypted form of passwords, not the plaintext.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          dict: ``{&#39;base&#39;: { base data }, &#39;netconf&#39;: { netconf data }, etc.}``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Add in dict representations of each plugin&#39;s data</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+
+        <span class="c1"># Add back in any pre-existing opaque data we don&#39;t understand.</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.update"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update this profile&#39;s data with the given extra data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          YSDeviceProfileValidationError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values_dict</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values_dict</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Unknown data, probably from a no-longer-installed plugin.</span>
+                <span class="c1"># Preserve it in case the plugin is later re-installed.</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_data</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">extra_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">extra_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">error</span> <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">YSDeviceProfileValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.upload"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_key</span><span class="p">,</span> <span class="n">file_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save file associated to this device.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          file_info (dict): Info needed to save file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">):</span>
+            <span class="n">device_path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;user_devices_dir&#39;</span><span class="p">,</span>
+                                   <span class="n">user</span><span class="o">=</span><span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">device_path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;devices_dir&#39;</span><span class="p">)</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">replace</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_replace&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_data&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">YSDeviceProfileValidationError</span><span class="p">(</span><span class="s2">&quot;No filename for upload&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">YSDeviceProfileValidationError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is an empty file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">and</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">device_path</span><span class="p">,</span>
+                                           <span class="n">device_key</span><span class="p">,</span>
+                                           <span class="n">replace</span><span class="p">)):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Certificate &quot;</span><span class="si">{0}</span><span class="s1">&quot; replaced with &quot;</span><span class="si">{1}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">replace</span><span class="p">,</span>
+                    <span class="n">filename</span>
+                <span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">device_path</span><span class="p">,</span>
+                                       <span class="n">device_key</span><span class="p">,</span>
+                                       <span class="n">replace</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">device_path</span><span class="p">,</span> <span class="n">device_key</span><span class="p">)):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">device_path</span><span class="p">,</span> <span class="n">device_key</span><span class="p">))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">device_path</span><span class="p">,</span>
+                                   <span class="n">device_key</span><span class="p">,</span>
+                                   <span class="n">filename</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.data_format"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.data_format">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">data_format</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dict representation of possible profile data and its constraints.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          OrderedDict: of form::</span>
+
+<span class="sd">            {</span>
+<span class="sd">              &#39;base&#39;: {</span>
+<span class="sd">                label: &#39;Basic info&#39;,</span>
+<span class="sd">                data: {</span>
+<span class="sd">                  &#39;profile_name&#39;: {</span>
+<span class="sd">                    type: &#39;string&#39;,</span>
+<span class="sd">                    required: True,</span>
+<span class="sd">                    ...</span>
+<span class="sd">                  },</span>
+<span class="sd">                  &#39;address&#39;: {</span>
+<span class="sd">                    type: &#39;string&#39;,</span>
+<span class="sd">                    required: True,</span>
+<span class="sd">                    ...</span>
+<span class="sd">                  },</span>
+<span class="sd">                  &#39;username&#39;: { ... },</span>
+<span class="sd">                  ...</span>
+<span class="sd">                }</span>
+<span class="sd">              },</span>
+<span class="sd">              &#39;netconf&#39;: {</span>
+<span class="sd">                label: &#39;NETCONF&#39;,</span>
+<span class="sd">                data: { ... }</span>
+<span class="sd">              },</span>
+<span class="sd">              ...</span>
+<span class="sd">            }</span>
+
+<span class="sd">        .. seealso:: :meth:`YSDeviceProtocolPlugin.data_format`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">discover_plugins</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">plugin</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">plugin</span><span class="o">.</span><span class="n">data_format</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="YSDeviceProfile.check_reachability"><a class="viewcode-back" href="../../developer/ysdevices.devprofile.html#ysdevices.devprofile.YSDeviceProfile.check_reachability">[docs]</a>    <span class="k">def</span> <span class="nf">check_reachability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether the described device is currently accessible.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          dict: Dictionary of {&lt;method&gt;: {status: &lt;boolean&gt;, reason: &lt;string&gt;}}</span>
+<span class="sd">          entries, plus the key &#39;status&#39;: &lt;boolean&gt; for the aggregate result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span>
+                                                       <span class="s1">&#39;enabled&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">check_reachability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No reachability check for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;reason&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reason</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">method</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Result: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>   <span class="c1"># pragma: no cover</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews and the other members of yang-suite-dev@cisco.com.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'2.8.0.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

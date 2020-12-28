@@ -1,0 +1,49 @@
+FROM ubuntu:18.04
+
+ARG PY=python3.6
+ARG PY_VER=3.6
+ARG YS_DIST=/usr/local/lib/python${PY_VER}/dist-packages/yangsuite
+ARG USERNAME=ysadmin
+ARG PASSWORD=superysadmin
+ARG EMAIL=ysadmin@cisco.com
+
+# Install required packages and remove the apt packages cache when done
+RUN apt-get update && \
+    apt-get install -y \
+        git \
+        openssh-client \
+        iputils-ping \
+        python3.6 \
+        python3-pip \
+        sqlite3 \
+        vim \
+        && \
+    apt-get clean && \
+    rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip setuptools
+RUN mkdir -p /yangsuite/uwsgi
+COPY *.whl /yangsuite/
+COPY uwsgi.ini /yangsuite/
+COPY migrate_and_start.sh /yangsuite/
+RUN cd /yangsuite
+RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade /yangsuite/*.whl uwsgi
+COPY wsgi.py ${YS_DIST}
+RUN mkdir /ys-data
+RUN mkdir /ys-static
+ENV YS_DOCKER_BUILD=true
+ENV DJANGO_SECRET_KEY=05_)-+2+*hm6=%39!qom7l!$!f6d1jws6lp_5q8n=%nmm7*lux
+
+RUN yangsuite --save-settings --configure-only \
+    --allowed-hosts localhost \
+    --static-root /ys-static \
+    --data-path /ys-data \
+    --settings-module yangsuite.settings.production
+
+# RUN cd ${YS_DIST} && \
+#   ${PY} manage.py collectstatic --noinput --settings=yangsuite.settings.production && \
+#   ${PY} manage.py makemigrations --settings=yangsuite.settings.production && \
+#   ${PY} manage.py migrate --settings=yangsuite.settings.production
+
+# RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('${USERNAME}', '${EMAIL}', '${PASSWORD}')" | ${PY} ${YS_DIST}/manage.py shell --settings=yangsuite.settings.production

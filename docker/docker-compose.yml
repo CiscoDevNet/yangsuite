@@ -1,14 +1,48 @@
 version: '3'
-
 services:
-  yangsuite:
-    build: .
-    restart: always
-    ports:
-      - "8480:8480"
-    environment:
-      - MEDIA_ROOT=/ys-data
-      - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
-    volumes:
-      - ./data:/ys-data
-    command: /setuser.sh
+    yangsuite:
+        image: yangsuite:latest
+        build:
+          context: ./yangsuite
+        environment:
+          - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
+          - MEDIA_ROOT=/ys-data/
+          - STATIC_ROOT=/ys-static/
+          - DJANGO_ALLOWED_HOSTS=localhost
+        command: /yangsuite/migrate_and_start.sh
+        volumes:
+          - static-content:/ys-static
+          - uwsgi:/yangsuite/uwsgi
+          - ys-data:/ys-data
+    backup:
+      image: backup:latest
+      build:
+        context: ./backup
+      command: ['/code/run_cron.sh']
+      depends_on:
+        - yangsuite
+      environment:
+        - DATA_DIR=/ysdata
+        - CRON_EXP=${YS_BACKUP_CRON:-*/30 * * * *}
+        - NO_BACKUP=${YS_NO_BACKUP:-false}
+        - MAX_BACKUP=${YS_MAX_BACKUP:-2}
+      volumes:
+        - ${YS_DATA_DIR:-./ys-data}:/ysdata
+        - ${YS_BACKUP_DIR:-./ys-backup}:/backup
+    nginx:
+      build:
+        context: ./nginx
+      image: nginx:latest
+      depends_on:
+        - yangsuite
+      volumes:
+        - static-content:/etc/nginx/html
+        - uwsgi:/var/run/uwsgi
+        - ys-data:/ys-data
+      ports:
+        - "80:80"
+
+volumes:
+    static-content:
+    uwsgi:
+    ys-data:

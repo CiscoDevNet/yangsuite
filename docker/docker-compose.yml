@@ -1,0 +1,51 @@
+version: '3'
+services:
+    yangsuite:
+        image: yangsuite:latest
+        build:
+          context: ./yangsuite
+        environment:
+          - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
+          - MEDIA_ROOT=/ys-data/
+          - STATIC_ROOT=/ys-static/
+          - DJANGO_ALLOWED_HOSTS=localhost
+          # Be sure and change admin/superuser before build or after you login
+          - YS_ADMIN_USER=admin
+          - YS_ADMIN_EMAIL=admin@cisco.com
+          - YS_ADMIN_PASS=superuser
+        command: /yangsuite/migrate_and_start.sh
+        volumes:
+          - static-content:/ys-static
+          - uwsgi:/yangsuite/uwsgi
+          - ./ys-data:/ys-data
+    nginx:
+      image: nginx:latest
+      build:
+        context: ./nginx
+      depends_on:
+        - yangsuite
+      volumes:
+        - static-content:/etc/nginx/html
+        - uwsgi:/var/run/uwsgi
+        - ./ys-data:/ys-data
+      ports:
+        - "80:80"
+    backup:
+      image: backup:latest
+      build:
+        context: ./backup
+      command: ['/code/run_cron.sh']
+      depends_on:
+        - yangsuite
+      environment:
+        - DATA_DIR=/ysdata
+        - CRON_EXP=${YS_BACKUP_CRON:-*/30 * * * *}
+        - NO_BACKUP=${YS_NO_BACKUP:-false}
+        - MAX_BACKUP=${YS_MAX_BACKUP:-2}
+      volumes:
+        - ./ys-data:/ysdata
+        - ./ys-backup:/backup
+volumes:
+    static-content:
+    uwsgi:
+

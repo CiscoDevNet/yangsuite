@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Exploring YANG Models &mdash; yangsuite-yangtree 1.19.1.post0.dev3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysyangtree developer documentation" href="../developer/index.html" />
+    <link rel="prev" title="Working with YANG Models" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-yangtree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.19.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Working with YANG Models</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Exploring YANG Models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/index.html">ysyangtree developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-yangtree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Working with YANG Models</a> &raquo;</li>
+        
+      <li>Exploring YANG Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/user/explore.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="exploring-yang-models">
+<h1>Exploring YANG Models<a class="headerlink" href="#exploring-yang-models" title="Permalink to this headline">¶</a></h1>
+<p>For you to explore YANG, the YANG Suite server needs YANG files.
+Once you have <a class="reference external" href="/help/ysfilemanager/create_repository/">provided the files</a>
+and <a class="reference external" href="/help/ysfilemanager/define_yangset/">defined a YANG module set</a>
+using yangsuite-filemanager, you can then explore the structure of the models
+in the YANG set you have created.</p>
+<ol class="arabic">
+<li><p class="first">From the menu bar at the top of this page, select
+<a class="reference external" href="/yangtree/explore/">“Operations → Explore YANG”</a>.</p>
+</li>
+<li><p class="first">Use the “Select a YANG set” menu to select the YANG set you wish to explore.</p>
+</li>
+<li><p class="first">Begin typing in the “Select YANG Module(s)” text box to
+bring up a menu of modules in this YANG set corresponding to
+what you have typed.</p>
+</li>
+<li><p class="first">From this menu, select the desired module(s), then select “Load module(s).”</p>
+</li>
+<li><p class="first">It may take a short time for YANG Suite to load the module(s),
+depending on complexity of the module(s) and its dependencies.
+When ready the root node(s) of the model(s) will appear below in a tree view.</p>
+</li>
+<li><p class="first">You can now explore the contents of the model(s) using the tree view.
+Click on any node in the tree to view information about it.</p>
+<img alt="Screenshot of tree view and node information" src="../_images/yangtree.png" />
+</li>
+<li><p class="first">If you want to see the plain text of a YANG module, you can right-click on
+any node in the tree and select “View text of module” from the context menu.</p>
+<img alt="Screenshot of context menu" src="../_images/context-menu.png" />
+<p>A new window will open to display the module text.</p>
+<img alt="Screenshot of window displaying module text." src="../_images/module-text.png" />
+</li>
+</ol>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../developer/index.html" class="btn btn-neutral float-right" title="ysyangtree developer documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Working with YANG Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.19.1.post0.dev3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

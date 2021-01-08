@@ -1,0 +1,16 @@
+``ysfilemanager.filemanager``
+=============================
+
+.. toctree::
+  :maxdepth: 2
+  :caption: Submodules:
+
+  ysfilemanager.filemanager.base
+  ysfilemanager.filemanager.dir_repository
+  ysfilemanager.filemanager.repository
+  ysfilemanager.filemanager.yangset
+  ysfilemanager.filemanager.mutableyangset
+  ysfilemanager.filemanager.utility
+
+.. automodule:: ysfilemanager.filemanager
+  :no-members:

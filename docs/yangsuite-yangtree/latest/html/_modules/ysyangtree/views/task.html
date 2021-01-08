@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysyangtree.views.task &mdash; yangsuite-yangtree 1.19.1.post0.dev3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yangsuite-yangtree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.19.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">Working with YANG Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/index.html">ysyangtree developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yangsuite-yangtree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysyangtree.views.task</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysyangtree.views.task</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Task handling Django APIs for all transports.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.views.decorators</span> <span class="kn">import</span> <span class="n">staff_member_required</span>
+<span class="kn">from</span> <span class="nn">yangsuite.paths</span> <span class="kn">import</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">yangsuite.logs</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">TaskException</span><span class="p">,</span> <span class="n">TaskHandler</span><span class="p">,</span> <span class="n">set_replay_path</span><span class="p">,</span> <span class="n">reset_replay_path</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">check_replays_subdir</span><span class="p">,</span> <span class="n">check_default_replay_dir</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">json_request</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="nd">@login_required</span>
+<span class="nd">@json_request</span>
+<span class="k">def</span> <span class="nf">save_task</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">jsondata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save a collection of task objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      request (django.http.HttpRequest): HTTP request</span>
+<span class="sd">      jsondata (dict): Parsed from request.body, with expected keys:</span>
+
+<span class="sd">        - name (str): Name of task</span>
+<span class="sd">        - description (str): Description of task</span>
+<span class="sd">        - category (str): User defined category</span>
+<span class="sd">        - autogenerated (bool): Whether this is an auto-generated replay or</span>
+<span class="sd">          a manually constructed one.</span>
+<span class="sd">        - devices (list): Devices this task was tested on</span>
+<span class="sd">        - images (list): Images this task was tested on</span>
+<span class="sd">        - segments (dict): All information needed to form multiple RPCs</span>
+<span class="sd">        - overwrite (bool): Whether to overwrite an existing replay if any.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">category</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                            <span class="n">reason</span><span class="o">=</span><span class="s1">&#39;Missing mandatory parameter&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">jsondata</span><span class="p">)</span><span class="o">.</span><span class="n">save_task</span><span class="p">(</span>
+            <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;overwrite&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">)},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+
+<span class="nd">@login_required</span>
+<span class="nd">@json_request</span>
+<span class="k">def</span> <span class="nf">edit_task</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">jsondata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Edit an existing task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      request (django.http.HttpRequest): HTTP request</span>
+
+<span class="sd">        - name (str): Name of task</span>
+<span class="sd">        - newName (str): New name of task</span>
+<span class="sd">        - description (str): Description of task</span>
+<span class="sd">        - devices (list): Devices this task was tested on</span>
+<span class="sd">        - category (str): User defined category</span>
+<span class="sd">        - newCat (str): New category</span>
+<span class="sd">        - images (list): Images this task was tested on</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">new_name</span> <span class="o">=</span> <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;newName&#39;</span><span class="p">)</span>
+    <span class="n">new_category</span> <span class="o">=</span> <span class="n">jsondata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;newCat&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">jsondata</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">edit_task</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span> <span class="n">new_category</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">)},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="del_task"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.del_task">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">del_task</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete task.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name (str): Name of task to delete</span>
+<span class="sd">      names[] (str): List of tasks to delete</span>
+<span class="sd">      category (str): Category containing all task(s) to delete</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;names[]&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s1">&#39;No category specified&#39;</span><span class="p">)</span>
+
+    <span class="n">tasks_deleted</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_exc</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">dict</span><span class="p">())</span><span class="o">.</span><span class="n">del_task</span><span class="p">()</span>
+            <span class="n">tasks_deleted</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">last_exc</span> <span class="o">=</span> <span class="n">e</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tasks_deleted</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">last_exc</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="n">tasks_deleted</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> replays deleted successfully&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tasks_deleted</span><span class="p">)},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> of </span><span class="si">{1}</span><span class="s2"> replays deleted successfully&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tasks_deleted</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">))},</span>
+                            <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_task"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.get_task">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve a task or list of tasks and return json.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name (str): Name of task. If omitted, get a listing of tasks instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="c1"># caller wants the whole list</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">get_task_list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">get_replay</span><span class="p">(</span>
+                    <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">),</span> <span class="n">name</span><span class="p">,</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;variables&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_category_list"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.get_category_list">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">get_category_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of replay categories.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      generated_only (str): If &#39;true&#39;, only list categories that contain</span>
+<span class="sd">        at least one autogenerated replay.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">generated_only</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;generated_only&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">generated_only</span> <span class="o">=</span> <span class="p">(</span><span class="n">generated_only</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+        <span class="s1">&#39;categories&#39;</span><span class="p">:</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">get_category_list</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">generated_only</span><span class="p">),</span>
+    <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="get_task_list"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.get_task_list">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">get_task_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of tasks for a category.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+    <span class="n">task_list</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">get_task_list</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">task_list</span><span class="p">:</span>
+        <span class="n">task_list</span> <span class="o">=</span> <span class="n">task_list</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">task_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+        <span class="s1">&#39;tasks&#39;</span><span class="p">:</span> <span class="n">task_list</span>
+    <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="get_replay_variables"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.get_replay_variables">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">get_replay_variables</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of variables used in a specific replay.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name (str): Name of replay.</span>
+<span class="sd">      category (str): Category of replay</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      JsonResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">category</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Missing mandatory arg&quot;</span><span class="p">)</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">get_replay_variables</span><span class="p">(</span>
+        <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">),</span>
+        <span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="n">variables</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="save_task_data"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.save_task_data">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">save_task_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update an existing replay with new contents.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name (str): Name of task.</span>
+<span class="sd">      category (str): Category of task</span>
+<span class="sd">      task (JSON): Task to be saved</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">category</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">task</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Missing mandatory arg&quot;</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="n">category</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">save_task_data</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">result</span><span class="p">)},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="delete_category"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.delete_category">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">delete_category</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete a given category and its associated replays.&quot;&quot;&quot;</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="o">.</span><span class="n">delete_category</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="change_category"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.change_category">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">change_category</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Move one or more replays into a different category.&quot;&quot;&quot;</span>
+    <span class="n">replays</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;replays[]&#39;</span><span class="p">)</span>
+    <span class="n">old_category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;old_category&#39;</span><span class="p">)</span>
+    <span class="n">new_category</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;new_category&#39;</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">replay</span> <span class="ow">in</span> <span class="n">replays</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TODO, is there a less convoluted way to do this?</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="n">old_category</span><span class="p">})</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">retrieve_task</span><span class="p">()</span>
+            <span class="n">th2</span> <span class="o">=</span> <span class="n">TaskHandler</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;task&#39;</span><span class="p">])</span>
+            <span class="n">th2</span><span class="o">.</span><span class="n">edit_task</span><span class="p">(</span><span class="n">replay</span><span class="p">,</span> <span class="n">new_category</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">TaskException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+            <span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="s1">&#39;Not all replays were successfully moved&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">errors</span>
+        <span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span>
+            <span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="s1">&#39;Replays successfully moved&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">errors</span>
+        <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="get_top_replay_dir"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.get_top_replay_dir">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">get_top_replay_dir</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get top directory containing replay categories.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;replaydir&#39;</span><span class="p">:</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;replays_dir&#39;</span><span class="p">,</span>
+                                               <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)})</span></div>
+
+
+<div class="viewcode-block" id="set_top_replay_dir"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.set_top_replay_dir">[docs]</a><span class="nd">@login_required</span>
+<span class="nd">@staff_member_required</span>
+<span class="k">def</span> <span class="nf">set_top_replay_dir</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set top directory containing replay categories.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># TODO: POST uses &#39;replay_dir&#39;, but the replies use &#39;replaydir&#39;</span>
+        <span class="n">replay_dir_path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;replay_dir&#39;</span><span class="p">)</span>
+        <span class="n">createDirectory</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;createDirectory&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">replay_dir_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                                <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;No directory location sent&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">createDirectory</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;false&#39;</span><span class="p">:</span>
+            <span class="c1"># Check if the top directory exists or not</span>
+            <span class="n">dir_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dir_exists</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;replay_dir_path&quot;</span><span class="p">:</span> <span class="n">replay_dir_path</span><span class="p">},</span>
+                                    <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
+                                    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Directory does not exist&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Check if &#39;replays&#39; sub directory exists or not</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">check_replays_subdir</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">check_default_replay_dir</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+                        <span class="n">base_dir_path</span> <span class="o">=</span> <span class="n">replay_dir_path</span>
+                        <span class="n">replay_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">,</span>
+                                                       <span class="s1">&#39;replays&#39;</span><span class="p">)</span>
+                        <span class="c1"># For handling, replays subdir present but not ending</span>
+                        <span class="c1"># in replay_dir_path</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">):</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;replay_dir_path&quot;</span><span class="p">:</span>
+                                            <span class="n">replay_dir_path</span><span class="p">},</span>
+                                            <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                            <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Directory set&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">base_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">)</span>
+
+                <span class="n">set_replay_path</span><span class="p">(</span><span class="n">base_dir_path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;replay_dir_path&quot;</span><span class="p">:</span> <span class="n">replay_dir_path</span><span class="p">},</span>
+                                    <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Directory set&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">createDirectory</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">check_replays_subdir</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">):</span>
+                <span class="n">base_dir_path</span> <span class="o">=</span> <span class="n">replay_dir_path</span>
+                <span class="n">replay_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">,</span> <span class="s1">&#39;replays&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">base_dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">)</span>
+
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">replay_dir_path</span><span class="p">)</span>
+            <span class="n">set_replay_path</span><span class="p">(</span><span class="n">base_dir_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;replay_dir_path&quot;</span><span class="p">:</span> <span class="n">replay_dir_path</span><span class="p">},</span>
+                                <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Directory set&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                                <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Unable to set replay directory path&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="reset_top_replay_dir"><a class="viewcode-back" href="../../../developer/ysyangtree.views.task.html#ysyangtree.views.task.reset_top_replay_dir">[docs]</a><span class="nd">@login_required</span>
+<span class="nd">@staff_member_required</span>
+<span class="k">def</span> <span class="nf">reset_top_replay_dir</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set top replay directory back to default.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">replay_dir</span> <span class="o">=</span> <span class="n">reset_replay_path</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;replaydir&#39;</span><span class="p">:</span> <span class="n">replay_dir</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.19.1.post0.dev3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

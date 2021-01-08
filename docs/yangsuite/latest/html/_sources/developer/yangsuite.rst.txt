@@ -1,0 +1,13 @@
+``yangsuite`` package reference
+===============================
+
+
+.. toctree::
+  :caption: YANG Suite submodules
+
+  yangsuite.apps
+  yangsuite.context_processors
+  yangsuite.logs
+  yangsuite.paths
+  yangsuite.plugins
+  yangsuite.views

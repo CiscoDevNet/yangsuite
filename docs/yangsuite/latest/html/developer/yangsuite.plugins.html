@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yangsuite.plugins &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="yangsuite.views" href="yangsuite.views.html" />
+    <link rel="prev" title="yangsuite.paths" href="yangsuite.paths.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="develop.html">YANG Suite developer documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_guidelines.html">Project structure and design guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc_tooling.html">Documentation tooling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_process.html">Release process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Building and publishing YANG Suite Docker images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_new_application.html">Creating a new application from our template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">Auto user registration for YangSuite</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="yangsuite.apps.html"><code class="docutils literal notranslate"><span class="pre">yangsuite.apps</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yangsuite.context_processors.html"><code class="docutils literal notranslate"><span class="pre">yangsuite.context_processors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yangsuite.logs.html"><code class="docutils literal notranslate"><span class="pre">yangsuite.logs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yangsuite.paths.html"><code class="docutils literal notranslate"><span class="pre">yangsuite.paths</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">yangsuite.plugins</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="yangsuite.views.html"><code class="docutils literal notranslate"><span class="pre">yangsuite.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer documentation</a> &raquo;</li>
+        
+          <li><a href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">yangsuite.plugins</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/yangsuite.plugins.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-yangsuite.plugins">
+<span id="yangsuite-plugins"></span><h1><code class="docutils literal notranslate"><span class="pre">yangsuite.plugins</span></code><a class="headerlink" href="#module-yangsuite.plugins" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="yangsuite.plugins.call_pip">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">call_pip</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#call_pip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.call_pip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoke pip with the given list of args and return output as a string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yangsuite.plugins.check_for_plugin_updates">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">check_for_plugin_updates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#check_for_plugin_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.check_for_plugin_updates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check upstream repository for available YANG Suite plugins.</p>
+<p>Since this involves network operations it can be somewhat slow, which
+is why this is a separate function from <a class="reference internal" href="#yangsuite.plugins.get_plugin_versions" title="yangsuite.plugins.get_plugin_versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_plugin_versions()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of dicts with keys ‘package_name’, ‘latest_version’, ‘description’,
+or an empty list in case of various failures.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="yangsuite.plugins.get_plugin_versions">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">get_plugin_versions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#get_plugin_versions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.get_plugin_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the installed YANG Suite plugins and their versions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> –<dl class="docutils">
+<dt>of dicts with keys ‘package_name’, ‘installed_version’,</dt>
+<dd>’module_name’, ‘verbose_name’, ‘error_message’</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="yangsuite.plugins.python_report">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">python_report</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#python_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.python_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report on the overall Python system status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – {python: {version: “3.6.5 …”}, modules: […]}</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="yangsuite.plugins.tag_sort">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">tag_sort</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#tag_sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.tag_sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="yangsuite.plugins.update_plugins">
+<code class="descclassname">yangsuite.plugins.</code><code class="descname">update_plugins</code><span class="sig-paren">(</span><em>plugins</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yangsuite/plugins.html#update_plugins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yangsuite.plugins.update_plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the given plugin to the latest release or pre-release version.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>plugins</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – of dictionaries with keys ‘plugin’, ‘version’</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>dict</em> – Package names as keys, each value is one of “updated”,
+“unchanged”, or “failed”</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="yangsuite.views.html" class="btn btn-neutral float-right" title="yangsuite.views" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="yangsuite.paths.html" class="btn btn-neutral" title="yangsuite.paths" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

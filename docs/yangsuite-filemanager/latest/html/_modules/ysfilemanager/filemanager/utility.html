@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.filemanager.utility &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/index.html">yangsuite-filemanager developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysfilemanager.filemanager.utility</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysfilemanager.filemanager.utility</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">filecmp</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">..quickparser</span> <span class="kn">import</span> <span class="n">name_and_revision_from_file</span><span class="p">,</span> <span class="n">module_listing</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="repository_path"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.repository_path">[docs]</a><span class="k">def</span> <span class="nf">repository_path</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the correctly slugified repository path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      owner (str): Owner of this repository</span>
+<span class="sd">      reponame (str): Unicode or slugified ASCII name of the repository</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      str: The correct repository path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;repository&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">owner</span><span class="p">,</span> <span class="n">reponame</span><span class="o">=</span><span class="n">reponame</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="yangset_path"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.yangset_path">[docs]</a><span class="k">def</span> <span class="nf">yangset_path</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the correctly slugified yangset path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      owner (str): Owner of this yangset</span>
+<span class="sd">      setname (str): Unicode or slugified ASCII name of the yangset</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      str: The correct yangset path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;yangset&#39;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">owner</span><span class="p">,</span> <span class="n">setname</span><span class="o">=</span><span class="n">setname</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="merge_user_set"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.merge_user_set">[docs]</a><span class="k">def</span> <span class="nf">merge_user_set</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">set_or_repo_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine (username, set_or_repo_name) tuple into a single slug string.</span>
+
+<span class="sd">    &gt;&gt;&gt; merge_user_set(&#39;user&#39;, &#39;some yangset!&#39;)</span>
+<span class="sd">    &#39;user+some-yangset&#39;</span>
+<span class="sd">    &gt;&gt;&gt; split_user_set(&#39;user+some-yangset&#39;)</span>
+<span class="sd">    (&#39;user&#39;, &#39;some-yangset&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">+</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">slugify</span><span class="p">(</span><span class="n">set_or_repo_name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="split_user_set"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.split_user_set">[docs]</a><span class="k">def</span> <span class="nf">split_user_set</span><span class="p">(</span><span class="n">userset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split merge_user_set() string back to a (user, set_or_repo_name) tuple.</span>
+
+<span class="sd">    Whether this returns a setname or a reponame is up to the caller to</span>
+<span class="sd">    understand; there&#39;s no difference in the logic of this function.</span>
+
+<span class="sd">    &gt;&gt;&gt; split_user_set(&#39;user+yangset&#39;)</span>
+<span class="sd">    (&#39;user&#39;, &#39;yangset&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; merge_user_set(&#39;user&#39;, &#39;yangset&#39;)</span>
+<span class="sd">    &#39;user+yangset&#39;</span>
+<span class="sd">    &gt;&gt;&gt; split_user_set(&#39;user:yangset&#39;)</span>
+<span class="sd">    (&#39;user&#39;, &#39;yangset&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">userset</span><span class="p">:</span>
+        <span class="n">user</span><span class="p">,</span> <span class="n">set_or_repo_name</span> <span class="o">=</span> <span class="n">userset</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">userset</span><span class="p">:</span>   <span class="c1"># backward compatibility</span>
+        <span class="n">user</span><span class="p">,</span> <span class="n">set_or_repo_name</span> <span class="o">=</span> <span class="n">userset</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to split yangset string &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">userset</span><span class="p">))</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Split userset &quot;</span><span class="si">%s</span><span class="s1">&quot; to user &quot;</span><span class="si">%s</span><span class="s1">&quot;, setname/reponame &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+              <span class="n">userset</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">set_or_repo_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">set_or_repo_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="list_yang_files"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.list_yang_files">[docs]</a><span class="k">def</span> <span class="nf">list_yang_files</span><span class="p">(</span><span class="n">path_or_paths</span><span class="p">,</span> <span class="n">include_subdirs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find all .yang files in the given path or paths.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      path_or_paths (str, list): Path to a directory or to a single .yang file,</span>
+<span class="sd">        or a list of such paths</span>
+<span class="sd">      include_subdirs (bool): If True, will list files in subdirectories</span>
+<span class="sd">        of the requested directory; otherwise, will only include files in</span>
+<span class="sd">        the directory itself.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      list: List of absolute paths to .yang files</span>
+<span class="sd">    Raises:</span>
+<span class="sd">      OSError: if a string is given but is not a path that exists</span>
+<span class="sd">      ValueError: if a path exists but does not represent a file or dir</span>
+<span class="sd">      TypeError: if path_or_paths is neither a string nor an iterable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path_or_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path_or_paths</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">include_subdirs</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.yang&#39;</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Walk the directory and its subdirectories</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">result</span> <span class="o">+=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.yang&#39;</span><span class="p">)]</span>
+                <span class="k">return</span> <span class="n">result</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.yang&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is neither a YANG file nor a directory.&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="c1"># Not a string or unicode.</span>
+    <span class="c1"># Maybe it&#39;s a list, tuple, or other iterable?</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">path_or_paths</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">list_yang_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_subdirs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="report_yang_files"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.report_yang_files">[docs]</a><span class="k">def</span> <span class="nf">report_yang_files</span><span class="p">(</span><span class="n">yangdir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get list of (module, revision, filename) in the given directory.</span>
+
+<span class="sd">    Differs from YSYangSet.get_modules_and_revisions in its use of filename</span>
+<span class="sd">    rather than absolute path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      yangdir (str): Path to directory containing YANG files.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      list: [(mod1, rev1, file1), (mod2, rev2, file2), etc.]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">yangdir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="n">list_yang_files</span><span class="p">(</span><span class="n">yangdir</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">module_listing</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">mod</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;YANG files in </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">yangdir</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="migrate_yang_files"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.migrate_yang_files">[docs]</a><span class="k">def</span> <span class="nf">migrate_yang_files</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">,</span>
+                       <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_subdirs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Move or copy yang files, fixing up filenames on the way.</span>
+
+<span class="sd">    Schemas with a revision will be named &#39;&lt;name&gt;@&lt;revision&gt;.yang&#39;, while</span>
+<span class="sd">    schemas with no revision will be named &#39;&lt;name&gt;.yang&#39;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      src_path (str): File or directory path to copy from</span>
+<span class="sd">      dest_path (str): Directory path to copy to</span>
+<span class="sd">      remove (bool): If True (default), delete the file(s) from src_path</span>
+<span class="sd">        after copying them to dest_path. If False, leave them alone.</span>
+<span class="sd">      include_subdirs (bool): If False (default), only get files from</span>
+<span class="sd">        the src_path directory itself; if True, get files from subdirectories</span>
+<span class="sd">        of src_path as well.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      dict: with format::</span>
+
+<span class="sd">            {&#39;added&#39;: [list of (module, revision) added to dest_path],</span>
+<span class="sd">             &#39;updated&#39;: [list of (module, revision) replaced with new files]</span>
+<span class="sd">             &#39;unchanged&#39;: [list of (module, rev) already in dest_path],</span>
+<span class="sd">             &#39;errors&#39;: [list of (filename, error message)],</span>
+<span class="sd">            }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src_files</span> <span class="o">=</span> <span class="n">list_yang_files</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">include_subdirs</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding </span><span class="si">%d</span><span class="s2"> files from </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="nb">len</span><span class="p">(</span><span class="n">src_files</span><span class="p">),</span> <span class="n">src_path</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;added&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;updated&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;unchanged&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dest_path</span><span class="p">):</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dest_path</span><span class="p">,</span> <span class="s1">&#39;No such directory&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">for</span> <span class="n">src_file</span> <span class="ow">in</span> <span class="n">src_files</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">src_file</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">revision</span> <span class="o">=</span> <span class="n">name_and_revision_from_file</span><span class="p">(</span>
+                <span class="n">src_file</span><span class="p">,</span> <span class="n">assume_correct_name</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)))</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># For us, &#39;name.yang&#39; and &#39;name@unknown.yang&#39; both mean the same thing,</span>
+        <span class="c1"># but pyang.FileRepository only understands the former - so comply.</span>
+        <span class="k">if</span> <span class="n">revision</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;unknown&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+            <span class="n">dest_filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">@</span><span class="si">{1}</span><span class="s2">.yang&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">revision</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dest_filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.yang&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">dest_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dest_path</span><span class="p">,</span> <span class="n">dest_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dest_file</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">dest_file</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;added&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">revision</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">filecmp</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">dest_file</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;unchanged&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">revision</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">dest_file</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s1">&#39;updated&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">revision</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;added&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;unchanged&#39;</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;updated&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]):</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">src_path</span><span class="p">,</span> <span class="s2">&quot;No YANG files found&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">src_file</span> <span class="ow">in</span> <span class="n">src_files</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">src_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to delete source file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">src_file</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;File add/upload completed. &quot;</span>
+              <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> files added, </span><span class="si">%d</span><span class="s2"> updated, </span><span class="si">%d</span><span class="s2"> unchanged, </span><span class="si">%d</span><span class="s2"> errors&quot;</span><span class="p">,</span>
+              <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;added&#39;</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;updated&#39;</span><span class="p">]),</span>
+              <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;unchanged&#39;</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="atomic_create"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.atomic_create">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">atomic_create</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">reraise</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Open the specified filepath for writing and yield.</span>
+
+<span class="sd">    If an error occurs while writing, delete the file in order to avoid</span>
+<span class="sd">    leaving garbage behind in the form of a half-written file.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        with atomic_create(&#39;/path/to/file&#39;) as fd:</span>
+<span class="sd">            fd.write(&quot;Hello&quot;)</span>
+<span class="sd">            raise RuntimeError</span>
+<span class="sd">            fd.write(&quot;Goodbye&quot;)</span>
+<span class="sd">        # as an error was raised, file is removed before returning</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      filepath (str): File path to create and open</span>
+<span class="sd">      reraise (bool): Whether to re-raise any exceptions after cleaning up</span>
+<span class="sd">      encoding (str): &#39;ascii&#39;, &#39;utf-8&#39;, etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">fd</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="c1"># Don&#39;t leave a half-written file around to cause trouble</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">reraise</span><span class="p">:</span>
+                    <span class="k">raise</span>
+        <span class="k">if</span> <span class="n">reraise</span><span class="p">:</span>
+            <span class="k">raise</span></div>
+
+
+<span class="n">user_status</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="do_validation"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.do_validation">[docs]</a><span class="k">def</span> <span class="nf">do_validation</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">yangset</span><span class="p">,</span> <span class="n">quick</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check and report the validity of the given yangset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      user (str): Username owning this request</span>
+<span class="sd">      yangset (YSYangSet): YANG set to validate</span>
+<span class="sd">      quick (bool, str): if &#39;true&#39; or True, only call the yangset&#39;s own</span>
+<span class="sd">        validate() function; if &#39;false&#39; or False, create a YSContext around</span>
+<span class="sd">        this yangset and call its validate() (more thorough but slower)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      dict: {&#39;reply&#39;: list of dicts - see YSYangSet.validate()}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">user_status</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">yangset</span><span class="o">.</span><span class="n">get_modules_and_revisions</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+
+    <span class="n">user_status</span><span class="p">[</span><span class="n">user</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="s1">&#39;Validation in progress&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">quick</span> <span class="ow">and</span> <span class="n">quick</span> <span class="o">!=</span> <span class="s1">&#39;false&#39;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">yangset</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">ysyangtree</span> <span class="kn">import</span> <span class="n">YSContext</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="n">YSContext</span><span class="p">(</span><span class="n">yangset</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+    <span class="n">reply</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reply&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">user_status</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">user_status</span><span class="p">[</span><span class="n">user</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">reply</span></div>
+
+
+<div class="viewcode-block" id="validation_status"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.utility.html#ysfilemanager.filemanager.utility.validation_status">[docs]</a><span class="k">def</span> <span class="nf">validation_status</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Report on the current status of a do_validation() request.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      user (str): User whose request we are interested in.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      dict: {&#39;value&#39;: x, &#39;max&#39;: x+y, &#39;info&#39;: string}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">user_status</span>
+
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user_status</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="s1">&#39;No request in progress&#39;</span>
+        <span class="p">}</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">user_status</span><span class="p">[</span><span class="n">user</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="kn">from</span> <span class="nn">ysyangtree</span> <span class="kn">import</span> <span class="n">YSContext</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">YSContext</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ctx</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">load_status</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">load_status</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">load_status</span><span class="p">[</span><span class="s1">&#39;info&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>   <span class="c1"># pragma: no cover</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

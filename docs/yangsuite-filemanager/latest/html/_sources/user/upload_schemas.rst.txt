@@ -1,0 +1,28 @@
+Uploading YANG files from the local filesystem to a YANG repository
+===================================================================
+
+If you have a set of YANG module files on your local system,
+you will need to upload them to the YANG Suite server.
+
+1. On the
+   `"Setup → YANG files and repositories" </filemanager/repository/manage/>`_
+   page, after selecting the desired repository,
+   select the "Upload from local filesystem" section to expand it.
+
+2. Select "Browse…" and use the file browser to select the set of YANG files
+   you wish to upload.
+
+   .. image:: images/upload_files_selected.png
+      :alt: Screenshot showing how files have been selected for uploading
+
+3. Select "Upload selected files."
+
+4. You will see a progress bar updating as the individual files
+   are uploaded to the YANG Suite server.
+   When complete, a pop-up dialog will summarize the results.
+
+   .. image:: images/repo_add_results.png
+      :alt: Screenshot showing dialog summarizing results of YANG module
+            upload to repository
+
+5. You can now continue as described at :doc:`create_repository`.

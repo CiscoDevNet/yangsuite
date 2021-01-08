@@ -1,0 +1,4 @@
+``ysfilemanager.apps``
+======================
+
+.. automodule:: ysfilemanager.apps

@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.views.repository &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysfilemanager.views.git_views" href="ysfilemanager.views.git_views.html" />
+    <link rel="prev" title="ysfilemanager.views" href="ysfilemanager.views.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">yangsuite-filemanager developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="working_with_filemanager.html">Coding with yangsuite-filemanager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.filemanager.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.apps.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.quickparser.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.scp_importer.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.scp_importer</span></code></a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ysfilemanager.views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views</span></code></a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.repository</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.views.git_views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.git_views</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.views.scp_views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.scp_views</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.views.upload.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.upload</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.views.yangsets.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.yangsets</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">yangsuite-filemanager developer documentation</a> &raquo;</li>
+        
+          <li><a href="ysfilemanager.views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views</span></code></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.repository</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysfilemanager.views.repository.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysfilemanager.views.repository">
+<span id="ysfilemanager-views-repository"></span><h1><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views.repository</span></code><a class="headerlink" href="#module-ysfilemanager.views.repository" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="ysfilemanager.views.repository.check_repo">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">check_repo</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#check_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.check_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the given repository is complete and valid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>django.http.HTTPRequest</em>) – HTTP POST (begin check) or GET
+(check progress) request.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">JsonResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.create_repo">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">create_repo</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#create_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.create_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new repository.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>django.http.HTTPRequest</em>) – HTTP POST request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>JsonResponse</em> – nothing?</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.delete_modules_from_repo">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">delete_modules_from_repo</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#delete_modules_from_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.delete_modules_from_repo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.delete_repo">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">delete_repo</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#delete_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.delete_repo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.get_repo_contents">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">get_repo_contents</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#get_repo_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.get_repo_contents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.get_repos">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">get_repos</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#get_repos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.get_repos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of available repositories.</p>
+<p>Superusers can get the listing for all users; regular users
+can only access their own repositories.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>django.http.HTTPRequest</em>) – HTTP GET request</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>JsonResponse</em> –<dl class="docutils">
+<dt>{‘repositories’: {</dt>
+<dd>‘user1’: [set1, set2],
+‘user2’: [set3], …]}</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.manage_repos">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">manage_repos</code><span class="sig-paren">(</span><em>request</em>, <em>repository=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#manage_repos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.manage_repos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the repo management page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.repository_required">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">repository_required</code><span class="sig-paren">(</span><em>decoratee</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#repository_required"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.repository_required" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for views that expect a ‘repository’ arg on the given request.</p>
+<p>If the arg is provided and valid, it’s split with <code class="xref py py-func docutils literal notranslate"><span class="pre">split_user_set()</span></code>
+and passed into the decorated function as args ‘owner’ and ‘reponame’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>JsonResponse</em> – if repository parameter is missing or incorrect.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysfilemanager.views.repository.show_repo_module">
+<code class="descclassname">ysfilemanager.views.repository.</code><code class="descname">show_repo_module</code><span class="sig-paren">(</span><em>request</em>, <em>repository</em>, <em>module</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/views/repository.html#show_repo_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.views.repository.show_repo_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the contents of the requested YANG module in the given repo.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysfilemanager.views.git_views.html" class="btn btn-neutral float-right" title="ysfilemanager.views.git_views" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysfilemanager.views.html" class="btn btn-neutral" title="ysfilemanager.views" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

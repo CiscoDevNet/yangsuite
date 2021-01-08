@@ -1,0 +1,92 @@
+Migrating your code from ysdevices 1.x to 2.x
+=============================================
+
+Being a brief guide to the changes needed to convert code using ``ysdevices``
+from the 1.x API to the different API used in 2.x.
+
+API changes
+-----------
+
+Class APIs
+''''''''''
+================================  =============================================
+1.x API                           2.x API
+================================  =============================================
+``get_available_profiles(path)``  :py:meth:`~ysdevices.devprofile.YSDeviceProfile.list`
+``get_profile(name)``             :py:meth:`~ysdevices.devprofile.YSDeviceProfile.get`
+``get_profile(name, path)``       :py:meth:`~ysdevices.devprofile.YSDeviceProfile.from_file`
+``delete_profile(name, path)``    :py:meth:`~ysdevices.devprofile.YSDeviceProfile.delete`
+``platform_options()``            removed [1]_
+``valid_platforms()``             removed [1]_
+``_encrypt_plaintext(...)``       :py:func:`ysdevices.utilities.encrypt_plaintext`
+``_decrypt_ciphertext(...)``      :py:func:`ysdevices.utilities.decrypt_ciphertext`
+================================  =============================================
+
+Instance APIs
+'''''''''''''
+===============================  ==============================================
+1.x API                                           2.x API
+===============================  ==============================================
+``.profilename``                 :py:attr:`.base.profile_name <ysdevices.plugin.BasePlugin.profile_name>`
+``.nc_*``                        :py:class:`.netconf.* <ysnetconf.device_plugin.NetconfPlugin>` [2]_
+``.platform``                    removed [1]_
+``.rc_*``                        removed
+``.ssh_*``                       :py:class:`.ssh.* <ysdevices.plugin.SshPlugin>`
+``.*`` (other named properties)  :py:class:`.base.* <ysdevices.plugin.BasePlugin>`
+``.check_netconf()``             :py:meth:`.netconf.check_reachability() <ysnetconf.device_plugin.NetconfPlugin.check_reachability>` [2]_
+``.check_ping()``                :py:meth:`.base.check_reachability() <ysdevices.plugin.BasePlugin.check_reachability>`
+``.check_restconf()``            removed
+``.check_ssh()``                 :py:meth:`.ssh.check_reachability() <ysdevices.plugin.SshPlugin.check_reachability>`
+``.validate()``                  removed [3]_
+``.write(path)``                 :py:meth:`~ysdevices.devprofile.YSDeviceProfile.write`
+===============================  ==============================================
+
+.. [1] ``devprofile.platform`` was NETCONF-specific and has been migrated to
+       ``devprofile.netconf.device_variant`` provided by ``yangsuite-netconf``.
+       Protocols other than NETCONF *must not* use this parameter as an
+       indicator of device type but should instead provide their own
+       protocol-specific set of platform options if required.
+       Similarly, the SSH plugin provides ``devprofile.ssh.device_variant``,
+       which is specific to SSH/Netmiko and should not be used for other
+       protocols.
+.. [2] ``devprofile.netconf`` is only available if ``yangsuite-netconf`` is
+       installed. See "Protocol plugins" below for more details.
+.. [3] Parameter values are validated during profile initialization and when
+       calling :py:meth:`~ysdevices.devprofile.YSDeviceProfile.update`;
+       there is no longer a separate step for validation.
+
+Protocol plugins
+----------------
+
+Any protocol-specific extensions to
+:py:class:`~ysdevices.devprofile.YSDeviceProfile` are now delivered by
+a subclass of :py:class:`~ysdevices.plugin.YSDeviceProtocolPlugin`,
+rather than by adding code to the YSDeviceProfile class itself.
+For sake of demonstration, even the "base" functionality (profile name,
+device address, protocol-agnostic username and password, etc.) are provided via
+this mechanism, as implemented in :py:class:`~ysdevices.plugin.BasePlugin`.
+
+Writing a protocol plugin
+'''''''''''''''''''''''''
+
+In your Python package, create a subclass of
+:py:class:`~ysdevices.plugin.YSDeviceProtocolPlugin` and provide concrete
+implementations of its various abstract properties and methods, as described
+in the aforementioned class's documentation and following the example given
+by :py:class:`~ysdevices.plugin.BasePlugin`.
+
+Once your class is defined, you must register it in your ``setup.py`` for
+discovery by yangsuite-devices, for example::
+
+    entry_points={
+        # Register as a yangsuite application so yangsuite can auto-discover me
+        'yangsuite.apps': [ ... ],
+        # Register NETCONF extensions to the device profile
+        'ysdevices.plugins': [
+            'netconf = ysnetconf.device_plugin:NetconfPlugin',
+        ],
+    },
+
+As with any change to ``setup.py``, you may then need to run
+``python setup.py build`` for your development environment to be able to
+make use of this change and successfully detect the new protocol plugin.

@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yangsuite.paths &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/index.html">Developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yangsuite.paths</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yangsuite.paths</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;APIs for declaring, creating, and accessing storage under ``MEDIA_ROOT``.</span>
+
+<span class="sd">- :func:`set_base_path` should be called from settings.py</span>
+<span class="sd">- Plugins can define extra storage directories with :func:`register_path()`</span>
+<span class="sd">- Plugins can access their own or other directories with :func:`get_path()`</span>
+<span class="sd">- Admin can inspect all declarations with :func:`list_paths()`</span>
+
+<span class="sd">Examples::</span>
+
+<span class="sd">    &gt;&gt;&gt; set_base_path(&quot;/&quot;)</span>
+
+<span class="sd">    Register a path under the base_path:</span>
+<span class="sd">    &gt;&gt;&gt; register_path(&quot;tilde&quot;, &quot;home&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; get_path(&quot;tilde&quot;)</span>
+<span class="sd">    &#39;/home&#39;</span>
+
+<span class="sd">    Register a path under this parent path, with a parameter:</span>
+<span class="sd">    &gt;&gt;&gt; register_path(&quot;person&quot;, &quot;{user}&quot;, parent=&quot;tilde&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; get_path(&quot;person&quot;, user=&quot;me&quot;)</span>
+<span class="sd">    &#39;/home/me&#39;</span>
+
+<span class="sd">    Paths can be chained together and slugified:</span>
+<span class="sd">    &gt;&gt;&gt; register_path(&quot;directory&quot;, &quot;{dirname}&quot;, parent=&quot;person&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; register_path(&quot;file&quot;, &quot;{file}.dat&quot;, parent=&quot;directory&quot;, slugify=True)</span>
+<span class="sd">    &gt;&gt;&gt; get_path(&quot;file&quot;, user=&quot;you&quot;, dirname=&quot;my-dir&quot;, file=&#39;MY File!&#39;)</span>
+<span class="sd">    &#39;/home/you/my-dir/my-file.dat&#39;</span>
+
+<span class="sd">    Listing registered paths thus far:</span>
+<span class="sd">    &gt;&gt;&gt; print(&quot;\n&quot;.join(&quot;{0}: {1}&quot;.format(k, v) for</span>
+<span class="sd">    ...                 k, v in sorted(list_paths().items())))</span>
+<span class="sd">    directory: /home/{user}/{dirname}</span>
+<span class="sd">    file: /home/{user}/{dirname}/{file}.dat</span>
+<span class="sd">    person: /home/{user}</span>
+<span class="sd">    tilde: /home</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+
+<span class="n">_base_path</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_paths</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="set_base_path"><a class="viewcode-back" href="../../developer/yangsuite.paths.html#yangsuite.paths.set_base_path">[docs]</a><span class="k">def</span> <span class="nf">set_base_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the root directory under which all other storage implicitly exists.</span>
+
+<span class="sd">    This directory *must* exist or :func:`get_path` will throw an exception.</span>
+<span class="sd">    Typically invoked from settings.py as ``set_base_path(MEDIA_ROOT)``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      path (str): Path to root directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_base_path</span>
+    <span class="n">_base_path</span> <span class="o">=</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="get_base_path"><a class="viewcode-back" href="../../developer/yangsuite.paths.html#yangsuite.paths.get_base_path">[docs]</a><span class="k">def</span> <span class="nf">get_base_path</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the root directory.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_base_path</span></div>
+
+
+<div class="viewcode-block" id="register_path"><a class="viewcode-back" href="../../developer/yangsuite.paths.html#yangsuite.paths.register_path">[docs]</a><span class="k">def</span> <span class="nf">register_path</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span>
+                  <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">autocreate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">slugify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Register a new storage path spec.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      key (str): Unique key to register this storage path for later retrieval</span>
+<span class="sd">        by get_path()</span>
+<span class="sd">      path_segment (str): Additional path segment(s) to append to the</span>
+<span class="sd">        parent path to generate this path. This can be a string literal</span>
+<span class="sd">        (e.g. ``&#39;logs&#39;``) or a format string (e.g. ``&#39;{user}&#39;``) that will be</span>
+<span class="sd">        built from the additional arguments passed to :func:`get_path`.</span>
+<span class="sd">        See examples above.</span>
+<span class="sd">      parent (str): Key of parent path, already registered, under which this</span>
+<span class="sd">        path is a descendant. If not specified, this path exists directly under</span>
+<span class="sd">        the path registered by :func:`set_base_path`.</span>
+<span class="sd">      autocreate (bool): If true, :func:`get_path` will automatically create</span>
+<span class="sd">        this path as a directory if it doesn&#39;t already exist.</span>
+<span class="sd">      slugify (bool): If true, any parameters of the ``path_segment`` will be</span>
+<span class="sd">        passed through :func:`slugify.slugify` before constructing the</span>
+<span class="sd">        path string. This has the effect of converting these parameters</span>
+<span class="sd">        (but not any static portion of the ``path_segment`` declaration)</span>
+<span class="sd">        to lowercase ASCII strings without spaces (replaced by hyphens) or</span>
+<span class="sd">        other special characters, ensuring a safe path string::</span>
+
+<span class="sd">          &gt;&gt;&gt; import slugify</span>
+<span class="sd">          &gt;&gt;&gt; slugify.slugify(&quot;My path segment!&quot;)</span>
+<span class="sd">          &#39;my-path-segment&#39;</span>
+
+<span class="sd">        This does have the caveat that multiple distinct inputs to</span>
+<span class="sd">        :func:`get_path` may result in the same generated path string;</span>
+<span class="sd">        if your application needs a one-to-one mapping between inputs and</span>
+<span class="sd">        generated paths, you shouldn&#39;t use this option. For example::</span>
+
+<span class="sd">          &gt;&gt;&gt; import slugify</span>
+<span class="sd">          &gt;&gt;&gt; slugify.slugify(&quot;--- my path segment ---&quot;)</span>
+<span class="sd">          &#39;my-path-segment&#39;</span>
+<span class="sd">          &gt;&gt;&gt; slugify.slugify(&quot;___ MY ___ PATH-SEGMENT __ &quot;)</span>
+<span class="sd">          &#39;my-path-segment&#39;</span>
+
+<span class="sd">      replace (bool): If true, replace any existing path registration under</span>
+<span class="sd">        this same key, instead of raising a KeyError as described below.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      KeyError:</span>
+<span class="sd">        if key is already registered with different values, and the</span>
+<span class="sd">        ``replace`` option was not set as True::</span>
+
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;foo&quot;, &quot;bar&quot;)</span>
+
+<span class="sd">          Re-registering the same path is a no-op:</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;foo&quot;, &quot;bar&quot;)</span>
+
+<span class="sd">          But registering the same key with different args is an error:</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;foo&quot;, &quot;baz/bar&quot;)</span>
+<span class="sd">          Traceback (most recent call last):</span>
+<span class="sd">              ...</span>
+<span class="sd">          KeyError: &#39;Path key &quot;foo&quot; is already registered&#39;</span>
+
+<span class="sd">          If the change is intended, you can use the ``replace`` option:</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;foo&quot;, &quot;baz/bar&quot;, replace=True)</span>
+
+<span class="sd">      KeyError:</span>
+<span class="sd">        if parent is specified and parent is not already registered::</span>
+
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;plover&quot;, &quot;plover&quot;, parent=&quot;frobozz&quot;)</span>
+<span class="sd">          Traceback (most recent call last):</span>
+<span class="sd">              ...</span>
+<span class="sd">          KeyError: &#39;Parent path key &quot;frobozz&quot; is not yet registered&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_paths</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_paths</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span> <span class="n">autocreate</span><span class="p">,</span> <span class="n">slugify</span><span class="p">):</span>
+            <span class="c1"># Attempt at re-registering same path with same params - no-op</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Path key &quot;</span><span class="si">{0}</span><span class="s1">&quot; is already registered&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="n">parent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_paths</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Parent path key &quot;</span><span class="si">{0}</span><span class="s1">&quot; is not yet registered&#39;</span>
+                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parent</span><span class="p">))</span>
+    <span class="n">_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span> <span class="n">autocreate</span><span class="p">,</span> <span class="n">slugify</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_path"><a class="viewcode-back" href="../../developer/yangsuite.paths.html#yangsuite.paths.get_path">[docs]</a><span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get (and possibly create) the requested path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      key (str): Key to look up the requested path spec previously registered.</span>
+<span class="sd">      create (bool): Force creation of this path as a directory if it doesn&#39;t</span>
+<span class="sd">        already exist, regardless of whether the path spec was registered as</span>
+<span class="sd">        auto-self-creating.</span>
+<span class="sd">      flush (bool): If this path already exists, remove any existing files</span>
+<span class="sd">        that it contains.</span>
+<span class="sd">      *args: Applied to :meth:`string.format` on the path spec.</span>
+<span class="sd">      **kwargs: Applied to :meth:`string.format` on the path spec.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      str: Requested path (may or may not exist, unless ``create=True`` is</span>
+<span class="sd">      explicitly specified or the path spec was declared as</span>
+<span class="sd">      ``autocreate=True``, in which case it will exist as a directory)</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      KeyError:</span>
+<span class="sd">        if the given key is not registered::</span>
+
+<span class="sd">          &gt;&gt;&gt; get_path(&quot;nothing_here&quot;)</span>
+<span class="sd">          Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">          KeyError: &#39;No such path key &quot;nothing_here&quot; is registered&#39;</span>
+
+<span class="sd">      RuntimeError:</span>
+<span class="sd">        if unable to create a requested path because a required</span>
+<span class="sd">        and not-auto-creating parent path does not yet exist::</span>
+
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;noautocreate&quot;, &quot;noauto&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;auto&quot;, &quot;autocreate&quot;,</span>
+<span class="sd">          ...               parent=&quot;noautocreate&quot;, autocreate=True)</span>
+<span class="sd">          &gt;&gt;&gt; get_path(&quot;auto&quot;)</span>
+<span class="sd">          Traceback (most recent call last):</span>
+<span class="sd">              ...</span>
+<span class="sd">          RuntimeError: Can&#39;t autocreate &#39;auto&#39; given &#39;/noauto&#39; doesn&#39;t exist</span>
+
+<span class="sd">      OSError:</span>
+<span class="sd">        if a parent path exists but is not a directory::</span>
+
+<span class="sd">          &gt;&gt;&gt; set_base_path(__file__)</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;myself&quot;, &#39;howdy&#39;, autocreate=True)</span>
+<span class="sd">          &gt;&gt;&gt; try:</span>
+<span class="sd">          ...     get_path(&quot;myself&quot;)</span>
+<span class="sd">          ... except OSError as exc:</span>
+<span class="sd">          ...     print(exc.strerror + &#39;: &#39; + exc.filename)# doctest: +ELLIPSIS</span>
+<span class="sd">          Not a directory: ...paths.py...</span>
+
+<span class="sd">      TypeError:</span>
+<span class="sd">        if a required argument is not provided::</span>
+
+<span class="sd">          &gt;&gt;&gt; set_base_path(&quot;/&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; register_path(&quot;person&quot;, &quot;{user}&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; get_path(&#39;person&#39;)</span>
+<span class="sd">          Traceback (most recent call last):</span>
+<span class="sd">             ...</span>
+<span class="sd">          TypeError: get_path() missing required keyword argument: &#39;user&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_paths</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_paths</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;No such path key &quot;</span><span class="si">{0}</span><span class="s1">&quot; is registered&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="n">parent</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span> <span class="n">autocreate</span><span class="p">,</span> <span class="n">do_slugify</span> <span class="o">=</span> <span class="n">_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="n">invalid_args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="n">invalid_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Positional argument </span><span class="si">{0}</span><span class="s2"> is empty&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">invalid_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Key &quot;</span><span class="si">{0}</span><span class="s1">&quot; has an empty value&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">invalid_args</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_args</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+        <span class="c1"># All paths are implicitly under _base_path</span>
+        <span class="k">global</span> <span class="n">_base_path</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_base_path</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;set_base_path not called yet. &quot;</span>
+                        <span class="s2">&quot;Implicitly setting to settings.MEDIA_ROOT (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">)</span>
+            <span class="n">set_base_path</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">)</span>
+        <span class="n">parent_path</span> <span class="o">=</span> <span class="n">_base_path</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">parent_path</span> <span class="o">=</span> <span class="n">get_path</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="n">create</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">create</span> <span class="ow">or</span> <span class="n">autocreate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">parent_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t autocreate &#39;</span><span class="si">{0}</span><span class="s2">&#39; given &#39;</span><span class="si">{1}</span><span class="s2">&#39; doesn&#39;t exist&quot;</span>
+                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">parent_path</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">parent_path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent_path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOTDIR</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOTDIR</span><span class="p">),</span> <span class="n">parent_path</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">seg_args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">seg_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">if</span> <span class="n">do_slugify</span><span class="p">:</span>
+            <span class="n">seg_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">slugify</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">seg_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">seg_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">path_segment</span> <span class="o">=</span> <span class="n">path_segment</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">seg_args</span><span class="p">,</span> <span class="o">**</span><span class="n">seg_kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># format() throws KeyError - missing expected kwarg</span>
+        <span class="c1"># Remap this to a TypeError such as user would get when calling a</span>
+        <span class="c1"># function with an expected kwarg, as that&#39;s what this effectively is.</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;get_path() missing required keyword argument: &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="c1"># IndexError - missing expected arg</span>
+        <span class="c1"># Remap this to a TypeError such as user would get when calling a</span>
+        <span class="c1"># function with required positional args.</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;get_path() missing required positional argument&quot;</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_path</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">create</span> <span class="ow">or</span> <span class="n">autocreate</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating new &#39;</span><span class="si">{0}</span><span class="s2">&#39; directory path </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">flush</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Deleting file </span><span class="si">%s</span><span class="s2"> and replacing it with a directory. &quot;</span>
+                        <span class="s2">&quot;This shouldn&#39;t be typical - check how this happened&quot;</span><span class="p">,</span>
+                        <span class="n">path</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<span class="c1"># Set yangsuite standard paths</span>
+<span class="c1"># Plugins will likely extend this list</span>
+<span class="n">register_path</span><span class="p">(</span><span class="s1">&#39;users_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="n">autocreate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">register_path</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{user}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s1">&#39;users_dir&#39;</span><span class="p">,</span> <span class="n">autocreate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">register_path</span><span class="p">(</span><span class="s1">&#39;log_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;logs/&#39;</span><span class="p">,</span> <span class="n">autocreate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">register_path</span><span class="p">(</span><span class="s1">&#39;logfile&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{filename}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s1">&#39;log_dir&#39;</span><span class="p">,</span> <span class="n">autocreate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="list_paths"><a class="viewcode-back" href="../../developer/yangsuite.paths.html#yangsuite.paths.list_paths">[docs]</a><span class="k">def</span> <span class="nf">list_paths</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Get the list of all currently registered paths.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      dict: of {key: pathspec_str}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_base_path</span>
+    <span class="k">global</span> <span class="n">_paths</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">_base_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">parent</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">pathspec</span> <span class="o">=</span> <span class="n">path_segment</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">parent</span><span class="p">,</span> <span class="n">path_segment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_paths</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+                <span class="n">pathspec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_segment</span><span class="p">,</span> <span class="n">pathspec</span><span class="p">)</span>
+            <span class="n">pathspec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_base_path</span><span class="p">,</span> <span class="n">pathspec</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pathspec</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

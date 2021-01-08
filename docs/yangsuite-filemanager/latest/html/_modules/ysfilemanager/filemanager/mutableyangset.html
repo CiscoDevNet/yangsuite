@@ -1,0 +1,544 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.filemanager.mutableyangset &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer/index.html">yangsuite-filemanager developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>ysfilemanager.filemanager.mutableyangset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ysfilemanager.filemanager.mutableyangset</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span>
+
+<span class="kn">from</span> <span class="nn">yangsuite</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">.yangset</span> <span class="kn">import</span> <span class="n">YSYangSet</span>
+<span class="kn">from</span> <span class="nn">.repository</span> <span class="kn">import</span> <span class="n">YSYangRepository</span>
+<span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">yangset_path</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="YSMutableYangSet"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet">[docs]</a><span class="k">class</span> <span class="nc">YSMutableYangSet</span><span class="p">(</span><span class="n">YSYangSet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class used for building and editing YSYangSets.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repository</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pruned_digraph</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YSMutableYangSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YSMutableYangSet.write"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save this yangset for later reuse via YSYangSet.load().&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;setname&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">,</span>
+            <span class="s1">&#39;owner&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span>
+            <span class="s1">&#39;repository&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">slug</span><span class="p">,</span>
+            <span class="c1"># Just write (name, rev) rather than (name, rev, abspath)</span>
+            <span class="c1"># as we can trivially reconstruct abspath from the repo</span>
+            <span class="s1">&#39;modules&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">yangset_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">setname</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># We&#39;re up to date!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datastore_mtime</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saved YANG set </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sorted list of (mod, rev, path) that this YSMutableYangSet has.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span>
+
+    <span class="nd">@modules</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unlike YSYangSet, this allows change.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YSMutableYangSet</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">fset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repository</span>
+
+    <span class="nd">@repository</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">repository</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repository</span> <span class="o">=</span> <span class="n">YSYangRepository</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">YSYangRepository</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repository</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;expected string or YSYangRepository instance, but got </span><span class="si">{0}</span><span class="s2">&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;reponame&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">reponame</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reponame</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reponame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">reponame</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">digraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rough approximation of inter-module dependencies within this set.</span>
+
+<span class="sd">        Unlike the base class :attr:`~._YSYangSetBase.digraph`, this includes</span>
+<span class="sd">        additional modules within the repository that are not actually part</span>
+<span class="sd">        of the set definition itself. These extra nodes are used for the</span>
+<span class="sd">        :meth:`~._YSYangSetBase.extra_dependencies` / :meth:`upstream_modules`</span>
+<span class="sd">        / :meth:`augmenter_modules` / :meth:`identity_deriving_modules`</span>
+<span class="sd">        / :meth:`related_modules` APIs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          :class:`networkx.DiGraph`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_module_graph</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_digraph</span>
+
+    <span class="c1"># Please keep these in alphabetical order</span>
+    <span class="n">MODS_PARENTS_UNRELATED</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;ietf-inet-types&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ietf-interfaces&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ietf-yang-types&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;openconfig-extensions&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;openconfig-interfaces&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;openconfig-types&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Cisco-IOS-XE-native&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Cisco-IOS-XE-types&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Cisco-IOS-XR-types&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Modules that are very widely imported and so do not indicate relation.</span>
+
+<span class="sd">    In other words, two modules should NOT be considered &#39;related&#39; simply</span>
+<span class="sd">    because they both import one of these modules - otherwise, say, any module</span>
+<span class="sd">    that imports &#39;ietf-inet-types&#39; might report over 1000 &quot;related&quot; modules,</span>
+<span class="sd">    which is not particularly useful.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pruned_digraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Digraph excluding certain nodes/paths that are not of interest.</span>
+
+<span class="sd">        Specifically, this prunes out the modules defined in</span>
+<span class="sd">        :const:`MODS_PARENTS_UNRELATED`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pruned_digraph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pruned</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">pruned</span><span class="o">.</span><span class="n">remove_nodes_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MODS_PARENTS_UNRELATED</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pruned_digraph</span> <span class="o">=</span> <span class="n">pruned</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pruned_digraph</span>
+
+<div class="viewcode-block" id="YSMutableYangSet.upstream_modules"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules">[docs]</a>    <span class="k">def</span> <span class="nf">upstream_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get modules that are not part of this YANG set but make use of it.</span>
+
+<span class="sd">        These are optional &quot;upstream consumers&quot; - modules that import</span>
+<span class="sd">        modules contained in our YANG set. Adding these to the</span>
+<span class="sd">        YANG set could possibly result in a more complete picture.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">          This API makes use of the :attr:`pruned_digraph` rather than the</span>
+<span class="sd">          :attr:`~._YSYangSetBase.digraph`, meaning that if this set includes</span>
+<span class="sd">          any of the modules listed in :const:`MODS_PARENTS_UNRELATED`,</span>
+<span class="sd">          other modules in the repository that import only said module(s)</span>
+<span class="sd">          will *not* be included in the returned list.</span>
+
+<span class="sd">        .. seealso::</span>
+
+<span class="sd">          :meth:`~._YSYangSetBase.modules_using`: for getting the modules</span>
+<span class="sd">          upstream of a single module, rather than the entire set. That API</span>
+<span class="sd">          also does not prune the digraph or the list of modules returned,</span>
+<span class="sd">          unlike this method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of (module, revision, path). This list may intersect with the</span>
+<span class="sd">          lists returned by :meth:`augmenter_modules` and/or</span>
+<span class="sd">          :meth:`identity_deriving_modules`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pruned_digraph</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+                <span class="c1"># Pruned out</span>
+                <span class="k">continue</span>
+            <span class="c1"># If it&#39;s in self.modules, it must be marked as such</span>
+            <span class="k">assert</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Module </span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2"> not found&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># log.debug(&quot;Checking for modules depending on %s@%s&quot;, name, rev)</span>
+            <span class="k">for</span> <span class="n">anc</span> <span class="ow">in</span> <span class="n">networkx</span><span class="o">.</span><span class="n">ancestors</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="c1"># log.debug(&quot;  Checking ancestor %s&quot;, anc)</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">(</span><span class="n">anc</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">],</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding upstream module </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">anc</span><span class="p">,</span>
+                              <span class="s2">&quot; → &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">anc</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSMutableYangSet.augmenter_modules"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules">[docs]</a>    <span class="k">def</span> <span class="nf">augmenter_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get modules that aren&#39;t in this set but augment modules that are.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of (name, revision, path) .This list may intersect with the</span>
+<span class="sd">          lists returned by :meth:`upstream_modules` and/or</span>
+<span class="sd">          :meth:`identity_deriving_modules`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span>
+            <span class="c1"># Repository may have multiple revisions of the same mod</span>
+            <span class="c1"># whereas digraph has one node per mod</span>
+            <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span> <span class="ow">and</span>
+            <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">mod</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;augments&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="YSMutableYangSet.identity_deriving_modules"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules">[docs]</a>    <span class="k">def</span> <span class="nf">identity_deriving_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get modules that aren&#39;t in this set but provide derived identities.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of (name, revision, path) .This list may intersect with the</span>
+<span class="sd">          lists returned by :meth:`upstream_modules` and/or</span>
+<span class="sd">          :meth:`augmenter_modules`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span>
+            <span class="c1"># Repository may have multiple revisions of the same mod</span>
+            <span class="c1"># whereas digraph has one node per mod</span>
+            <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span> <span class="ow">and</span>
+            <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">mod</span><span class="p">][</span><span class="s1">&#39;in_yangset&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;derives-identities-from&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="YSMutableYangSet.related_modules"><a class="viewcode-back" href="../../../developer/ysfilemanager.filemanager.mutableyangset.html#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.related_modules">[docs]</a>    <span class="k">def</span> <span class="nf">related_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get modules that aren&#39;t part of this YANG set but might be relevant.</span>
+
+<span class="sd">        Think of this function as providing a &quot;People who use this yangset</span>
+<span class="sd">        might also be interested in...&quot; set of suggestions.</span>
+
+<span class="sd">        The set of modules returned by this API is non-intersecting with those</span>
+<span class="sd">        reported by :meth:`~._YSYangSetBase.extra_dependencies` and</span>
+<span class="sd">        :meth:`upstream_modules`, which represent known dependencies and known</span>
+<span class="sd">        consumers of the modules in this YANG set, respectively.</span>
+
+<span class="sd">        As currently implemented, this is &#39;degrees of separation&#39; based, as</span>
+<span class="sd">        shown below (``(*)`` represents modules too distant to be considered</span>
+<span class="sd">        as related_modules)::</span>
+
+<span class="sd">                        ┌───────────────────────┐</span>
+<span class="sd">                        │ upstream_grandparent &lt;─imports&lt;─ (*)</span>
+<span class="sd">          upstream_mods ┤   ^ imports ^         │</span>
+<span class="sd">                        │ upstream_parent  &lt;──imports&lt;──┐  related_modules</span>
+<span class="sd">                        └   ^ imports ^    ─────┘    ┌──│─────────┴───────┐</span>
+<span class="sd">                      ┌─  module_in_yangset      ─┐  │ upstream_relative &lt;─&gt;(*)</span>
+<span class="sd">          yangset ────┤     ^ imports ^           │  │                    │</span>
+<span class="sd">                      └─  another_mod_in_yangset ─┘  │ dep_relative &lt;──────&gt;(*)</span>
+<span class="sd">                        ┌   ^ imports ^    ────┐     └───^────────────────┘</span>
+<span class="sd">                        │ extra_dep_child ──&gt;imported─by─┘</span>
+<span class="sd">          extra_depends ┤   ^ imports ^        │</span>
+<span class="sd">                        │ extra_dep_grandchild ─&gt;imported─by─&gt; (*)</span>
+<span class="sd">                        └──────────────────────┘</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">          This API makes use of the :attr:`pruned_digraph` rather than the</span>
+<span class="sd">          :attr:`~._YSYangSetBase.digraph`, meaning that if this set includes</span>
+<span class="sd">          any of the modules listed in :const:`MODS_PARENTS_UNRELATED`,</span>
+<span class="sd">          other modules in the repository that import or are imported by</span>
+<span class="sd">          said module(s) alone will *not* be included in the returned list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: of tuples (`modulename`, `revision`, `path`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># For now this is hard-coded; maybe let them be user-specified?</span>
+        <span class="n">MAX_DEGREES</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">upstream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upstream_modules</span><span class="p">()</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pruned_digraph</span>
+        <span class="k">for</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes_iter</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_name</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">],</span>
+                     <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">node_name</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">ancestor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancestors</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">MAX_DEGREES</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">ancestor</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">ancestor</span><span class="p">,</span> <span class="n">MAX_DEGREES</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                        <span class="k">continue</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">],</span>
+                             <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">upstream</span><span class="p">:</span>
+                        <span class="n">results</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">MAX_DEGREES</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">desc</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">anc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ancestors</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">MAX_DEGREES</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;found&#39;</span><span class="p">]:</span>
+                        <span class="k">continue</span>
+                    <span class="n">entry</span> <span class="o">=</span> <span class="p">(</span><span class="n">anc</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;revision&#39;</span><span class="p">],</span>
+                             <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">anc</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="ow">and</span> <span class="n">entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">upstream</span><span class="p">:</span>
+                        <span class="n">results</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_ancestors</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for related_modules().</span>
+
+<span class="sd">        Since :meth:`networkx.ancestors` doesn&#39;t filter by max distance,</span>
+<span class="sd">        we have to roll our own.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          g (networkx.DiGraph): graph</span>
+<span class="sd">          node_name (str): node whose ancestors we want</span>
+<span class="sd">          max_distance (int): maximum number of edges to traverse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list(str): of node names representing the requested ancestors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+                <span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">max_distance</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">node_name</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_name</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for related_modules().</span>
+
+<span class="sd">        Since :meth:`networkx.descendants` doesn&#39;t filter by max distance,</span>
+<span class="sd">        we have to roll our own.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          g (networkx.DiGraph): graph</span>
+<span class="sd">          node_name (str): node whose descendants we want</span>
+<span class="sd">          max_distance (int): maximum number of edges to traverse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list(str): of node names representing the requested descendants</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+                <span class="n">networkx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="n">max_distance</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">node_name</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

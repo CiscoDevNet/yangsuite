@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysfilemanager.filemanager.mutableyangset &mdash; yangsuite-filemanager 1.7.0.post0.dev26 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysfilemanager.filemanager.utility" href="ysfilemanager.filemanager.utility.html" />
+    <link rel="prev" title="ysfilemanager.filemanager.yangset" href="ysfilemanager.filemanager.yangset.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-filemanager
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Managing YANG module files in YANG Suite</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">yangsuite-filemanager developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="working_with_filemanager.html">Coding with yangsuite-filemanager</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="ysfilemanager.filemanager.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.filemanager.base.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.filemanager.dir_repository.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.dir_repository</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.filemanager.repository.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.repository</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.filemanager.yangset.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.yangset</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.mutableyangset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ysfilemanager.filemanager.utility.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.utility</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.apps.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.quickparser.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.quickparser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.scp_importer.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.scp_importer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysfilemanager.views.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-filemanager</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">yangsuite-filemanager developer documentation</a> &raquo;</li>
+        
+          <li><a href="ysfilemanager.filemanager.html"><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager</span></code></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.mutableyangset</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysfilemanager.filemanager.mutableyangset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysfilemanager.filemanager.mutableyangset">
+<span id="ysfilemanager-filemanager-mutableyangset"></span><h1><code class="docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.mutableyangset</span></code><a class="headerlink" href="#module-ysfilemanager.filemanager.mutableyangset" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet">
+<em class="property">class </em><code class="descclassname">ysfilemanager.filemanager.mutableyangset.</code><code class="descname">YSMutableYangSet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ysfilemanager.filemanager.yangset.html#ysfilemanager.filemanager.yangset.YSYangSet" title="ysfilemanager.filemanager.yangset.YSYangSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysfilemanager.filemanager.yangset.YSYangSet</span></code></a></p>
+<p>Class used for building and editing YSYangSets.</p>
+<dl class="attribute">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED">
+<code class="descname">MODS_PARENTS_UNRELATED</code><em class="property"> = ['ietf-inet-types', 'ietf-interfaces', 'ietf-yang-types', 'openconfig-extensions', 'openconfig-interfaces', 'openconfig-types', 'Cisco-IOS-XE-native', 'Cisco-IOS-XE-types', 'Cisco-IOS-XR-types']</em><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modules that are very widely imported and so do not indicate relation.</p>
+<p>In other words, two modules should NOT be considered ‘related’ simply
+because they both import one of these modules - otherwise, say, any module
+that imports ‘ietf-inet-types’ might report over 1000 “related” modules,
+which is not particularly useful.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules">
+<code class="descname">augmenter_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet.augmenter_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get modules that aren’t in this set but augment modules that are.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of (name, revision, path) .This list may intersect with the
+lists returned by <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upstream_modules()</span></code></a> and/or
+<a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">identity_deriving_modules()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.digraph">
+<code class="descname">digraph</code><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.digraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rough approximation of inter-module dependencies within this set.</p>
+<p>Unlike the base class <a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.digraph" title="ysfilemanager.filemanager.base._YSYangSetBase.digraph"><code class="xref py py-attr docutils literal notranslate"><span class="pre">digraph</span></code></a>, this includes
+additional modules within the repository that are not actually part
+of the set definition itself. These extra nodes are used for the
+<a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.extra_dependencies" title="ysfilemanager.filemanager.base._YSYangSetBase.extra_dependencies"><code class="xref py py-meth docutils literal notranslate"><span class="pre">extra_dependencies()</span></code></a> / <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upstream_modules()</span></code></a>
+/ <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">augmenter_modules()</span></code></a> / <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">identity_deriving_modules()</span></code></a>
+/ <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.related_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.related_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">related_modules()</span></code></a> APIs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">networkx.DiGraph</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules">
+<code class="descname">identity_deriving_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet.identity_deriving_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get modules that aren’t in this set but provide derived identities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of (name, revision, path) .This list may intersect with the
+lists returned by <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upstream_modules()</span></code></a> and/or
+<a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">augmenter_modules()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.modules">
+<code class="descname">modules</code><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorted list of (mod, rev, path) that this YSMutableYangSet has.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph">
+<code class="descname">pruned_digraph</code><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Digraph excluding certain nodes/paths that are not of interest.</p>
+<p>Specifically, this prunes out the modules defined in
+<a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED"><code class="xref py py-const docutils literal notranslate"><span class="pre">MODS_PARENTS_UNRELATED</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.related_modules">
+<code class="descname">related_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet.related_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.related_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get modules that aren’t part of this YANG set but might be relevant.</p>
+<p>Think of this function as providing a “People who use this yangset
+might also be interested in…” set of suggestions.</p>
+<p>The set of modules returned by this API is non-intersecting with those
+reported by <a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.extra_dependencies" title="ysfilemanager.filemanager.base._YSYangSetBase.extra_dependencies"><code class="xref py py-meth docutils literal notranslate"><span class="pre">extra_dependencies()</span></code></a> and
+<a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upstream_modules()</span></code></a>, which represent known dependencies and known
+consumers of the modules in this YANG set, respectively.</p>
+<p>As currently implemented, this is ‘degrees of separation’ based, as
+shown below (<code class="docutils literal notranslate"><span class="pre">(*)</span></code> represents modules too distant to be considered
+as related_modules):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>              ┌───────────────────────┐
+              │ upstream_grandparent &lt;─imports&lt;─ (*)
+upstream_mods ┤   ^ imports ^         │
+              │ upstream_parent  &lt;──imports&lt;──┐  related_modules
+              └   ^ imports ^    ─────┘    ┌──│─────────┴───────┐
+            ┌─  module_in_yangset      ─┐  │ upstream_relative &lt;─&gt;(*)
+yangset ────┤     ^ imports ^           │  │                    │
+            └─  another_mod_in_yangset ─┘  │ dep_relative &lt;──────&gt;(*)
+              ┌   ^ imports ^    ────┐     └───^────────────────┘
+              │ extra_dep_child ──&gt;imported─by─┘
+extra_depends ┤   ^ imports ^        │
+              │ extra_dep_grandchild ─&gt;imported─by─&gt; (*)
+              └──────────────────────┘
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This API makes use of the <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pruned_digraph</span></code></a> rather than the
+<a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.digraph" title="ysfilemanager.filemanager.base._YSYangSetBase.digraph"><code class="xref py py-attr docutils literal notranslate"><span class="pre">digraph</span></code></a>, meaning that if this set includes
+any of the modules listed in <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED"><code class="xref py py-const docutils literal notranslate"><span class="pre">MODS_PARENTS_UNRELATED</span></code></a>,
+other modules in the repository that import or are imported by
+said module(s) alone will <em>not</em> be included in the returned list.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of tuples (<cite>modulename</cite>, <cite>revision</cite>, <cite>path</cite>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.repository">
+<code class="descname">repository</code><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.repository" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules">
+<code class="descname">upstream_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet.upstream_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.upstream_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get modules that are not part of this YANG set but make use of it.</p>
+<p>These are optional “upstream consumers” - modules that import
+modules contained in our YANG set. Adding these to the
+YANG set could possibly result in a more complete picture.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This API makes use of the <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.pruned_digraph"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pruned_digraph</span></code></a> rather than the
+<a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.digraph" title="ysfilemanager.filemanager.base._YSYangSetBase.digraph"><code class="xref py py-attr docutils literal notranslate"><span class="pre">digraph</span></code></a>, meaning that if this set includes
+any of the modules listed in <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.MODS_PARENTS_UNRELATED"><code class="xref py py-const docutils literal notranslate"><span class="pre">MODS_PARENTS_UNRELATED</span></code></a>,
+other modules in the repository that import only said module(s)
+will <em>not</em> be included in the returned list.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="ysfilemanager.filemanager.base.html#ysfilemanager.filemanager.base._YSYangSetBase.modules_using" title="ysfilemanager.filemanager.base._YSYangSetBase.modules_using"><code class="xref py py-meth docutils literal notranslate"><span class="pre">modules_using()</span></code></a>: for getting the modules
+upstream of a single module, rather than the entire set. That API
+also does not prune the digraph or the list of modules returned,
+unlike this method.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of (module, revision, path). This list may intersect with the
+lists returned by <a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.augmenter_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">augmenter_modules()</span></code></a> and/or
+<a class="reference internal" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules" title="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.identity_deriving_modules"><code class="xref py py-meth docutils literal notranslate"><span class="pre">identity_deriving_modules()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.write">
+<code class="descname">write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysfilemanager/filemanager/mutableyangset.html#YSMutableYangSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysfilemanager.filemanager.mutableyangset.YSMutableYangSet.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save this yangset for later reuse via YSYangSet.load().</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysfilemanager.filemanager.utility.html" class="btn btn-neutral float-right" title="ysfilemanager.filemanager.utility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysfilemanager.filemanager.yangset.html" class="btn btn-neutral" title="ysfilemanager.filemanager.yangset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.7.0.post0.dev26',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yangsuite.views &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer/index.html">Developer documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yangsuite.views</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yangsuite.views</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Baseline views provided by yangsuite itself.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">django.apps</span> <span class="kn">import</span> <span class="n">apps</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.views.decorators</span> <span class="kn">import</span> <span class="n">staff_member_required</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin</span> <span class="kn">import</span> <span class="n">site</span> <span class="k">as</span> <span class="n">my_admin_site</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span> <span class="nn">django.utils.html</span> <span class="kn">import</span> <span class="n">escape</span> <span class="k">as</span> <span class="n">html_escape</span>
+<span class="kn">from</span> <span class="nn">django.contrib.staticfiles</span> <span class="kn">import</span> <span class="n">finders</span>
+<span class="kn">from</span> <span class="nn">yangsuite.logs</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">yangsuite.paths</span> <span class="kn">import</span> <span class="n">get_path</span>
+<span class="kn">from</span> <span class="nn">yangsuite.plugins</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_plugin_versions</span><span class="p">,</span> <span class="n">check_for_plugin_updates</span><span class="p">,</span>
+    <span class="n">python_report</span><span class="p">,</span> <span class="n">update_plugins</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="json_request"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.json_request">[docs]</a><span class="k">def</span> <span class="nf">json_request</span><span class="p">(</span><span class="n">decoratee</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;View decorator for views that expect a request in JSON format.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">decorated</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">jsondata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">jsondata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                                      <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;csrfmiddlewaretoken&#39;</span> <span class="ow">in</span> <span class="n">jsondata</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">jsondata</span><span class="p">[</span><span class="s1">&#39;csrfmiddlewaretoken&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                                    <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Malformed JSON request&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoratee</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">jsondata</span><span class="o">=</span><span class="n">jsondata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">decorated</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">==</span> <span class="n">decoratee</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="k">return</span> <span class="n">decorated</span></div>
+
+
+<div class="viewcode-block" id="user_profile_view"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.user_profile_view">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">user_profile_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display details of logged-in user.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;yangsuite/user_profile.html&quot;</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)})</span></div>
+
+
+<div class="viewcode-block" id="enable_gtm"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.enable_gtm">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">enable_gtm</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Disable Google Tag Manager for developer accounts.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;enable_gtm&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span> <span class="o">!=</span> <span class="s1">&#39;yangsuite-developer&#39;</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="log_view"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.log_view">[docs]</a><span class="nd">@staff_member_required</span>
+<span class="k">def</span> <span class="nf">log_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Admin-only view of the yang-suite log file.&quot;&quot;&quot;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">my_admin_site</span><span class="o">.</span><span class="n">each_context</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">context</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;YANG Suite logs&#39;</span>
+    <span class="n">context</span><span class="p">[</span><span class="s1">&#39;is_popup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;yangsuite/logs.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_log"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.get_log">[docs]</a><span class="nd">@staff_member_required</span>
+<span class="k">def</span> <span class="nf">get_log</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Admin-only get log contents as JSON.&quot;&quot;&quot;</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;levelname&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">))</span>
+    <span class="n">maxlines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;maxlines&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">_get_log_from_file</span><span class="p">(</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;logfile&#39;</span><span class="p">,</span>
+                                       <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;yangsuite.log.json&#39;</span><span class="p">),</span>
+                              <span class="n">maxlines</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="c1"># Make the &#39;message&#39; field HTML-safe (escaping &amp;&quot;&#39;&lt;&gt; characters)</span>
+        <span class="n">record</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">html_escape</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">])</span>
+        <span class="c1"># If there are newlines in the message, split it into paragraphs</span>
+        <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]:</span>
+            <span class="n">record</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;&lt;p&gt;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&lt;/p&gt;&lt;p&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/p&gt;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># &#39;asctime&#39; and &#39;msecs&#39; are two separate fields, but it&#39;s more useful</span>
+    <span class="c1"># to merge these under a single &#39;timestamp&#39; key as well:</span>
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">record</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.</span><span class="si">{1:03d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asctime&#39;</span><span class="p">,</span> <span class="s1">&#39;????-??-?? ??:??:??&#39;</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msecs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">})</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_log_from_file</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="n">maxlines</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Due to log rotation we may not get everything we need from a single file.</span>
+
+<span class="sd">    This function will loop as needed until running out of files or getting</span>
+<span class="sd">    the requested maxlines.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      basename (str): Base log name, e.g. &quot;yangsuite.log.json&quot;. Rotated older</span>
+<span class="sd">        logs are presumed to be basename.1, basename.2, etc.</span>
+<span class="sd">      maxlines (int): Maximum number of lines to retrieve</span>
+<span class="sd">      verbosity (int): Maximum logging level to filter by</span>
+<span class="sd">    Returns:</span>
+<span class="sd">      list: List of no more than maxlines dicts, each representing a single</span>
+<span class="sd">        log entry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">basename</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Generating log messages while retrieving log entries is likely a problem.</span>
+    <span class="c1">#</span>
+    <span class="c1"># log.debug(&quot;maxlines: {0} verbosity: {1}&quot;.format(maxlines, verbosity))</span>
+
+    <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># log.debug(&quot;Checking file {0}&quot;.format(filename))</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">logfile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">logfile</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;levelname&#39;</span><span class="p">:</span> <span class="s1">&#39;ERROR&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Malformed JSON entry:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">line</span><span class="p">)})</span>
+
+        <span class="c1"># log.debug(&quot;Got {0} lines from {1}&quot;.format(len(new_data), filename))</span>
+
+        <span class="c1"># Filter the data by verbosity</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">new_data</span> <span class="k">if</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;levelname&#39;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">verbosity</span><span class="p">]</span>
+
+        <span class="c1"># log.debug(&quot;After filtering by verbosity, {0} lines remain&quot;.format(</span>
+        <span class="c1">#               len(new_data)))</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_data</span> <span class="o">+</span> <span class="n">data</span><span class="p">)[</span><span class="o">-</span><span class="n">maxlines</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">maxlines</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># log.debug(&quot;Still have only {0}/{1} lines, continuing&quot;.format(</span>
+        <span class="c1">#               len(data), maxlines))</span>
+
+        <span class="n">number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="n">number</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<div class="viewcode-block" id="plugins"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.plugins">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">plugins</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Page to display installed plugins.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      django.http.HttpResponse: rendered plugins.html page</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;yangsuite/plugins.html&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="list_plugins"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.list_plugins">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">list_plugins</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;List the installed YANG Suite plugins.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      django.http.JsonResponse: {&#39;plugins&#39;: [list of dicts]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;plugins&#39;</span><span class="p">:</span> <span class="n">get_plugin_versions</span><span class="p">()})</span></div>
+
+
+<div class="viewcode-block" id="check_plugins"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.check_plugins">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">check_plugins</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check upstream repository for new versions of installed plugins.</span>
+
+<span class="sd">    Since this involves network operations it can be somewhat slow,</span>
+<span class="sd">    which is why this should be invoked as an AJAX call rather than</span>
+<span class="sd">    as part of the page load in :func:`plugins` above.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      django.http.JsonResponse: {&#39;apps&#39;: [{&#39;package_name&#39;: &#39;yangsuite&#39;, ...}]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;apps&#39;</span><span class="p">:</span> <span class="n">check_for_plugin_updates</span><span class="p">()})</span></div>
+
+
+<div class="viewcode-block" id="update_plugins_view"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.update_plugins_view">[docs]</a><span class="nd">@staff_member_required</span>
+<span class="k">def</span> <span class="nf">update_plugins_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the requested plugin(s).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      request (django.http.HttpRequest): with key &#39;plugins&#39; describing a list</span>
+<span class="sd">        of {plugin, version} dictionaries.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      django.http.JsonResponse:</span>
+<span class="sd">      ``{&#39;result&#39;: {&#39;plugins&#39;: {&#39;pluginname&#39;: &#39;updated&#39;}, &#39;message&#39;: &#39;&#39;}}``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plugins</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plugins&#39;</span><span class="p">,</span> <span class="s1">&#39;[]&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">plugins</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({},</span> <span class="n">status</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;No plugin(s) specified&quot;</span><span class="p">)</span>
+    <span class="n">update_result</span> <span class="o">=</span> <span class="n">update_plugins</span><span class="p">(</span><span class="n">plugins</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;plugins&#39;</span><span class="p">:</span> <span class="n">update_result</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;updated&#39;</span> <span class="k">for</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">update_result</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="c1"># Are we running in auto-reload mode?</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RUN_MAIN&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;YANG Suite server will automatically restart.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;You will need to restart the YANG Suite &quot;</span>
+                                 <span class="s2">&quot;server for these changes to take effect.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Check YANG Suite logs for details.&#39;</span>
+
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;result&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="report_modules"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.report_modules">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">report_modules</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Report on all installed Python modules and the Python version.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;report&#39;</span><span class="p">:</span> <span class="n">python_report</span><span class="p">()})</span></div>
+
+
+<div class="viewcode-block" id="mode"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.mode">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if mode.py file exists, which means this is a demo package.&quot;&quot;&quot;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;mode.py&#39;</span><span class="p">)):</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&lt;p&gt;&lt;strong&gt;Demo Version Copyright (c) 2017-2019&#39;</span>
+                <span class="s1">&#39; by Cisco Systems, Inc.&lt;/strong&gt;&lt;/p&gt;&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="help_view"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.help_view">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">help_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">document</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display a given help page, or the index if none is requested.&quot;&quot;&quot;</span>
+    <span class="n">doc_content</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;yangsuite&quot;</span>
+    <span class="k">if</span> <span class="n">document</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">document</span> <span class="o">=</span> <span class="s2">&quot;index&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">finders</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/docs/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">document</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.fjson&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">doc_content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="c1"># Fixup relative paths to embedded images</span>
+        <span class="n">doc_content</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;src=&quot;(?:\.\./)?_images/&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;src=&quot;/static/&#39;</span> <span class="o">+</span> <span class="n">section</span> <span class="o">+</span> <span class="s1">&#39;/docs/_images/&#39;</span><span class="p">,</span>
+            <span class="n">doc_content</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">doc_content</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Help file not found&quot;</span>
+
+    <span class="n">toctree</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># toctree is structured as:</span>
+    <span class="c1">#</span>
+    <span class="c1"># {</span>
+    <span class="c1">#   &#39;ysnetconf&#39;: {</span>
+    <span class="c1">#     &#39;title&#39;: &#39;Using NETCONF with YANG Suite&#39;,</span>
+    <span class="c1">#     &#39;items&#39;: [</span>
+    <span class="c1">#       {</span>
+    <span class="c1">#         &#39;title&#39;: &#39;Using NETCONF RPCs&#39;,</span>
+    <span class="c1">#         &#39;content&#39;: &#39;rpcs&#39;,</span>
+    <span class="c1">#       },</span>
+    <span class="c1">#       ...</span>
+    <span class="c1">#     ],</span>
+    <span class="c1">#   },</span>
+    <span class="c1">#   &#39;ysyangtree&#39;: {...},</span>
+    <span class="c1"># }</span>
+    <span class="n">finders</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;nonexistent/path&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">staticdir</span> <span class="ow">in</span> <span class="n">finders</span><span class="o">.</span><span class="n">searched_locations</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">staticdir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;_modules&#39;</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+                <span class="n">dirs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;_modules&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;docs&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">section</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+
+            <span class="c1"># If the plugin has specified a preferred order for its help pages,</span>
+            <span class="c1"># get that order now.</span>
+            <span class="n">page_order</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ac</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_app_config</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="c1"># ac.help_pages is (suggested_title, pagename.html)</span>
+                <span class="c1"># we just want the pagename</span>
+                <span class="n">page_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">ac</span><span class="o">.</span><span class="n">help_pages</span><span class="p">]</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">LookupError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                <span class="k">pass</span>
+
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.fjson&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;genindex.fjson&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;py-modindex.fjson&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;search.fjson&#39;</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">toctree</span><span class="p">:</span>
+                    <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+
+                <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span>
+                    <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
+                    <span class="p">})</span>
+
+            <span class="k">if</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">toctree</span> <span class="ow">and</span> <span class="s1">&#39;items&#39;</span> <span class="ow">in</span> <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">]:</span>
+                <span class="c1"># Sort the pages into the order suggested by the app. Any pages</span>
+                <span class="c1"># not specifically suggested go at the end of the list,</span>
+                <span class="c1"># in alphabetical order by filename.</span>
+                <span class="k">def</span> <span class="nf">ordering</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">page_order</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">page_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]))</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
+                <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">],</span>
+                                                   <span class="n">key</span><span class="o">=</span><span class="n">ordering</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sorted pages based on page_order </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                          <span class="n">page_order</span><span class="p">,</span> <span class="n">toctree</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Sort the sections so that built in apps are first, followed by all</span>
+    <span class="c1"># other apps in alphabetical order.</span>
+    <span class="n">section_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yangsuite&#39;</span><span class="p">,</span> <span class="s1">&#39;ysdevices&#39;</span><span class="p">,</span> <span class="s1">&#39;ysfilemanager&#39;</span><span class="p">,</span> <span class="s1">&#39;ysyangtree&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">ordering</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">section_order</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">section_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">newtoctree</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">toctree</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">ordering</span><span class="p">):</span>
+        <span class="n">newtoctree</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">toctree</span> <span class="o">=</span> <span class="n">newtoctree</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;yangsuite/help.html&quot;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;toctree&#39;</span><span class="p">:</span> <span class="n">toctree</span><span class="p">,</span>
+        <span class="s1">&#39;document&#39;</span><span class="p">:</span> <span class="n">doc_content</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="help_search"><a class="viewcode-back" href="../../developer/yangsuite.views.html#yangsuite.views.help_search">[docs]</a><span class="nd">@login_required</span>
+<span class="k">def</span> <span class="nf">help_search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display the &quot;search help&quot; page and populate it with the search index.&quot;&quot;&quot;</span>
+    <span class="n">finders</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;nonexistent/path&quot;</span><span class="p">)</span>
+    <span class="n">searchindex</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;docnames&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;filenames&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;titles&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">&#39;titleterms&#39;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Each plugin provides its own &quot;docs/searchindex.json&quot; file, which is an</span>
+    <span class="c1"># index of the documentation pages provided by this plugin.</span>
+    <span class="c1"># We walk across all plugins to build a single global search index.</span>
+    <span class="k">for</span> <span class="n">staticdir</span> <span class="ow">in</span> <span class="n">finders</span><span class="o">.</span><span class="n">searched_locations</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">staticdir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;_modules&#39;</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+                <span class="n">dirs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;_modules&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;docs&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="s1">&#39;searchindex.json&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">section</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;searchindex.json&#39;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">newindex</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+            <span class="c1"># Each searchindex dictionary references its documents by a</span>
+            <span class="c1"># integer index. We need to modify this index to avoid collisions,</span>
+            <span class="c1"># i.e. if plugin A has docs [0..4] and plugin B has docs [0..3],</span>
+            <span class="c1"># we need to remap plugin B to use [5..8] instead.</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">searchindex</span><span class="p">[</span><span class="s1">&#39;docnames&#39;</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">newindex</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;titles&#39;</span><span class="p">]:</span>
+                    <span class="c1"># List of document titles - just append to existing list</span>
+                    <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;docnames&#39;</span><span class="p">,</span> <span class="s1">&#39;filenames&#39;</span><span class="p">]:</span>
+                    <span class="c1"># Prepend section to each name, then add to existing list</span>
+                    <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">section</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">,</span> <span class="s1">&#39;titleterms&#39;</span><span class="p">]:</span>
+                    <span class="c1"># Dictionary of term: matching document index(es)</span>
+                    <span class="c1"># To add complexity, the matches can either be a single</span>
+                    <span class="c1"># page index (int) or a list of such indices, so we have to</span>
+                    <span class="c1"># handle both cases when combining pages</span>
+                    <span class="k">for</span> <span class="n">term</span><span class="p">,</span> <span class="n">matches</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="c1"># Apply previously calculated offset to all indices.</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="n">matches</span> <span class="o">+=</span> <span class="n">offset</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="n">offset</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">]</span>
+
+                        <span class="k">if</span> <span class="n">term</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                            <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">matches</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Combine entries into a single list</span>
+                            <span class="n">base_matches</span> <span class="o">=</span> <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">term</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_matches</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                                <span class="n">base_matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_matches</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                                <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">matches</span><span class="p">]</span>
+                            <span class="n">searchindex</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_matches</span> <span class="o">+</span> <span class="n">matches</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;yangsuite/help_search.html&quot;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;searchindex&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">searchindex</span><span class="p">),</span>
+    <span class="p">})</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

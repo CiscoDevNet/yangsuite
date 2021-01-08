@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysdevices.views &mdash; yangsuite-devices 2.8.0.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="ysdevices.plugin" href="ysdevices.plugin.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-devices
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Device Profiles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ysdevices developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="migration-from-1.0.html">Migrating your code from ysdevices 1.x to 2.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.apps.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.devprofile.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.devprofile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysdevices.plugin.html"><code class="docutils literal notranslate"><span class="pre">ysdevices.plugin</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysdevices.views</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-devices</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">ysdevices developer documentation</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysdevices.views</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysdevices.views.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysdevices.views">
+<span id="ysdevices-views"></span><h1><code class="docutils literal notranslate"><span class="pre">ysdevices.views</span></code><a class="headerlink" href="#module-ysdevices.views" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="ysdevices.views.check_device">
+<code class="descclassname">ysdevices.views.</code><code class="descname">check_device</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#check_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.check_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirm reachability of the given device profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>JsonResponse</em> – information about device reachability (on success)
+or an error status with a possible {‘errors’: …} dict.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.create_default_repo_yangset">
+<code class="descclassname">ysdevices.views.</code><code class="descname">create_default_repo_yangset</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#create_default_repo_yangset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.create_default_repo_yangset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Create default Repository and Yangset for</dt>
+<dd>the given device profile from the server.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) – GET</li>
+<li><strong>device_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Required</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><em>JsonResponse</em> –</p>
+<dl class="docutils">
+<dt>either a HTTP 200 success message with no content,</dt>
+<dd><p class="first last">or an error message with possible dict {‘errors’: errors} for details.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.create_device">
+<code class="descclassname">ysdevices.views.</code><code class="descname">create_device</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#create_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.create_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create, validate, and possibly save a new device profile.</p>
+<p>Helper to <a class="reference internal" href="#ysdevices.views.device_crud" title="ysdevices.views.device_crud"><code class="xref py py-func docutils literal notranslate"><span class="pre">device_crud()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.delete_device">
+<code class="descclassname">ysdevices.views.</code><code class="descname">delete_device</code><span class="sig-paren">(</span><em>device_key</em>, <em>user</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#delete_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.delete_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a device profile. Helper for <a class="reference internal" href="#ysdevices.views.device_crud" title="ysdevices.views.device_crud"><code class="xref py py-func docutils literal notranslate"><span class="pre">device_crud()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.device_crud">
+<code class="descclassname">ysdevices.views.</code><code class="descname">device_crud</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#device_crud"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.device_crud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create, read, update, or delete the given device profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) – POST, GET, PATCH, or DELETE request</li>
+<li><strong>device_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Required for GET, PATCH, or DELETE; ignored for POST.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><em>JsonResponse</em> –</p>
+<dl class="docutils">
+<dt>either a HTTP 200 success message with no content,</dt>
+<dd><p class="first last">or an error message with possible dict {‘errors’: errors} for details.</p>
+</dd>
+<dt>HttpResponse: for a generic “GET” request with no parameters</dt>
+<dd><p class="first last">(rendering the device.html page)</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.devices_page">
+<code class="descclassname">ysdevices.views.</code><code class="descname">devices_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#devices_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.devices_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the main “device profiles list” setup page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.edit_device_form">
+<code class="descclassname">ysdevices.views.</code><code class="descname">edit_device_form</code><span class="sig-paren">(</span><em>request</em>, <em>device_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#edit_device_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.edit_device_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the form used to edit an existing profile.</p>
+<p>Note that the return is an HTML snippet <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;...&lt;/form&gt;</span></code> and not a
+complete web page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.file_upload">
+<code class="descclassname">ysdevices.views.</code><code class="descname">file_upload</code><span class="sig-paren">(</span><em>request</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#file_upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.file_upload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save file associated to a device profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) – POST request</li>
+<li><strong>device_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Required for POST.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><em>JsonResponse</em> –</p>
+<dl class="docutils">
+<dt>either a HTTP 201 success message with no content,</dt>
+<dd><p class="first last">or an error message with possible dict {‘errors’: errors} for details.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.json_request">
+<code class="descclassname">ysdevices.views.</code><code class="descname">json_request</code><span class="sig-paren">(</span><em>decoratee</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#json_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.json_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for views that expect a request in JSON format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.list_devices">
+<code class="descclassname">ysdevices.views.</code><code class="descname">list_devices</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#list_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.list_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the listing of device profiles, optionally filtered.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.new_device_form">
+<code class="descclassname">ysdevices.views.</code><code class="descname">new_device_form</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#new_device_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.new_device_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the blank form used to define a new profile.</p>
+<p>Note that the return is an HTML snippet <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;...&lt;/form&gt;</span></code> and not a
+complete web page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysdevices.views.update_device">
+<code class="descclassname">ysdevices.views.</code><code class="descname">update_device</code><span class="sig-paren">(</span><em>device_key</em>, <em>data</em>, <em>user</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysdevices/views.html#update_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysdevices.views.update_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate changes to an existing profile and save if valid.</p>
+<p>Helper to <a class="reference internal" href="#ysdevices.views.device_crud" title="ysdevices.views.device_crud"><code class="xref py py-func docutils literal notranslate"><span class="pre">device_crud()</span></code></a>.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="ysdevices.plugin.html" class="btn btn-neutral" title="ysdevices.plugin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, Glenn Matthews and the other members of yang-suite-dev@cisco.com.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.8.0.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

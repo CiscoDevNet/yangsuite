@@ -1,0 +1,9 @@
+Device Profiles
+===============
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   devices
+   enxr

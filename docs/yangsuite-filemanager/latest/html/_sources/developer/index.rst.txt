@@ -1,0 +1,13 @@
+yangsuite-filemanager developer documentation
+=============================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   working_with_filemanager
+   ysfilemanager.filemanager
+   ysfilemanager.apps
+   ysfilemanager.quickparser
+   ysfilemanager.scp_importer
+   ysfilemanager.views

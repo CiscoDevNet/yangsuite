@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Project structure and design guidelines &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation tooling" href="doc_tooling.html" />
+    <link rel="prev" title="YANG Suite developer documentation" href="develop.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="develop.html">YANG Suite developer documentation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Project structure and design guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#directory-and-repository-structure">Directory and repository structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#division-of-responsibilities-between-yang-suite-and-apps">Division of responsibilities between YANG Suite and apps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#application-design-and-division-of-responsibilities">Application design and division of responsibilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc_tooling.html">Documentation tooling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_process.html">Release process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Building and publishing YANG Suite Docker images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_new_application.html">Creating a new application from our template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">Auto user registration for YangSuite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer documentation</a> &raquo;</li>
+        
+      <li>Project structure and design guidelines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/design_guidelines.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="project-structure-and-design-guidelines">
+<h1>Project structure and design guidelines<a class="headerlink" href="#project-structure-and-design-guidelines" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="directory-and-repository-structure">
+<h2>Directory and repository structure<a class="headerlink" href="#directory-and-repository-structure" title="Permalink to this headline">¶</a></h2>
+<p>YANG Suite itself and its individual application plugins all follow a similar
+directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>yangsuite.git
+├── bin/
+|   └── setup_yangsuite.sh
+├── docs/
+|   ├── developer/
+|   |   ├── design_guidelines.rst
+|   |   └── develop.rst
+|   └── user/
+|       └── index.rst
+├── Makefile
+├── README.rst
+├── setup.py        definition for yangsuite package
+└── yangsuite/
+    ├── apps.py
+    ├── context_processors.py
+    ├── static/
+    │   └── yangsuite/
+    │       ├── js/
+    │       └── css/
+    ├── templates/
+    │   └── yangsuite/
+    ├── tests/
+    │   ├── test_context_processors.py
+    │   └── test_doctests.py
+    ├── urls.py        core YANG Suite URLs plus loading of app URLs
+    └── views.py       core YANG Suite Django view functions
+
+yangsuite-devices.git
+├── docs/
+|   ├── developer/
+|   |   ├── ysdevices.rst
+|   └── user/
+|       └── index.rst
+├── Makefile
+├── README.rst
+├── setup.py           definition for yangsuite-devices package
+└── ysdevices/
+    ├── apps.py        registration as a discoverable YANG Suite app
+    ├── devprofile.py  application infrastructure (Django-agnostic)
+    ├── static/
+    │   └── ysdevices/
+    │       ├── js/
+    │       └── css/
+    ├── templates/
+    │   └── ysdevices/
+    ├── tests/
+    ├── urls.py        URLs provided to Django by ysdevices
+    └── views.py       Django view functions provided by ysdevices
+
+yangsuite-netconf.git
+├── docs/
+|   ├── developer/
+|   |   ├── ysnetconf.rst
+|   └── user/
+|       └── index.rst
+├── Makefile
+├── README.rst
+├── setup.py           definition for yangsuite-netconf package
+└── ysnetconf/
+    ├── apps.py        registration as a discoverable YANG Suite app
+    ├── nconf.py       application infrastructure (Django-agnostic)
+    ├── static/
+    │   └── ysnetconf/
+    │       ├── js/
+    │       └── css/
+    ├── templates/
+    │   └── ysnetconf/
+    ├── tests/
+    ├── urls.py        URLs provided to Django by ysnetconf
+    └── views.py       Django view functions provided by ysnetconf
+
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="division-of-responsibilities-between-yang-suite-and-apps">
+<h2>Division of responsibilities between YANG Suite and apps<a class="headerlink" href="#division-of-responsibilities-between-yang-suite-and-apps" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The core <code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> project should be as lean as possible –
+it provides a basic infrastructure for installing all of the various apps,
+but provides very little YANG Suite application functionality itself.</li>
+<li>As such, adding new <code class="docutils literal notranslate"><span class="pre">.py</span></code> files to <code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> will be considered
+suspect, as application functionality should be included in an application
+plugin instead.</li>
+<li>Each application should typically “do one thing and do it well” - don’t be
+afraid to create a new application plugin if a new set of functionality is
+needed and it doesn’t <em>very clearly</em> belong in an existing application.</li>
+<li>For any given application plugin, the Python package name (as defined in
+<code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, etc.) should generally be <code class="docutils literal notranslate"><span class="pre">yangsuite-applicationname</span></code> and
+app code should be in the <code class="docutils literal notranslate"><span class="pre">ysapplicationname</span></code> namespace,
+i.e. installed to <code class="docutils literal notranslate"><span class="pre">site-packages/</span></code> in a <code class="docutils literal notranslate"><span class="pre">ysapplicationname/</span></code> directory.</li>
+</ul>
+</div>
+<div class="section" id="application-design-and-division-of-responsibilities">
+<h2>Application design and division of responsibilities<a class="headerlink" href="#application-design-and-division-of-responsibilities" title="Permalink to this headline">¶</a></h2>
+<p>Applications should not be tightly coupled with Django or with a web interface
+in general. There are cases where an application may wish to be executable from
+the command line (interactively or non-) and we want to make that as
+straightforward as possible to implement. Some practical implications:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">views.py</span></code> should serve as little more than a translation layer between the
+web front-end (HTTP/HTML/JSON) and the underlying Python code (methods,
+objects, functions).</li>
+<li>Most of the actual ‘work’ of the application should be done in code that is
+unaware of Django or of the web front-end where applicable, such as:<ul>
+<li>API inputs should be Python objects (or possibly JSON strings), never
+<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> (translation to be handled in the views functions).</li>
+<li>API outputs should be Python objects (typically <code class="docutils literal notranslate"><span class="pre">dict</span></code> or plain-text
+<code class="docutils literal notranslate"><span class="pre">str</span></code>), not <code class="docutils literal notranslate"><span class="pre">JsonResponse</span></code> or HTML <code class="docutils literal notranslate"><span class="pre">str</span></code>.</li>
+<li>Code in this module(s) shouldn’t ever <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">django</span></code> or similar.</li>
+</ul>
+</li>
+<li>Using Django’s “forms” APIs results in adding a lot of Django-specific
+input validation logic. It’s usually better to implement this logic in the
+pure-Python code instead.</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="doc_tooling.html" class="btn btn-neutral float-right" title="Documentation tooling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="develop.html" class="btn btn-neutral" title="YANG Suite developer documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

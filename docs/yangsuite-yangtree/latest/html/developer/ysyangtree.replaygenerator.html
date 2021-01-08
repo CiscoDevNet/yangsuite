@@ -1,0 +1,860 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ysyangtree.replaygenerator &mdash; yangsuite-yangtree 1.18.0.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ysyangtree.tasks" href="ysyangtree.tasks.html" />
+    <link rel="prev" title="ysyangtree.context" href="ysyangtree.context.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yangsuite-yangtree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.18.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Working with YANG Models</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ysyangtree developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.apps.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.apps</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.context.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.context</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.tasks.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.tasks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.utilities.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.utilities</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.views.task.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.task</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.views.utilities.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.utilities</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.views.yangtree.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.views.yangtree</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ysyangtree.ymodels.html"><code class="docutils literal notranslate"><span class="pre">ysyangtree.ymodels</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yangsuite-yangtree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">ysyangtree developer documentation</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/ysyangtree.replaygenerator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ysyangtree.replaygenerator">
+<span id="ysyangtree-replaygenerator"></span><h1><code class="docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator</span></code><a class="headerlink" href="#module-ysyangtree.replaygenerator" title="Permalink to this headline">¶</a></h1>
+<p>Module to autogenerate families of replays.</p>
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.BaseReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">BaseReplay</code><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for all replay classes.</p>
+<dl class="classmethod">
+<dt id="ysyangtree.replaygenerator.BaseReplay.add_to_mandatory_nodes">
+<em class="property">classmethod </em><code class="descname">add_to_mandatory_nodes</code><span class="sig-paren">(</span><em>node={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.add_to_mandatory_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.add_to_mandatory_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.edit_config">
+<code class="descname">edit_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.edit_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.edit_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this function if special processing is needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.get_config">
+<code class="descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this function to support get-config replays.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.get_values">
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.get_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.group_count">
+<code class="descname">group_count</code><em class="property"> = 1</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.group_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.group_counter">
+<code class="descname">group_counter</code><em class="property"> = count(1)</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.group_counter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.in_mandatory_nodes">
+<code class="descname">in_mandatory_nodes</code><span class="sig-paren">(</span><em>cfg={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.in_mandatory_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.in_mandatory_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.in_required_nodes">
+<code class="descname">in_required_nodes</code><span class="sig-paren">(</span><em>xpath=''</em>, <em>cfg={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.in_required_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.in_required_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.mandatory_nodes">
+<code class="descname">mandatory_nodes</code><em class="property"> = []</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.mandatory_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.pre_nodes">
+<code class="descname">pre_nodes</code><em class="property"> = []</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.pre_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.referred_to_nodes">
+<code class="descname">referred_to_nodes</code><em class="property"> = []</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.referred_to_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.required_leafref">
+<code class="descname">required_leafref</code><span class="sig-paren">(</span><em>xpath</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.required_leafref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.required_leafref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return referred-to node of a leafref if required.</p>
+<p>If a learef is defined in a key, the referred-to node must be in
+every replay beyond the list entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Xpath of the current node to be configured in a replay.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – All referred-to nodes required in path.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.BaseReplay.state_replay">
+<code class="descname">state_replay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#BaseReplay.state_replay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.state_replay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this function if special processing is needed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.BaseReplay.tw">
+<code class="descname">tw</code><em class="property"> = None</em><a class="headerlink" href="#ysyangtree.replaygenerator.BaseReplay.tw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.ChoiceReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">ChoiceReplay</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>xpath</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ChoiceReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ChoiceReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a choice nodetype for special handling.</p>
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ChoiceReplay.add_config">
+<code class="descname">add_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ChoiceReplay.add_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ChoiceReplay.add_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ChoiceReplay.get_cases">
+<code class="descname">get_cases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ChoiceReplay.get_cases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ChoiceReplay.get_cases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">ConfigGenerator</code><span class="sig-paren">(</span><em>parseyang</em>, <em>base_xpath</em>, <em>category</em>, <em>output_path</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Contains all parameters needed to generate edit and get configs.</p>
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_KEYS">
+<code class="descname">RE_STRIP_KEYS</code><em class="property"> = re.compile('\\[[^]]+\\]')</em><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_KEYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_PREFIXES">
+<code class="descname">RE_STRIP_PREFIXES</code><em class="property"> = re.compile('/[-a-zA-Z0-9]+:')</em><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_PREFIXES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_VARIABLES">
+<code class="descname">RE_STRIP_VARIABLES</code><em class="property"> = re.compile('_-|-_')</em><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.RE_STRIP_VARIABLES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.add_mandatory">
+<code class="descname">add_mandatory</code><span class="sig-paren">(</span><em>node</em>, <em>group</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.add_mandatory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.add_mandatory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.add_mandatory_nodes">
+<code class="descname">add_mandatory_nodes</code><span class="sig-paren">(</span><em>group</em>, <em>xp</em>, <em>cutoff_node</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.add_mandatory_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.add_mandatory_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to add mandatory nodes to configs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.generate_replay_name">
+<code class="descname">generate_replay_name</code><span class="sig-paren">(</span><em>counter</em>, <em>prefix</em>, <em>suffix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.generate_replay_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.generate_replay_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an appropriate name for a constructed replay.</p>
+<p>Note that yangsuite-testmanager identifies generated replays based on
+the naming pattern, so any changes to this need to be validated
+against that!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>counter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Numerical ID associated with this replay</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – XPath this replay applies to</li>
+<li><strong>suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Descriptive string for this replay</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>str</em> – Of no more than about 72 characters in length, if possible.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<p># Simple case - no trimming required
+1, “/native/banner/exec/banner”, “basic merge”
+# Returns
+‘00001 - /native/banner/exec/banner - basic merge’</p>
+<p># XPath needs namespace prefixes stripped and to be trimmed as well
+150, ‘&lt;long path&gt;/pfx:redundancy/pfx:minimum-preferred-links’, ‘extra’
+# Returns
+‘00150 - …/redundancy/minimum-preferred-links - extra’</p>
+<p># Also requires stripping out of list keys
+1, ‘/interface[active=”act”]/physical/slot’, “basic replace”
+# Returns
+‘00001 - …/physical/slot - basic replace’</p>
+<p># Both prefix and suffix need to be trimmed for length</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.get_case_nodes">
+<code class="descname">get_case_nodes</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.get_case_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.get_case_nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.make_csv_and_replays">
+<code class="descname">make_csv_and_replays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.make_csv_and_replays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.make_csv_and_replays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using output from built replays, create a CSV file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.make_csv_replays">
+<code class="descname">make_csv_replays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.make_csv_replays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.make_csv_replays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create replays based on input from a CSV file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.make_group_replays">
+<code class="descname">make_group_replays</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.make_group_replays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.make_group_replays" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.make_replay_generic">
+<code class="descname">make_replay_generic</code><span class="sig-paren">(</span><em>counter</em>, <em>prefix</em>, <em>suffix</em>, <em>proto_op</em>, <em>configs</em>, <em>opfields=[]</em>, <em>description=''</em>, <em>cli={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.make_replay_generic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.make_replay_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a replay for the given parseyang.</p>
+<p>See also <code class="xref py py-func docutils literal notranslate"><span class="pre">make_replay()</span></code> function defined later on.</p>
+<p>Inherits the following local variables from class constructor:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">parseyang</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">nsps</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">description</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">output_path</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">opfields</span></code></li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>counter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Numeric prefix for the name of the replay</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – String prefix for the name of the replay,
+typically an XPath string</li>
+<li><strong>suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – String suffix for the name of the replay,
+typically the NETCONF edit-config operation (merge, create, etc.)
+being exercised</li>
+<li><strong>proto_op</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The NETCONF operation (generally “edit-config”)</li>
+<li><strong>configs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of dicts to populate the replay with.</li>
+<li><strong>opfields</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of dicts to evaluate operational state fields.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.make_tests">
+<code class="descname">make_tests</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.make_tests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.make_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate tests based on newly created replays or a CSV file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.process_mandatory">
+<code class="descname">process_mandatory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.process_mandatory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.process_mandatory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find nearest upstream list or precense container of mandatory node.</p>
+<p>Leaf nodes with mandatory “true” are required for all configurations
+that fall within a non-presence container.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ConfigGenerator.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ConfigGenerator.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ConfigGenerator.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear out static values that may skew next generation run.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.ContainerReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">ContainerReplay</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>xpath</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ContainerReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ContainerReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a container nodetype with parameters for replays.</p>
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.ContainerReplay.non_leaf_types">
+<code class="descname">non_leaf_types</code><em class="property"> = ['list', 'container', 'leaflist']</em><a class="headerlink" href="#ysyangtree.replaygenerator.ContainerReplay.non_leaf_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ContainerReplay.state_replay">
+<code class="descname">state_replay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ContainerReplay.state_replay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ContainerReplay.state_replay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this function if special processing is needed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.LeafListReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">LeafListReplay</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>xpath</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#LeafListReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.LeafListReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a leaf-list nodetype with required parameters for replays.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.LeafRef">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">LeafRef</code><span class="sig-paren">(</span><em>base_node</em>, <em>parent</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#LeafRef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.LeafRef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a leafref node but does not construct replays.</p>
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.LeafRef.config">
+<code class="descname">config</code><a class="headerlink" href="#ysyangtree.replaygenerator.LeafRef.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.LeafRef.xpath">
+<code class="descname">xpath</code><a class="headerlink" href="#ysyangtree.replaygenerator.LeafRef.xpath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.LeafReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">LeafReplay</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>xpath</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#LeafReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.LeafReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a leaf node for replays.</p>
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.LeafReplay.handle_tailf_annotations">
+<code class="descname">handle_tailf_annotations</code><span class="sig-paren">(</span><em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#LeafReplay.handle_tailf_annotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.LeafReplay.handle_tailf_annotations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.LeafReplay.state_replay">
+<code class="descname">state_replay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#LeafReplay.state_replay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.LeafReplay.state_replay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a state replay for the leaf node</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.ListReplay">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">ListReplay</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>xpath</em>, <em>xpath_subst</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ListReplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ListReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ysyangtree.replaygenerator.BaseReplay" title="ysyangtree.replaygenerator.BaseReplay"><code class="xref py py-class docutils literal notranslate"><span class="pre">ysyangtree.replaygenerator.BaseReplay</span></code></a></p>
+<p>Represents a list nodetype with required parameters for replays.</p>
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ListReplay.edit_config">
+<code class="descname">edit_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ListReplay.edit_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ListReplay.edit_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>List edit-ops are different.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.ListReplay.non_leaf_types">
+<code class="descname">non_leaf_types</code><em class="property"> = ['list', 'container', 'leaflist']</em><a class="headerlink" href="#ysyangtree.replaygenerator.ListReplay.non_leaf_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ysyangtree.replaygenerator.ListReplay.state_replay">
+<code class="descname">state_replay</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#ListReplay.state_replay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.ListReplay.state_replay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a state replay that creates a list entry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ysyangtree.replaygenerator.NodeEntry">
+<em class="property">class </em><code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">NodeEntry</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ysyangtree.replaygenerator.NodeEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<p>Tuple of a node dict, its parent dict, and a list of additional dicts.</p>
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.NodeEntry.node">
+<code class="descname">node</code><a class="headerlink" href="#ysyangtree.replaygenerator.NodeEntry.node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ysyangtree.replaygenerator.NodeEntry.parent">
+<code class="descname">parent</code><a class="headerlink" href="#ysyangtree.replaygenerator.NodeEntry.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.add_extra_nodes">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">add_extra_nodes</code><span class="sig-paren">(</span><em>extra_nodes</em>, <em>more_extra_nodes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#add_extra_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.add_extra_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add extra nodes like mandatory children or list keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>extra_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of xpath/value dicts needed for replay.</li>
+<li><strong>more_extra_nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Additional xpath/value dicts for replay.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.clean_regex_result">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">clean_regex_result</code><span class="sig-paren">(</span><em>xeger</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#clean_regex_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.clean_regex_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove characters that have proven to effect IOS configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xeger</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Pattern that should match regex created by Xeger.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>(str)</em> – Pattern after unwanted characters have been removed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.extra_node_data">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">extra_node_data</code><span class="sig-paren">(</span><em>stmt=None</em>, <em>parent_data=None</em>, <em>node=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#extra_node_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.extra_node_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add tailf annotations to the node data.</p>
+<p>Callback function for <a class="reference internal" href="ysyangtree.ymodels.html#ysyangtree.ymodels.ParseYang.generate_tree" title="ysyangtree.ymodels.ParseYang.generate_tree"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ysyangtree.ymodels.ParseYang.generate_tree()</span></code></a>.</p>
+<p>Currently uses the following annotations:</p>
+<ul class="simple">
+<li><cite>tailf:cli-sequence-commands</cite> - specifies that the arguments in the model
+need to each be input in order to be accepted by the IOS XE CLI</li>
+<li><cite>tailf:cli-break-sequence-commands</cite> - negates a previous
+<cite>cli-sequence-commands</cite> annotation, meaning that this node and those
+after it no longer need to be specified in full order.</li>
+<li><cite>tailf:cli-incomplete-command</cite> - specifies that this leaf by itself
+does not constitute a complete CLI command.
+When combined with <cite>cli-sequence-commands</cite>, this means that the next leaf
+in the current container also needs to be included for the command
+to be considered valid.</li>
+<li><cite>tailf:cli-optional-in-sequence</cite> - specifies that the leaf may be omitted
+from the sequence of leafs under a <cite>cli-sequence-commands</cite> container.
+If not specified, this leaf must be specified if the next leaf in the
+container is also to be specified.</li>
+</ul>
+<p>Between the above annotations, we can determine any leafs that must precede
+a given leaf (due to <cite>cli-sequence-commands</cite> plus the absence of any
+<cite>cli-optional-in-sequence</cite> annotations, analogous to a YANG “when” clause)
+and any leafs that must follow a given leaf (due to the given leaf being
+<cite>cli-incomplete-command</cite>, analogous to a YANG “must” clause).</p>
+<p>For more information on these and other annotations, see:
+<a class="reference external" href="http://wwwin-people.cisco.com/phpetty/nso_man/man.5.tailf_yang_cli_extensions.html">http://wwwin-people.cisco.com/phpetty/nso_man/man.5.tailf_yang_cli_extensions.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.generate_replays">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">generate_replays</code><span class="sig-paren">(</span><em>parseyang</em>, <em>base_xpath</em>, <em>category</em>, <em>output_path</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#generate_replays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.generate_replays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a family of replays based on the given xpath root.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parseyang</strong> (<a class="reference internal" href="ysyangtree.ymodels.html#ysyangtree.ymodels.ParseYang" title="ysyangtree.ymodels.ParseYang"><em>ysyangtree.ymodels.ParseYang</em></a>) – Parsed YANG module tree</li>
+<li><strong>base_xpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Node ‘xpath’ to use as the root
+node to descend from.</li>
+<li><strong>category</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Subdirectory within output_path to group files into.</li>
+<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Directory path to output files to.
+If not already ending with “/replays”, that will be appended.</li>
+<li><strong>kwargs</strong> – May include any of the following
+- generic_string_values: List of string values to use for
+create/merge and replace replays (in that order) for strings
+that don’t have a defined pattern</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.main">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">main</code><span class="sig-paren">(</span><em>argv</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>CLI entry point for generate_replays().</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.mandatory_children_of_node">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">mandatory_children_of_node</code><span class="sig-paren">(</span><em>root_node</em>, <em>xpath_subst</em>, <em>mandatory_nodes=[]</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#mandatory_children_of_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.mandatory_children_of_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the descendants of the given node which are themselves mandatory.</p>
+<p>At present, handles any <code class="docutils literal notranslate"><span class="pre">mandatory</span></code> leaf and choice nodes.</p>
+<ul class="simple">
+<li>TODO: handle list/leaf-list with <code class="docutils literal notranslate"><span class="pre">min-elements</span></code>.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>node</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Representing a node in a yangtree</li>
+<li><strong>xpath_subst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Of (before, after) XPath string substitutions</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – of dicts with keys ‘xpath’, ‘value’.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.pre_config_values">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">pre_config_values</code><span class="sig-paren">(</span><em>xpath</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#pre_config_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.pre_config_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return user supplied values associated to xpath.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Xpath with prefixes to node of supplied value.</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Optioonal “preconfig” dict with xpath/value pairs.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – Values supplied by user.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.safe_xegers">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">safe_xegers</code><span class="sig-paren">(</span><em>pattern</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#safe_xegers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.safe_xegers" title="Permalink to this definition">¶</a></dt>
+<dd><p>As xeger.Xeger, but avoiding characters that can be problematic.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> – Two strings satisfying the given pattern. Will always return
+the same two strings for the same given pattern.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.values_for_leaf_data">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">values_for_leaf_data</code><span class="sig-paren">(</span><em>node</em>, <em>parent</em>, <em>generic_string_values={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#values_for_leaf_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.values_for_leaf_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a yangtree ‘data’ dict, determine candidate leaf values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>node</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – As in yangtree node, the leaf or leaf-list node.</li>
+<li><strong>parent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – The leaf’s or leaf-list’s immediate parent node.</li>
+<li><strong>generic_string_values</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – A list of string values to use for replays
+that the user can provide. Currently the first value corresponds to a
+value for create/merge replays and the second to a value for replace
+replays.</li>
+<li><strong>kwargs</strong> – Takes in any preconfigured values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – of zero or more (usually, but not always, 2) candidate
+values for this leaf.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.walk_tree_to_xpath">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">walk_tree_to_xpath</code><span class="sig-paren">(</span><em>tree</em>, <em>target_xpath</em>, <em>config_gen</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#walk_tree_to_xpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.walk_tree_to_xpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Walk the given node data tree until reaching the desired node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tree</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – YANG model tree to walk</li>
+<li><strong>target_xpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – XPath of desired target node</li>
+<li><strong>kwargs</strong> – Takes in any available kwargs from generate_replays,
+check docstring for possible values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><em>dict</em> –</p>
+<dl class="docutils">
+<dt>with the following keys.</dt>
+<dd><ul class="first last simple">
+<li>’node’ (node dict with data and children)</li>
+<li>’parent’ (node dict with data and children)</li>
+<li>’xpath’ (xpath updated with list keys as appropriate)</li>
+<li>’mandatory_nodes’ (list of (node, xpath) tuples)</li>
+</ul>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.xpath_children">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">xpath_children</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#xpath_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.xpath_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next children in the xpath.</p>
+<p>I.e., skip through choice/case nodes as they aren’t part of the xpath.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – of node dicts.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ysyangtree.replaygenerator.xpath_substitution">
+<code class="descclassname">ysyangtree.replaygenerator.</code><code class="descname">xpath_substitution</code><span class="sig-paren">(</span><em>xpath</em>, <em>xpath_subst</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ysyangtree/replaygenerator.html#xpath_substitution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ysyangtree.replaygenerator.xpath_substitution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill in list keys, etc. in the given XPath as appropriate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xpath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Base XPath to perform substitutions against</li>
+<li><strong>xpath_subst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – List of (before, after) string substitutions</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>str</em> – Substituted XPath.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ysyangtree.tasks.html" class="btn btn-neutral float-right" title="ysyangtree.tasks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ysyangtree.context.html" class="btn btn-neutral" title="ysyangtree.context" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2018, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.18.0.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating a new application from our template &mdash; YANG Suite 2.5.1.post0.dev1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Auto user registration for YangSuite" href="registration.html" />
+    <link rel="prev" title="Building and publishing YANG Suite Docker images" href="docker.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> YANG Suite
+          
+
+          
+            
+            <img src="../_static/android-chrome-192x192.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">YANG Suite</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">Welcome to YANG Suite!</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="develop.html">YANG Suite developer documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design_guidelines.html">Project structure and design guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc_tooling.html">Documentation tooling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_process.html">Release process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docker.html">Building and publishing YANG Suite Docker images</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating a new application from our template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mirror-your-application-repository-to-wwwin-github-cisco-com">Mirror your application repository to wwwin-github.cisco.com</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-up-jenkins-integration">Set up Jenkins integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="registration.html">Auto user registration for YangSuite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yangsuite.html"><code class="docutils literal notranslate"><span class="pre">yangsuite</span></code> package reference</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">YANG Suite</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Developer documentation</a> &raquo;</li>
+        
+      <li>Creating a new application from our template</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/developer/create_new_application.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="creating-a-new-application-from-our-template">
+<h1>Creating a new application from our template<a class="headerlink" href="#creating-a-new-application-from-our-template" title="Permalink to this headline">¶</a></h1>
+<p>We provide a template for the development of new YANG Suite applications at
+<a class="reference external" href="https://wwwin-github.cisco.com/yang-suite/yangsuite-app-template">https://wwwin-github.cisco.com/yang-suite/yangsuite-app-template</a> .
+Refer to the included
+<a class="reference external" href="https://wwwin-github.cisco.com/yang-suite/yangsuite-app-template/blob/develop/INSTRUCTIONS.rst">instructions</a>
+for guidance on the basic steps needed to create a new application
+using this template.</p>
+<p>The following sections of this document describe more advanced optional steps
+that are primarily of interest to developers of core YANG Suite content.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Placeholder text throughout this document and the application template
+itself is prefixed with <code class="docutils literal notranslate"><span class="pre">T_</span></code>.</p>
+</div>
+<div class="section" id="mirror-your-application-repository-to-wwwin-github-cisco-com">
+<h2>Mirror your application repository to wwwin-github.cisco.com<a class="headerlink" href="#mirror-your-application-repository-to-wwwin-github-cisco-com" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you’re a member of the YANG Suite development team, you can create
+your repository under the “yang-suite” organization where the other
+“official” applications reside. Otherwise, you can create the repository
+under your own CEC username. In this section and below, we will use
+<code class="docutils literal notranslate"><span class="pre">$GROUPING</span></code> as shorthand for ‘“yang-suite” or your username’.</p>
+</div>
+<ol class="arabic">
+<li><p class="first">Create github repo</p>
+<ul class="simple">
+<li>If you’re a member of the YANG Suite development team, you can <a class="reference external" href="https://wwwin-github.cisco.com/organizations/yang-suite/repositories/new">create a
+repository under the “yang-suite” organization</a>.
+Otherwise, <a class="reference external" href="https://wwwin-github.cisco.com/new">create the repository under your userid</a>.</li>
+<li>Enter “yangsuite-T_APPLICATION” (use your application name here!) as the
+<code class="docutils literal notranslate"><span class="pre">Repository</span> <span class="pre">name</span></code></li>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">repository</span></code></li>
+<li>Do <em>not</em> select “Initialize this repository with a README” or
+“Add .gitignore” since you’ve already initialized the repository locally.</li>
+</ul>
+</li>
+<li><p class="first">Push to github:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>git remote add origin https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION.git
+git push --set-upstream origin master
+git push --set-upstream origin develop
+git push --tag
+</pre></div>
+</div>
+</li>
+<li><p class="first">Set development branch as the default target for pull requests.</p>
+<ul class="simple">
+<li>Go to
+<a class="reference external" href="https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION/settings/branches">https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION/settings/branches</a>.</li>
+<li>Under <code class="docutils literal notranslate"><span class="pre">Default</span> <span class="pre">branch</span></code>, select “develop” from the drop-down menu and
+then click <code class="docutils literal notranslate"><span class="pre">Update</span></code>.</li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="set-up-jenkins-integration">
+<h2>Set up Jenkins integration<a class="headerlink" href="#set-up-jenkins-integration" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section is written assuming that you are a member of the
+YANG Suite development team and thus have access to the <code class="docutils literal notranslate"><span class="pre">team_yangsuite</span></code>
+Jenkins group. Setting up a Jenkins job from scratch is not simple,
+but when you can copy an existing job it is much easier.</p>
+</div>
+<p>You are going to create a Jenkins job that will run your test automation every
+time there is a commit or pull request to your wwwin-github repository.
+Additionally, commits to the <code class="docutils literal notranslate"><span class="pre">master</span></code> or <code class="docutils literal notranslate"><span class="pre">develop</span></code> branches will be built
+and automatically published to our internal PyPI repository on Artifactory,
+and a new release (commit to master) will trigger an automatic release
+announcement email. This may sound like a lot but fortunately we have a job
+template that makes most of this automatic.</p>
+<ol class="arabic">
+<li><p class="first">Create your new job.</p>
+<ul class="simple">
+<li>Go to <a class="reference external" href="https://engci-jenkins-sjc2.cisco.com/jenkins/job/team_yangsuite/job/yangsuite-projects/newJob">https://engci-jenkins-sjc2.cisco.com/jenkins/job/team_yangsuite/job/yangsuite-projects/newJob</a></li>
+<li>Fill in your application name (yangsuite-T_APPLICATION) as the “item name”
+at the top of the page.</li>
+<li>Select “YANG Suite job template” as the project type (approximately
+halfway down the page), then click <code class="docutils literal notranslate"><span class="pre">OK</span></code>.</li>
+</ul>
+</li>
+<li><p class="first">Specify job parameters.</p>
+<ul class="simple">
+<li>The “Name” should already be populated with the text you entered on the
+previous page.</li>
+<li>The “Repository URL” should be the Git repository you have created
+(<a class="reference external" href="https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION.git">https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION.git</a>)</li>
+<li>The “GitHub project URL” should be the project page for your repository
+(<a class="reference external" href="https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION">https://wwwin-github.cisco.com/$GROUPING/yangsuite-T_APPLICATION</a>)</li>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Save</span></code>.</li>
+</ul>
+<p>(You just saved a LOT of trial and error by not starting from scratch
+to get everything else set up correctly.)</p>
+</li>
+<li><p class="first">Enable GitHub hooks</p>
+<ul class="simple">
+<li>Go to your repository’s web page and select the <code class="docutils literal notranslate"><span class="pre">Settings</span></code> tab near
+the top right corner of the page.</li>
+<li>Select <code class="docutils literal notranslate"><span class="pre">Hooks</span> <span class="pre">&amp;</span> <span class="pre">services</span></code> on this page.</li>
+<li>Set up Jenkins triggers for commits:<ul>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">webhook</span></code> and re-enter your credentials if prompted.</li>
+<li>Set the <code class="docutils literal notranslate"><span class="pre">Payload</span> <span class="pre">URL</span></code> to
+“<a class="reference external" href="https://engci-jenkins-sjc2.cisco.com/jenkins/github-webhook/">https://engci-jenkins-sjc2.cisco.com/jenkins/github-webhook/</a>”
+and the <code class="docutils literal notranslate"><span class="pre">Content</span> <span class="pre">type</span></code> to “application/json”</li>
+<li>Under “Which events would you like to trigger this webhook?”, select
+<code class="docutils literal notranslate"><span class="pre">Just</span> <span class="pre">the</span> <span class="pre">push</span> <span class="pre">event.</span></code></li>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">webhook</span></code>.</li>
+</ul>
+</li>
+<li>Set up Jenkins triggers for pull requests:<ul>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">webhook</span></code> and re-enter your credentials if prompted.</li>
+<li>Set the <code class="docutils literal notranslate"><span class="pre">Payload</span> <span class="pre">URL</span></code> to
+“<a class="reference external" href="https://engci-jenkins-sjc2.cisco.com/jenkins/github-pull-request-hook/">https://engci-jenkins-sjc2.cisco.com/jenkins/github-pull-request-hook/</a>”
+and the <code class="docutils literal notranslate"><span class="pre">Content</span> <span class="pre">type</span></code> to “application/x-www-form-urlencoded”.</li>
+<li>Under “Which events would you like to trigger this webhook?”, select
+<code class="docutils literal notranslate"><span class="pre">Let</span> <span class="pre">me</span> <span class="pre">select</span> <span class="pre">individual</span> <span class="pre">events.</span></code>, then check only the
+<code class="docutils literal notranslate"><span class="pre">Pull</span> <span class="pre">request</span></code> box.</li>
+<li>Click <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">webhook</span></code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="registration.html" class="btn btn-neutral float-right" title="Auto user registration for YangSuite" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="docker.html" class="btn btn-neutral" title="Building and publishing YANG Suite Docker images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, YANG Suite development team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'2.5.1.post0.dev1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

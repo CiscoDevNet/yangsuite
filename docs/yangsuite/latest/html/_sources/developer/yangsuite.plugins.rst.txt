@@ -1,0 +1,4 @@
+``yangsuite.plugins``
+=====================
+
+.. automodule:: yangsuite.plugins

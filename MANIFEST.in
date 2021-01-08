@@ -1,3 +1,0 @@
-recursive-exclude docs *.pyc
-include README.rst
-include LICENSE.txt

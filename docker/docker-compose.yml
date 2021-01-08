@@ -48,4 +48,4 @@ services:
 volumes:
     static-content:
     uwsgi:
-    ys-data:
+

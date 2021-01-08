@@ -13,43 +13,46 @@ Supports: Python 3.6, Python 3.7, Python 3.8
 YANG Suite can be installed as a Docker container or through Python
 package management.  Docker-compose is the recommended install.
 
-Docker installation and use
----------------------------
-
 Installation
-~~~~~~~~~~~~
+-------------------
+
+Docker Installation
+~~~~~~~~~~~~~~~~~~~
+
+To ensure you have the latest release of the YANG Suite Docker container files,
+from a terminal or PowerShell window, git clone git@github.com:CiscoDevNet/yangsuite.git
 
 WARNING: Change admin username/password default in docker-compose.yml file first!
 
-To ensure you have the latest release of the YANG Suite Docker container,
-from a terminal or PowerShell window, git clone git@github.com:CiscoDevNet/yangsuite.git
-and run this command in the yangsuite/docker/ directory ::
+Run this command in the yangsuite/docker/ directory ::
 
     docker-compose up
 
 The yangsuite/docker/yangsuite/production.py file contains Django settings.
 
 Adding/Updating plugins can be done through the Admin-->Manage plugins page or by copying
-the plugin wheels into the yangsuite/docker/yangsuite/ directory, uncommenting the appropriate
-lines in the yangsuite/docker/yangsuite/dockerfile, and running ::
+the plugin wheels into the yangsuite/docker/yangsuite/ directory, uncomment the appropriate
+lines in the yangsuite/docker/yangsuite/dockerfile, and run ::
 
     docker-compose up --build
 
-Access with web browser
-~~~~~~~~~~~~~~~~~~~~~~~
+Access docker with web browser
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Connect to http://localhost:8480.
-- Default (administrator) login is ysadmin/superysadmin. You should change this after your first login.
+- Connect to http://localhost.
+- Login using default user. You should change this after your first login.
 
 Python package installation and use
 -----------------------------------
 
-Installation (virtualenv)
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Virtualenv Installation
+~~~~~~~~~~~~~~~~~~~~~~~
 
 - Create a python 3.6, 3.7, or 3.8 virtural environment and activate it.
 - Type ``pip install yangsuite[core]``
-- Type ``yangsuite`` to start the yangsuite server.
+- You will be prompted to set superuser credentials.
+- Use ctrl-c to stop the yangsuite server
+- Use ``yangsuite`` to start the yangsuite server
 
 Installation with pyATS
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,10 +60,17 @@ Installation with pyATS
 - Create a python 3.6, 3.7, or 3.8 virtural environment and activate it.
 - Type ``pip install pyats[full]``
 - Type ``pip install yangsuite[core]``
+- You will be prompted to set superuser credentials.
 - Type ``yangsuite`` to start the yangsuite server.
 
+Access with web browser
+~~~~~~~~~~~~~~~~~~~~~~~
+
+- Connect to http://localhost:8480.
+- Login using user set at install.
+
 Configuring yangsuite Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 - Activate the virtual environment
 - Type ``yangsuite -h``

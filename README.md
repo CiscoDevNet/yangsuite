@@ -22,9 +22,18 @@ Docker Installation
 To ensure you have the latest release of the YANG Suite Docker container files,
 from a terminal or PowerShell window, git clone git@github.com:CiscoDevNet/yangsuite.git
 
-WARNING: Change admin username/password default in docker-compose.yml file first!
+WARNINGS:
+- Change admin username/password default in docker-compose.yml file first!
+- Official SSL/TLS certificate/key needs to be obtained and copied to yangsuite/docker/nginx directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Self-signed Certificate for testing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Run this command in the yangsuite/docker/ directory ::
+The SSL/TLS certificates installed with the nginx container should be obtained or generated using a trusted
+certificate authority.  As a convenience you can use the yangsuite/docker/ngins/gen_test_certs.sh script to
+generate a self-signed certificate/key to get you going quickly.
+
+After obtaining or generating a certificate/key, run this command in the yangsuite/docker/ directory ::
 
     docker-compose up
 
@@ -35,16 +44,16 @@ the plugin wheels into the yangsuite/docker/yangsuite/ directory, uncomment the 
 lines in the yangsuite/docker/yangsuite/dockerfile, and run ::
 
     docker-compose up --build
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Access docker with web browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Connect to http://localhost.
+- Connect to https://localhost NOTE: You will get a complaint about the certificate if it was generated using "gen_test_certs.sh"
 - Login using default user. You should change this after your first login.
 
 Python package installation and use
 -----------------------------------
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Virtualenv Installation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,7 +62,7 @@ Virtualenv Installation
 - You will be prompted to set superuser credentials.
 - Use ctrl-c to stop the yangsuite server
 - Use ``yangsuite`` to start the yangsuite server
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Installation with pyATS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -62,13 +71,13 @@ Installation with pyATS
 - Type ``pip install yangsuite[core]``
 - You will be prompted to set superuser credentials.
 - Type ``yangsuite`` to start the yangsuite server.
-
+~~~~~~~~~~~~~~~~~~~~~~~
 Access with web browser
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Connect to http://localhost:8480.
 - Login using user set at install.
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Configuring yangsuite Server
 ----------------------------
 

@@ -26,6 +26,7 @@ WARNINGS:
 - Change admin username/password default in docker-compose.yml file first!
 - Official SSL/TLS certificate/key needs to be obtained and copied to yangsuite/docker/nginx directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Self-signed Certificate for testing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,15 +46,17 @@ lines in the yangsuite/docker/yangsuite/dockerfile, and run ::
 
     docker-compose up --build
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Access docker with web browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Connect to https://localhost NOTE: You will get a complaint about the certificate if it was generated using "gen_test_certs.sh"
 - Login using default user. You should change this after your first login.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Python package installation and use
 -----------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~
+
 Virtualenv Installation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -63,6 +66,7 @@ Virtualenv Installation
 - Use ctrl-c to stop the yangsuite server
 - Use ``yangsuite`` to start the yangsuite server
 ~~~~~~~~~~~~~~~~~~~~~~~
+
 Installation with pyATS
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -72,12 +76,14 @@ Installation with pyATS
 - You will be prompted to set superuser credentials.
 - Type ``yangsuite`` to start the yangsuite server.
 ~~~~~~~~~~~~~~~~~~~~~~~
+
 Access with web browser
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 - Connect to http://localhost:8480.
 - Login using user set at install.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Configuring yangsuite Server
 ----------------------------
 

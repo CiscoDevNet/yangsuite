@@ -14,7 +14,7 @@ YANG Suite can be installed as a Docker container or through Python
 package management.  Docker-compose is the recommended install.
 
 Installation
--------------------
+------------
 
 Docker Installation
 ~~~~~~~~~~~~~~~~~~~
@@ -34,7 +34,7 @@ The SSL/TLS certificates installed with the nginx container should be obtained o
 certificate authority.  As a convenience you can use the yangsuite/docker/ngins/gen_test_certs.sh script to
 generate a self-signed certificate/key to get you going quickly.
 
-After obtaining or generating a certificate/key, run this command in the yangsuite/docker/ directory ::
+After obtaining or generating a certificate/key, run this command in the yangsuite/docker/ directory:
 
     docker-compose up
 
@@ -42,10 +42,11 @@ The yangsuite/docker/yangsuite/production.py file contains Django settings.
 
 Adding/Updating plugins can be done through the Admin-->Manage plugins page or by copying
 the plugin wheels into the yangsuite/docker/yangsuite/ directory, uncomment the appropriate
-lines in the yangsuite/docker/yangsuite/dockerfile, and run ::
+lines in the yangsuite/docker/yangsuite/dockerfile, and run:
 
     docker-compose up --build
 
+If for any reason the plugin does not update, stop the container and ``docker-compose up`` again.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Access docker with web browser

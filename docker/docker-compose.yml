@@ -24,12 +24,13 @@ services:
         context: ./nginx
       depends_on:
         - yangsuite
+      ports:
+        - "80:80"
+        - "443:443"
       volumes:
         - static-content:/etc/nginx/html
         - uwsgi:/var/run/uwsgi
         - ./ys-data:/ys-data
-      ports:
-        - "80:80"
     backup:
       image: backup:latest
       build:

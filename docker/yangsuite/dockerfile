@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+ENV DOCKER_RUN  true
+
 ARG PY=python3.6
 ARG PY_VER=3.6
 ARG YS_DIST=/usr/local/lib/python${PY_VER}/dist-packages/yangsuite/
@@ -46,4 +48,5 @@ RUN mkdir /ys-static
 RUN yangsuite --save-settings --configure-only \
     --allowed-hosts localhost \
     --static-root /ys-static \
-    --data-path /ys-data
+    --data-path /ys-data \
+    --settings yangsuite.settings.production

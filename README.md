@@ -13,6 +13,8 @@ GUI appearance and behavior, and client-server communication.
 YANG Suite can be installed as a Docker container or through Python
 package management.  Docker-compose is the recommended install.
 
+Requires about 3.5GB of memory to load large Cisco native models.
+
 Docker Installation
 -------------------
 

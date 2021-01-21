@@ -29,6 +29,8 @@ RUN pip3 install --upgrade pip
 
 # Installing YANG Suite
 RUN pip3 install --upgrade --no-cache yangsuite[core] uwsgi
+# Installing YANG Suite optional free plugins
+RUN pip3 install --upgrade --no-cache yangsuite-grpc-telemetry yangsuite-coverage
 
 # Uncomment to add another pypi repository to search for here
 #

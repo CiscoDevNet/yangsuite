@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2020 Cisco Systems, Inc
+#
 # Start the yanguite service in production.
 
 # Get the system yangsuite location

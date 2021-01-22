@@ -1,3 +1,5 @@
+Copyright 2020 Cisco Systems, Inc
+
 YANG Suite
 ==========
 
@@ -29,7 +31,7 @@ Self-signed Certificate for testing
 -----------------------------------
 
 The SSL/TLS certificates installed with the nginx container should be obtained or generated using a trusted
-certificate authority.  As a convenience you can use the yangsuite/docker/ngins/gen_test_certs.sh script to
+certificate authority.  As a convenience you can use the yangsuite/docker/gen_test_certs.sh script to
 generate a self-signed certificate/key to get you going quickly.
 
 After obtaining or generating a certificate/key, run this command in the yangsuite/docker/ directory:

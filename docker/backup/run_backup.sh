@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright 2020 Cisco Systems, Inc
 
 DATA_DIR=${1:-/data}
 BACKUP_DIR=${2:-/backup}

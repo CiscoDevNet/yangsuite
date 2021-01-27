@@ -9,7 +9,7 @@ Capable of dynamic discovery of installed application plugins.
 Provides common library APIs for logging, filesystem access,
 GUI appearance and behavior, and client-server communication.
 
-- Authors:  Michael Ott and the other members of yang-suite-dev@cisco.com
+- Authors:  Members of the Cisco YANG Suite development team.
 - Supports: Python 3.6, Python 3.7, Python 3.8
 
 YANG Suite can be installed as a Docker container or through Python

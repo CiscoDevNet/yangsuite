@@ -1,4 +1,0 @@
-``ysyangtree.ymodels``
-======================
-
-.. automodule:: ysyangtree.ymodels

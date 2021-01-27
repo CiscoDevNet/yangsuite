@@ -1,5 +1,0 @@
-``ysfilemanager.filemanager.base``
-==================================
-
-.. automodule:: ysfilemanager.filemanager.base
-  :private-members:

@@ -1,4 +1,0 @@
-ysnetconf.views.download
-========================
-
-.. automodule:: ysnetconf.views.download

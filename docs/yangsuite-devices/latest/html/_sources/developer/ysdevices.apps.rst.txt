@@ -1,4 +1,0 @@
-``ysdevices.apps``
-==================
-
-.. automodule:: ysdevices.apps

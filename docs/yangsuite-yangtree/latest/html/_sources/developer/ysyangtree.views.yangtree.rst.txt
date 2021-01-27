@@ -1,4 +1,0 @@
-``ysyangtree.views.yangtree``
-=============================
-
-.. automodule:: ysyangtree.views.yangtree

@@ -1,8 +1,0 @@
-``ysnetconf.views``
-===================
-
-.. toctree::
-
-   ysnetconf.views.download
-   ysnetconf.views.rpc
-   ysnetconf.views.utilities

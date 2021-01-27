@@ -1,4 +1,0 @@
-``ysfilemanager.filemanager.mutableyangset``
-============================================
-
-.. automodule:: ysfilemanager.filemanager.mutableyangset

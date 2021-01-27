@@ -1,4 +1,0 @@
-``ysdevices.views``
-===================
-
-.. automodule:: ysdevices.views

@@ -1,5 +1,0 @@
-``ysnetconf.rpcbuilder``
-========================
-
-.. automodule:: ysnetconf.rpcbuilder
-   :private-members:

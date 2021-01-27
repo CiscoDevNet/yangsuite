@@ -1,4 +1,0 @@
-``ysfilemanager.quickparser``
-=============================
-
-.. automodule:: ysfilemanager.quickparser

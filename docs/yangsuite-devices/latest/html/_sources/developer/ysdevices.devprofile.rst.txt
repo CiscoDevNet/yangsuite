@@ -1,4 +1,0 @@
-``ysdevices.devprofile``
-========================
-
-.. automodule:: ysdevices.devprofile

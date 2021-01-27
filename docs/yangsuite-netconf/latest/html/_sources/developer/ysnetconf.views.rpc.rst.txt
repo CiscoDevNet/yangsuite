@@ -1,8 +1,0 @@
-ysnetconf.views.rpc
-===================
-
-.. automodule:: ysnetconf.views.rpc
-   :members:
-
-   .. autofunction:: get_rpc(request, jsondata)
-   .. autofunction:: run_rpc(request, jsondata)

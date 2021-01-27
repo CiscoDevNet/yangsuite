@@ -1,4 +1,0 @@
-``ysyangtree.utilities``
-========================
-
-.. automodule:: ysyangtree.utilities

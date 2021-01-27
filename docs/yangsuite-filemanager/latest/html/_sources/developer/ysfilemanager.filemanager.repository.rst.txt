@@ -1,4 +1,0 @@
-``ysfilemanager.filemanager.repository``
-========================================
-
-.. automodule:: ysfilemanager.filemanager.repository

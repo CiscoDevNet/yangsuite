@@ -1,4 +1,0 @@
-``ysfilemanager.scp_importer``
-==============================
-
-.. automodule:: ysfilemanager.scp_importer

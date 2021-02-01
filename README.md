@@ -1,6 +1,6 @@
 Copyright 2020 Cisco Systems, Inc
 
-YANG Suite
+Cisco YANG Suite
 ==========
 
 YANG Suite core Django application.
@@ -16,6 +16,25 @@ YANG Suite can be installed as a Docker container or through Python
 package management.  Docker-compose is the recommended install.
 
 Requires about 3.5GB of memory to load large Cisco native models.
+
+## Quick Start with Docker:
+
+1. Clone this repository
+
+2. Generate the certificates for the HTTPS secure connection
+
+3. Run docker-compose
+
+4. Access the tool at https://localhost
+
+```
+git clone https://github.com/CiscoDevNet/yangsuite
+cd yangsuite/docker/ ; ./gen_test_certs.sh
+docker-compose up
+```
+
+Instructions on how to install Docker and the docker-compose client can be found at https://docs.docker.com/compose/install/
+
 
 Docker Installation
 -------------------

@@ -17,6 +17,13 @@ package management.  Docker-compose is the recommended install.
 
 Requires about 3.5GB of memory to load large Cisco native models.
 
+## YANG Suite Resources
+
+Landing page: [developer.cisco.com/yangsuite](https://developer.cisco.com/yangsuite)
+
+Documentatoin: [developer.cisco.com/docs/yangsuite](https://developer.cisco.com/docs/yangsuite)
+
+
 ## Quick Start with Docker:
 
 1. Clone this repository

@@ -23,21 +23,21 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
-RUN pip3 install --upgrade pip setuptools wheel
+RUN pip3 install --upgrade pip setuptools wheel uwsgi
 RUN mkdir -p /yangsuite/uwsgi
 COPY uwsgi.ini /yangsuite/
 COPY migrate_and_start.sh /yangsuite/
 RUN pip3 install --upgrade pip
 
 # Installing YANG Suite
-RUN pip3 install --upgrade --no-cache yangsuite[core] uwsgi
+RUN pip3 install --upgrade --no-cache yangsuite[core]
 # Installing YANG Suite optional free plugins
 RUN pip3 install --upgrade --no-cache yangsuite-grpc-telemetry yangsuite-coverage
 
 # Uncomment to add another pypi repository to search for here
 #
 # ARG PIP_EXTRA_URL=https://private.pypi.com/simple
-# RUN pip3 install --upgrade --no-cache --extra-index-url=${PIP_EXTRA_URL} yangsuite[core] uwsgi
+# RUN pip3 install --upgrade --no-cache --extra-index-url=${PIP_EXTRA_URL}  private_lib
 
 # Uncomment to install optional plugin or replacement wheels
 #

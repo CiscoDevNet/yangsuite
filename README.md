@@ -85,17 +85,6 @@ Instructions for that can be found searching online.
 - Connect to http://localhost:8480.
 - Login using user set at install.
 
-Installation with pyATS
------------------------
-
-- Create a python 3.6, 3.7, or 3.8 virtural environment and activate it.
-- Type ``pip install pyats[full]``
-- Type ``pip install yangsuite[core]``
-- You will be prompted to set superuser credentials.
-- Type ``yangsuite`` to start the yangsuite server.
-- Connect to http://localhost:8480.
-- Login using user set at install.
-
 Configuring yangsuite Server
 ----------------------------
 

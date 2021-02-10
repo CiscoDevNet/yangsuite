@@ -15,5 +15,5 @@ else
     echo "## NOTE: Some browsers may still reject these certificates!!  ##"
     echo "################################################################"
     echo " "
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "//CN=localhost" -keyout nginx/nginx-self-signed.key -out nginx/nginx-self-signed.cert
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/CN=localhost" -keyout nginx/nginx-self-signed.key -out nginx/nginx-self-signed.cert
 fi

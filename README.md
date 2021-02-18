@@ -76,7 +76,7 @@ Access docker with web browser
 ------------------------------
 
 - Connect to https://localhost NOTE: You will get a complaint about the certificate if it was generated using "gen_test_certs.sh"
-- Login using default user. You should change this after your first login.
+- Login using default user. You can find in "cat docker-compose.yml" file. You should change this after your first login.
 
 Python Virtualenv Installation
 ------------------------------

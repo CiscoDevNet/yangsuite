@@ -25,9 +25,7 @@ Documentation: [developer.cisco.com/docs/yangsuite](https://developer.cisco.com/
 
 ## Prerequisites
 
-To use the resources in this repository, you must install Docker on the system where you want to 
-run YANG Suite. Go to https://docs.docker.com/get-docker/ for downloads. 
-Instructions on how to install Docker and the docker-compose client can be found at https://docs.docker.com/compose/install/.
+To use the resources in this repository, you must install Docker on the system where you want to run YANG Suite. In addition, since this YANG Suite repository uses Docker Compose, your system needs Docker Compose. Docker Desktop for Mac and Docker Desktop for Windows installations include Compose and you can install those using instructions at https://docs.docker.com/install. For Linux, follow [these specific instructions to install Docker Compose on Linux systems](https://docs.docker.com/compose/install/#install-compose-on-linux-systems).
 
 ## Quick Start with Docker:
 

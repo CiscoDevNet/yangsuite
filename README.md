@@ -51,7 +51,7 @@ WARNINGS:
 - Official SSL/TLS certificate/key needs to be obtained and copied to yangsuite/docker/nginx directory.
 
 To ensure you have the latest release of the YANG Suite Docker container files,
-from a terminal or PowerShell window, run: git clone git@github.com:CiscoDevNet/yangsuite.git
+from a terminal or PowerShell window, run: git clone https://github.com/CiscoDevNet/yangsuite.git
 
 Self-signed Certificate for testing
 -----------------------------------

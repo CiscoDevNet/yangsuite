@@ -39,11 +39,6 @@ RUN pip3 install --upgrade --no-cache yangsuite-grpc-telemetry yangsuite-coverag
 # ARG PIP_EXTRA_URL=https://private.pypi.com/simple
 # RUN pip3 install --upgrade --no-cache --extra-index-url=${PIP_EXTRA_URL}  private_lib
 
-# Uncomment to install optional plugin or replacement wheels
-#
-# COPY *.whl /yangsuite/
-# RUN pip3 install --upgrade --no-cache /yangsuite/*.whl
-
 COPY production.py ${YS_SETTINGS}
 COPY wsgi.py ${YS_DIST}
 RUN mkdir /ys-data
@@ -54,3 +49,9 @@ RUN yangsuite --save-settings --configure-only \
     --static-root /ys-static \
     --data-path /ys-data \
     --settings yangsuite.settings.production
+
+# Uncomment to install optional plugin or replacement wheels
+#
+# COPY *.whl /yangsuite/
+# RUN pip3 install --upgrade --no-cache /yangsuite/*.whl
+# RUN yangsuite --static-root /ys-static

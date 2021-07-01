@@ -1,5 +1,4 @@
-"""Copyright 2020 Cisco Systems, Inc
-   YANG Suite production deployment settings."""
+"""YANG Suite production deployment settings."""
 
 import os
 

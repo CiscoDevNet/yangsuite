@@ -1,18 +1,13 @@
+# Copyright 2020-2021 Cisco Systems, Inc
+
 version: '3'
 services:
     yangsuite:
       image: yangsuite:latest
       build:
         context: ./yangsuite
-      environment:
-        - DJANGO_SETTINGS_MODULE=yangsuite.settings.production
-        - MEDIA_ROOT=/ys-data/
-        - STATIC_ROOT=/ys-static/
-        - DJANGO_ALLOWED_HOSTS=localhost
-        # Be sure and change admin/superuser before build or after you login
-        - YS_ADMIN_USER=admin
-        - YS_ADMIN_EMAIL=admin@cisco.com
-        - YS_ADMIN_PASS=superuser
+      env_file:
+        - ./yangsuite/setup.env
       command: /yangsuite/migrate_and_start.sh
       ports:
         # gNMI insecure port (IOS-XE)
@@ -25,6 +20,8 @@ services:
         - "57344:57344"
         # gRPC MDT telemetry secure port (IOS-XE)
         - "57345:57345"
+        # RESTCONF
+        - "443:443"
       volumes:
         - static-content:/ys-static
         - uwsgi:/yangsuite/uwsgi
@@ -37,7 +34,7 @@ services:
         - yangsuite
       ports:
         - "80:80"
-        - "443:443"
+        - "8443:8443"
       volumes:
         - static-content:/etc/nginx/html
         - uwsgi:/var/run/uwsgi

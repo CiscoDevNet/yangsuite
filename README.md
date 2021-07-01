@@ -31,11 +31,9 @@ To use the resources in this repository, you must install Docker on the system w
 
 1. Clone this repository
 
-2. Generate the certificates for the HTTPS secure connection
+2. Run start_yang_suite.sh
 
-3. Run docker-compose
-
-4. Access the tool at https://localhost
+3. Access the tool at http://localhost or https://localhost:8443
 
 ```
 git clone https://github.com/CiscoDevNet/yangsuite
@@ -75,8 +73,8 @@ lines in the yangsuite/docker/yangsuite/dockerfile, and run:
 
     docker-compose up --build
 
-Access YANG Suite with web browser
-----------------------------------
+Access YANG Suite Docker Install with web browser
+-------------------------------------------------
 
 - The nginx container redirects port 80 to port 8443 which is used to interface with the yangsuite core.  Connect to http://localhost or https://localhost:8443. **NOTE:** A complaint about the certificate will appear if it was generated using "start_yang_suite.sh".
 - The yangsuite-restconf plugin uses port 443 to communicate to your Cisco device so enable restconf in the YANG Suite Device profile page for devices that support that protocol.

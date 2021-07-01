@@ -82,7 +82,7 @@ Access YANG Suite Docker Install with web browser
 Python Virtualenv Installation
 ------------------------------
 
-WARNING: HTTPS support is not available unless a web server is installed like NGINX and frontend it with uwsgi.
+WARNING: HTTPS support is not available unless a web server is installed like NGINX and frontended with uwsgi.
 Instructions for that can be found searching online.
 
 - Create a Python 3.6, 3.7, or 3.8 virtural environment and activate it.

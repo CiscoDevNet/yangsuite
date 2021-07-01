@@ -50,9 +50,6 @@ The yangsuite/docker/start_yang_suite.sh script performs the following:
 - Creates an environment file needed for the yangsuite docker container install.
 - Runs docker-compose up.
 
-To ensure using the latest release of the YANG Suite Docker container files,
-from a terminal or PowerShell window, run: git clone https://github.com/CiscoDevNet/yangsuite.git
-
 Self-signed Certificate for testing
 -----------------------------------
 

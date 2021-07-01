@@ -1,10 +1,26 @@
 Copyright 2020 Cisco Systems, Inc
 
-YANG Suite Docker Container
+Cisco YANG Suite Docker Container
 ===========================
 
-Instructions on how to install docker-compose client can be found here - https://docs.docker.com/compose/install/.
 
+## Quick Start
+
+1. Clone this repository
+
+2. Generate the certificates for the HTTPS secure connection
+
+3. Run docker-compose
+
+4. Access the tool at https://localhost
+
+```
+git clone https://github.com/CiscoDevNet/yangsuite
+cd yangsuite/docker/ ; ./gen_test_certs.sh
+docker-compose up
+```
+
+Instructions on how to install Docker and the docker-compose client can be found at https://docs.docker.com/compose/install/
 
 Creating Container
 ------------------

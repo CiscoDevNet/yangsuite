@@ -1,0 +1,190 @@
+Cisco End User License Agreement
+
+Table of Contents
+
+Section 1.	Scope and Applicability
+Section 2.	Using Cisco Technology
+Section 3.	Additional Conditions of Use
+Section 4.	Fees
+Section 5.	Confidential Information and Use of Data
+Section 6.	Ownership
+Section 7.	Indemnification
+Section 8.	Warranties and Representations
+Section 9.	Liability
+Section 10.	Termination and Suspension
+Section 11.	Verification
+Section 12.	General Provisions
+Section 13.	Definitions
+
+Section 1. Scope and Applicability
+
+This End User License Agreement (“EULA”) between You and Cisco covers Your use of the Software and Cloud Services (“Cisco Technology”). This document also incorporates any Product Specific Terms that may apply to the Cisco Technology You acquire. Definitions of capitalized terms are in Section 13 (Definitions).
+
+You agree to be bound by the terms of this EULA through (a) Your download, installation, or use of the Cisco Technology; or (b) Your express agreement to this EULA.
+If You do not have authority to enter into this EULA or You do not agree with its terms, do not use the Cisco Technology. You may request a refund for the Software within 30 days of Your initial purchase provided You return the Software to the Approved Source and disable or uninstall it. This paragraph does not apply where You have expressly agreed to end user license terms with Cisco as part of a transaction with an Approved Source.
+
+Section 2. Using Cisco Technology
+
+2.1. License and Right to Use. Cisco grants You a non-exclusive, non-transferable (except with respect to Software as permitted under the https://www.cisco.com/c/dam/en_us/about/doing_business/legal/policy/Cisco_Software_Transfer_and_Relicensing_Policy.pdf) (a) license to use the Software; and (b) right to use the Cloud Services, both as acquired from an Approved Source, for Your direct benefit during the Usage Term and as set out in Your Entitlement and this EULA (collectively, the “Usage Rights”).
+
+2.2. Use by Third Parties. You may permit Authorized Third Parties to exercise the Usage Rights on Your behalf, provided that You are responsible for (a) ensuring that such Authorized Third Parties comply with this EULA and (b) any breach of this EULA by such Authorized Third Parties.
+
+2.3. Beta and Trial Use. If Cisco grants You Usage Rights in the applicable Cisco Technology on a trial, evaluation, beta or other free-of-charge basis (“Evaluation Software and Services”), You may only use the Evaluation Software and Services on a temporary basis for the period limited by the license key or specified by Cisco in writing.  If there is no period identified, such use is limited to 30 days after the Evaluation Software and Services are made available to You.  If You fail to stop using and/or return the Evaluation Software and Services or the equipment on which it is authorized for use by the end of the trial period, You may be invoiced for its list price and agree to pay such invoice.  Cisco, in its discretion, may stop providing the Evaluation Software and Services at any time, at which point You will no longer have access to any related data, information, and files and must immediately cease using the Cisco Technology.  The Evaluation Software and Services may not have been subject to Cisco’s usual testing and quality assurance processes and may contain bugs, errors, or other issues.  Except where agreed to in writing by Cisco, You will not put Evaluation Software and Services into production use.  Cisco provides Evaluation Software and Services “AS-IS” without support or any express or implied warranty or indemnity for any problems or issues, and Cisco will not have any liability relating to Your use of the Evaluation Software and Services.
+
+2.4. Upgrades or Additional Copies of Software. You may only use Upgrades or additional copies of the Software beyond Your license Entitlement if You have (a) acquired such rights under a support agreement covering the applicable Software; or (b) You have purchased the right to use Upgrades or additional copies separately.
+
+2.5. Interoperability of Software. If required by law and upon Your request, Cisco will provide You with the information needed to achieve interoperability between the Software and another independently created program, provided You agree to any additional terms reasonably required by Cisco. You will treat such information as Confidential Information.
+
+2.6. Subscription Renewal.  Usage Rights in Cisco Technology acquired on a subscription basis will automatically renew for the renewal period indicated on the order You or Your Cisco Partner placed with Cisco (“Renewal Term”) unless: (a) You notify Your Approved Source in writing at least 45 days before the end of Your then-current Usage Term of Your intention not to renew; or (b) You or Your Cisco Partner elect not to auto-renew at the time of the initial order placed with Cisco. Your Approved Source will notify You reasonably in advance of any Renewal Term if there are fee changes. The new fees will apply for the upcoming Renewal Term unless You or Your Cisco Partner promptly notify Cisco in writing, before the renewal date, that You do not accept the fee changes. In that case, Your subscription will terminate at the end of the current Usage Term.
+
+Section 3. Additional Conditions of Use
+
+3.1. Cisco Technology Generally. Unless expressly agreed by Cisco, You may not (a) transfer, sell, sublicense, monetize or make the functionality of any Cisco Technology available to any third party; (b) use the Software on second hand or refurbished Cisco equipment not authorized by Cisco, or use Software that is licensed for a specific device on a different device (except as permitted under https://www.cisco.com/c/dam/en_us/about/doing_business/legal/policy/Software_License_Portability_Policy_FINAL.pdf); (c) remove, modify, or conceal any product identification, copyright, proprietary, intellectual property notices or other marks; (d) reverse engineer, decompile, decrypt, disassemble, modify, or make derivative works of the Cisco Technology; or (e) use Cisco Content other than as part of Your permitted use of the Cisco Technology. 
+
+3.2. Cloud Services. You will not intentionally (a) interfere with other customers’ access to, or use of, the Cloud Service, or with its security; (b) facilitate the attack or disruption of the Cloud Service, including a denial of service attack, unauthorized access, penetration testing, crawling, or distribution of malware (including viruses, trojan horses, worms, time bombs, spyware, adware, and cancelbots); (c) cause an unusual spike or increase in Your use of the Cloud Service that negatively impacts the Cloud Service’s operation; or (d) submit any information that is not contemplated in the applicable Documentation.
+
+3.3. Evolving Cisco Technology. Cisco may: (a) enhance or refine a Cloud Service, although in doing so, Cisco will not materially reduce the core functionality of that Cloud Service, except as contemplated in this Section; and (b) perform scheduled maintenance of the infrastructure and software used to provide a Cloud Service, during which time You may experience some disruption to that Cloud Service.  Whenever reasonably practicable, Cisco will provide You with advance notice of such maintenance.  You acknowledge that, from time to time, Cisco may need to perform emergency maintenance without providing You advance notice, during which time Cisco may temporarily suspend Your access to, and use of, the Cloud Service. 
+
+Cisco may end the life of Cisco Technology, including component functionality (“EOL”), by providing written notice on Cisco.com. If You or Your Cisco Partner prepaid a fee for Your use of the Cisco Technology that becomes EOL before the expiration of Your then-current Usage Term, Cisco will use commercially reasonable efforts to transition You to a substantially similar Cisco Technology. If Cisco does not have substantially similar Cisco Technology, then Cisco will credit You or Your Cisco Partner any unused portion of the prepaid fee for the Cisco Technology that has been declared EOL (“EOL Credit”).  The EOL Credit will be calculated from the last date the applicable Cisco Technology is available to the last date of the applicable Usage Term.  Such credit can be applied towards the future purchase of Cisco products.
+
+3.4. Protecting Account Access. You will keep all account information up to date, use reasonable means to protect Your account information, passwords and other login credentials, and promptly notify Cisco of any known or suspected unauthorized use of or access to Your account. 
+
+3.5. Use with Third-Party Products. If You use the Cisco Technology together with third-party products, such use is at Your risk.  You are responsible for complying with any third-party provider terms, including its privacy policy.  Cisco does not provide support or guarantee ongoing integration support for products that are not a native part of the Cisco Technology.
+
+3.6. Open Source Software. Open source software not owned by Cisco is subject to separate license terms as set out at http://www.cisco.com/go/opensource. The applicable open source software licences will not materially or adversely affect Your ability to exercise Usage Rights in applicable Cisco Technology.
+
+Section 4. Fees
+
+To the extent permitted by law, orders for the Cisco Technology are non-cancellable. Fees for Your use of Cisco Technology are set out in Your purchase terms with Your Approved Source.  If You use Cisco Technology beyond Your Entitlement (“Overage”), the Approved Source may invoice You, and You agree to pay, for such Overage.
+
+Section 5. Confidential Information and Use of Data
+
+5.1. Confidentiality. Recipient will hold in confidence and use no less than reasonable care to avoid disclosure of any Confidential Information to any third party, except for its employees, affiliates, and contractors who have a need to know (“Permitted Recipients”). Recipient: (a) must ensure that its Permitted Recipients are subject to written confidentiality obligations no less restrictive than the Recipient’s obligations under this EULA, and (b) is liable for any breach of this Section by its Permitted Recipients.  Such nondisclosure obligations will not apply to information that: (i) is known by Recipient without confidentiality obligations; (ii) is or has become public knowledge through no fault of Recipient; or (iii) is independently developed by Recipient. Recipient may disclose Discloser’s Confidential Information if required under a regulation, law or court order provided that Recipient provides prior notice to Discloser (to the extent legally permissible) and reasonably cooperates, at Discloser’s expense, regarding protective actions pursued by Discloser. Upon the reasonable request of Discloser, Recipient will either return, delete or destroy all Confidential Information of Discloser and certify the same.
+
+5.2. How We Use Data. Cisco will access, process and use data in connection with Your use of the Cisco Technology in accordance with applicable privacy and data protection laws.  For further detail, please visit http://www.cisco.com/go/data. 
+
+5.3. Notice and Consent. To the extent Your use of the Cisco Technology requires it, You are responsible for providing notice to, and obtaining consents from, individuals regarding the collection, processing, transfer and storage of their data through Your use of the Cisco Technology. 
+
+Section 6. Ownership
+
+Except where agreed in writing, nothing in this EULA transfers ownership in, or grants any license to, any intellectual property rights.  You retain any ownership of Your content and Cisco retains ownership of the Cisco Technology and Cisco Content. Cisco may use any feedback You provide in connection with Your use of the Cisco Technology as part of its business operations.   
+
+Section 7. Indemnification
+
+7.1. Claims. Cisco will defend any third-party claim against You that Your valid use of Cisco Technology under Your Entitlement infringes a third party's patent, copyright or registered trademark (the “IP Claim”). Cisco will indemnify You against the final judgment entered by a court of competent jurisdiction or any settlements arising out of an IP Claim, provided that You: (a) promptly notify Cisco in writing of the IP Claim; (b) fully cooperate with Cisco in the defense of the IP Claim; and (c) grant Cisco the right to exclusively control the defense and settlement of the IP Claim, and any subsequent appeal. Cisco will have no obligation to reimburse You for attorney fees and costs incurred prior to Cisco's receipt of notification of the IP Claim. You, at Your own expense, may retain Your own legal representation.
+
+7.2. Additional Remedies. If an IP Claim is made and prevents Your exercise of the Usage Rights, Cisco will either procure for You the right to continue using the Cisco Technology or replace or modify the Cisco Technology with functionality that is at least equivalent. Only if Cisco determines that these alternatives are not reasonably available, Cisco may terminate Your Usage Rights granted under this EULA upon written notice to You and will refund You a prorated portion of the fee You paid for the Cisco Technology for the remainder of the unexpired Usage Term.
+
+7.3. Exclusions.  Cisco has no obligation with respect to any IP Claim based on: (a) compliance with any designs, specifications, or requirements You provide or a third party provides on Your behalf; (b) Your modification of any Cisco Technology or modification by a third party; (c) the amount or duration of use made of the Cisco Technology, revenue You earned, or services You offered; (d) combination, operation, or use of Cisco Technology with non-Cisco products, software or business processes; (e) Your failure to modify or replace Cisco Technology as required by Cisco; or (f) any Cisco Technology provided on a no charge, beta or evaluation basis.
+
+7.4. This Section Section 7 states Cisco’s entire obligation and Your exclusive remedy regarding any IP Claims against You. 
+
+Section 8. Warranties and Representations
+
+8.1. Performance. Cisco warrants that: (a) for a period of 90 days from the Delivery Date or longer as stated in Documentation, or on www.cisco.com/go/warranty, the Software substantially complies with the Documentation; and (b) during the Usage Term, it provides the Cloud Services with commercially reasonable skill and care in accordance with the Documentation and Product Specific Terms.
+
+8.2. Malicious Code. Cisco will use commercially reasonable efforts to deliver the Cisco Technology free of Malicious Code.
+
+8.3. Qualifications. Sections 8.1 and 8.2 do not apply if the Cisco Technology or the equipment on which it is authorized for use: (a) has been altered, except by Cisco or its authorized representative; (b) has been subjected to abnormal physical conditions, accident or negligence, or installation or use inconsistent with this EULA or Cisco’s instructions; (c) is acquired on a no charge, beta or evaluation basis; (d) is not a Cisco-branded product or service; or (e) has not been provided by an Approved Source. Upon Your prompt written notification to the Approved Source during the warranty period of Cisco’s breach of this Section 8, Your sole and exclusive remedy (unless otherwise required by applicable law) is, at Cisco’s option, either (i) repair or replacement of the applicable Cisco Technology or (ii) a refund of the (a) license fees paid or due for the non-conforming Software, or (b) the fees paid for the period in which the Cloud Service did not comply, excluding any amounts paid under a service level agreement/objective, if applicable.  
+
+Where Cisco provides a refund of license fees paid for Software, You must return or destroy all copies of the applicable Software. Except as expressly stated in this Section, to the extent allowed by applicable law, Cisco expressly disclaims all warranties and conditions of any kind, express or implied, including without limitation any warranty, condition or other implied term as to merchantability, fitness for a particular purpose or non-infringement, or that the Cisco Technology will be secure, uninterrupted or error free. If You are a consumer, You may have legal rights in Your country of residence that prohibit the limitations set out in this Section from applying to You, and, where prohibited, they will not apply. 
+
+Section 9. Liability
+
+Neither party will be liable for indirect, incidental, exemplary, special or consequential damages; loss or corruption of data or interruption or loss of business; or loss of revenues, profits, goodwill or anticipated sales or savings. The maximum aggregate liability of each party under this EULA is limited to (a) for claims solely arising from Software licensed on a perpetual basis, the fees received by Cisco for that Software; or (b) for all other claims, the fees received by Cisco for the applicable Cisco Technology and attributable to the 12 month period immediately preceding the first event giving rise to such liability.
+
+These limitations of liability do not apply to liability arising from (a) Your failure to pay all amounts due; or (b) Your breach of Sections 2.1 (License and Right to Use), 3.1 (Cisco Technology Generally), 3.2 (Cloud Services) or 12.8 (Export). This limitation of liability applies whether the claims are in warranty, contract, tort (including negligence), infringement, or otherwise, even if either party has been advised of the possibility of such damages. Nothing in this EULA limits or excludes any liability that cannot be limited or excluded under applicable law. This limitation of liability is cumulative and not per incident. 
+
+Section 10. Termination and Suspension
+
+10.1. Suspension. Cisco may immediately suspend Your Usage Rights if You breach Sections 2.1 (License and Right to Use), 3.1 (Cisco Technology Generally), 3.2 (Cloud Services) or 12.8 (Export). 
+
+10.2. Termination. If a party materially breaches this EULA and does not cure that breach within 30 days after receipt of written notice of the breach, the non-breaching party may terminate this EULA for cause.  Cisco may immediately terminate this EULA if You breach Sections 2.1 (License and Right to Use), 3.1 (Cisco Technology Generally), 3.2 (Cloud Services) or 12.8 (Export). Upon termination of the EULA, You must stop using the Cisco Technology and destroy any copies of Software and Confidential Information within Your control. If this EULA is terminated due to Cisco’s material breach, Cisco will refund You or Your Approved Source, the prorated portion of fees You have prepaid for the Usage Rights beyond the date of termination. Upon Cisco’s termination of this EULA for Your material breach, You will pay Cisco or the Approved Source any unpaid fees through to the end of the then-current Usage Term. If You continue to use or access any Cisco Technology after termination, Cisco or the Approved Source may invoice You, and You agree to pay, for such continued use.
+
+Section 11. Verification
+
+During the Usage Term and for a period of 12 months after its expiry or termination, You will take reasonable steps to maintain complete and accurate records of Your use of the Cisco Technology sufficient to verify compliance with this EULA (“Verification Records”). Upon reasonable advance notice, and no more than once per 12 month period, You will, within 30 days from Cisco’s notice, allow Cisco and its auditors access to the Verification Records and any applicable books, systems (including Cisco product(s) or other equipment), and accounts during Your normal business hours. If the verification process discloses underpayment of fees: (a) You will pay such fees; and (b) You will also pay the reasonable cost of the audit if the fees owed to Cisco as a result exceed the amounts You paid for Your Usage Rights by more than 5%. 
+
+Section 12. General Provisions
+
+12.1. Survival. Sections 4, 5, 6, 8, 9, 10, 11 and 12 survive termination or expiration of this EULA.
+
+12.2. Third-Party Beneficiaries. This EULA does not grant any right or cause of action to any third party.
+
+12.3. Assignment and Subcontracting. Except as set out below, neither party may assign or novate this EULA in whole or in part without the other party’s express written consent. Cisco may (a) by written notice to You, assign or novate this EULA in whole or in part to an Affiliate of Cisco, or otherwise as part of a sale or transfer of any part of its business; or (b) subcontract any performance associated with the Cisco Technology to third parties, provided that such subcontract does not relieve Cisco of any of its obligations under this EULA. 
+
+12.4. U.S. Government End Users. The Software, Cloud Services and Documentation are deemed to be “commercial computer software” and “commercial computer software documentation” pursuant to FAR 12.212 and DFARS 227.7202. All U.S. Government end users acquire the Software, Cloud Services and Documentation with only those rights set forth in this EULA. Any provisions that are inconsistent with federal procurement regulations are not enforceable against the U.S. Government.
+
+12.5. Cisco Partner Transactions. If You purchase Cisco Technology from a Cisco Partner, the terms of this EULA apply to Your use of that Cisco Technology and prevail over any inconsistent provisions in Your agreement with the Cisco Partner.
+
+12.6. Modifications to the EULA. Cisco may change this EULA or any of its components by updating this EULA on Cisco.com. Changes to the EULA apply to any Entitlements acquired or renewed after the date of modification. 
+
+12.7. Compliance with Laws. Each party will comply with all laws and regulations applicable to their respective obligations under this EULA. Cisco may restrict the availability of the Cisco Technology in any particular location or modify or discontinue features to comply with applicable laws and regulations.  
+
+If You use the Cisco Technology in a location with local laws requiring a designated entity to be responsible for collection of data about individual end users and transfer of data outside of that jurisdiction (e.g. Russia and China), You acknowledge that You are the entity responsible for complying with such laws.
+
+12.8. Export. Cisco’s Software, Cloud Services, products, technology and services (collectively the “Cisco Products”) are subject to U.S. and local export control and sanctions laws. You acknowledge and agree to the applicability of and Your compliance with those laws, and You will not receive, use, transfer, export or re-export any Cisco Products in a way that would cause Cisco to violate those laws. You also agree to obtain any required licenses or authorizations. 
+
+12.9. Governing Law and Venue. This EULA, and any disputes arising from it, will be governed exclusively by the applicable governing law below, based on Your primary place of business and without regard to conflicts of laws rules or the United Nations Convention on the International Sale of Goods. The courts located in the applicable venue below will have exclusive jurisdiction to adjudicate any dispute arising out of or relating to the EULA or its formation, interpretation or enforcement. Each party hereby consents and submits to the exclusive jurisdiction of such courts. Regardless of the below governing law, either party may seek interim injunctive relief in any court of appropriate jurisdiction with respect to any alleged breach of Cisco’s intellectual property or proprietary rights. 
+Your Primary Place of Business -  Governing Law - Jurisdiction and Venue
+Any location not specified below  - State of California, United States of America - Superior Court of California, County of Santa Clara and Federal Courts of the Northern District of California 
+Australia - Laws of the State of New South Wales - State and Federal Courts of New South Wales
+Canada - Province of Ontario, Canada - Courts of the Province of Ontario, Canada
+China - Laws of the People’s Republic of China - Hong Kong International Arbitration Center
+Europe (excluding Italy), Middle East, Africa, Asia (excluding Japan and China), Oceania (excluding Australia) - Laws of England - English Courts 
+Italy - Laws of Italy - Court of Milan
+Japan - Laws of Japan - Tokyo District Court of Japan
+United States, Latin America or the Caribbean - State of California, United States of America - Superior Court of California, County of Santa Clara and Federal Courts of the Northern District of California	
+If You are a United States public sector agency or government institution located in the United States, the laws of the primary jurisdiction in which You are located will govern the EULA and any disputes arising from it.  For U.S. Federal Government customers, this EULA will be controlled and construed under the laws of the United States of America.  
+
+12.10. Notice. Any notice delivered by Cisco to You under this EULA will be delivered via email, regular mail or postings on Cisco.com. Notices to Cisco should be sent to Cisco Systems, Office of General Counsel, 170 Tasman Drive, San Jose, CA 95134 unless this EULA, applicable Product Specific Terms or an order specifically allows other means of notice. 
+
+12.11. Force Majeure. Except for payment obligations, neither party will be responsible for failure to perform its obligations due to an event or circumstances beyond its reasonable control.
+
+12.12. No Waiver. Failure by either party to enforce any right under this EULA will not waive that right.
+
+12.13. Severability. If any portion of this EULA is not enforceable, it will not affect any other terms. 
+
+12.14. Entire agreement. This EULA is the complete agreement between the parties with respect to the subject matter of this EULA and supersedes all prior or contemporaneous communications, understandings or agreements (whether written or oral). 
+
+12.15. Translations. Cisco may provide local language translations of this EULA in some locations.  You agree that those translations are provided for informational purposes only and if there is any inconsistency, the English version of this EULA will prevail.
+
+12.16. Order of Precedence. If there is any conflict between this EULA and any Product Specific Terms expressly referenced in this EULA, the order of precedence is: (a) such Product Specific Terms; (b) this EULA (excluding the Product Specific Terms and any Cisco policies); then (c) any applicable Cisco policy expressly referenced in this EULA. 
+
+Section 13. Definitions
+
+“Affiliate” means any corporation or company that directly or indirectly controls, or is controlled by, or is under common control with the relevant party, where “control” means to: (a) own more than 50% of the relevant party; or (b) be able to direct the affairs of the relevant party through any lawful means (e.g., a contract that allows control).
+
+“Approved Source” means Cisco or a Cisco Partner.
+
+“Authorized Third Parties” means Your Users, Your Affiliates, Your third-party service providers, and each of their respective Users permitted to access and use the Cisco Technology on Your behalf as part of Your Entitlement.
+
+“Cisco” “we” “our” or “us” means Cisco Systems, Inc. or its applicable Affiliate(s).
+
+“Cisco Content” means any (a) content or data provided by Cisco to You as part of Your use of the Cisco Technology and (b) content or data that the Cisco Technology generates or derives in connection with Your use.  Cisco Content includes geographic and domain information, rules, signatures, threat intelligence and data feeds and Cisco’s compilation of suspicious URLs.
+
+“Cisco Partner” means a Cisco authorized reseller, distributor or systems integrator authorized by Cisco to sell Cisco Technology.
+
+“Cloud Service” means the Cisco hosted software-as-a-service offering or other Cisco cloud-enabled feature described in the applicable Product Specific Terms.  Cloud Service includes applicable Documentation and may also include Software.
+
+“Confidential Information” means non-public proprietary information of the disclosing party (“Discloser”) obtained by the receiving party (“Recipient”) in connection with this EULA, which is (a) conspicuously marked as confidential or, if verbally disclosed, is summarized in writing to the Recipient within 14 days and marked as confidential; or (b) is information which by its nature should reasonably be considered confidential whether disclosed in writing or verbally. 
+
+“Delivery Date” means the date agreed in Your Entitlement, or where no date is agreed: (a) where Usage Rights in Software or Cloud Services are granted separately: (i) for Software, the earlier of the date Software is made available for download or installation, or the date that Cisco ships the tangible media containing the Software, and (ii) for Cloud Services, the date on which the Cloud Service is made available for Your use; or (b) where Usage Rights in Software and Cloud Services are granted together, the earlier of the date Software is made available for download, or the date on which the Cloud Service is made available for Your use.
+
+“Documentation” means the technical specifications and usage materials officially published by Cisco specifying the functionalities and capabilities of the applicable Cisco Technology.
+
+“Entitlement” means the specific metrics, duration, and quantity of Cisco Technology that You commit to acquire from an Approved Source through individual acquisitions or Your participation in a Cisco buying program.
+
+“Malicious Code” means code that is designed or intended to disable or impede the normal operation of, or provide unauthorized access to, networks, systems, Software or Cloud Services other than as intended by the Cisco Technology (for example, as part of some of Cisco’s security products).
+
+“Product Specific Terms” means additional product related terms applicable to the Cisco Technology You acquire as set out at www.cisco.com/go/softwareterms. 
+
+“Software” means the Cisco computer programs including Upgrades, firmware and applicable Documentation.
+
+“Upgrades” means all updates, upgrades, bug fixes, error corrections, enhancements and other modifications to the Software.
+
+“Usage Term” means the period commencing on the Delivery Date and continuing until expiration or termination of the Entitlement, during which period You have the right to use the applicable Cisco Technology.
+
+“User” means the individuals (including contractors or employees) permitted to access and use the Cisco Technology on Your behalf as part of Your Entitlement.  
+
+“You” means the individual or legal entity purchasing the Cisco Technology. 

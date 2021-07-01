@@ -1,6 +1,6 @@
-Copyright 2020 Cisco Systems, Inc
+Copyright 2020-2021 Cisco Systems, Inc
 
-YANG Suite
+Cisco YANG Suite
 ==========
 
 YANG Suite core Django application.
@@ -17,15 +17,41 @@ package management.  Docker-compose is the recommended install.
 
 Requires about 3.5GB of memory to load large Cisco native models.
 
-Docker Installation
--------------------
+## YANG Suite Resources
 
-To ensure you have the latest release of the YANG Suite Docker container files,
-from a terminal or PowerShell window, git clone git@github.com:CiscoDevNet/yangsuite.git
+DevNet landing page: [developer.cisco.com/yangsuite](https://developer.cisco.com/yangsuite)
+
+Documentation: [developer.cisco.com/docs/yangsuite](https://developer.cisco.com/docs/yangsuite)
+
+## Prerequisites
+
+To use the resources in this repository, you must install Docker on the system where you want to run YANG Suite. In addition, since this YANG Suite repository uses Docker Compose, your system needs Docker Compose. Docker Desktop for Mac and Docker Desktop for Windows installations include Compose and you can install those using instructions at https://docs.docker.com/install. For Linux, follow [these specific instructions to install Docker Compose on Linux systems](https://docs.docker.com/compose/install/#install-compose-on-linux-systems).
+
+## Quick Start with Docker:
+
+1. Clone this repository
+
+2. Generate the certificates for the HTTPS secure connection
+
+3. Run docker-compose
+
+4. Access the tool at https://localhost
+
+```
+git clone https://github.com/CiscoDevNet/yangsuite
+cd yangsuite/docker/ ; ./gen_test_certs.sh
+docker-compose up
+```
+
+Docker-based YANG Suite Installation
+------------------------------------
 
 WARNINGS:
 - Change admin username/password default in docker-compose.yml file first!
-- Official SSL/TLS certificate/key needs to be obtained and copied to yangsuite/docker/nginx directory
+- Official SSL/TLS certificate/key needs to be obtained and copied to yangsuite/docker/nginx directory.
+
+To ensure you have the latest release of the YANG Suite Docker container files,
+from a terminal or PowerShell window, run: git clone https://github.com/CiscoDevNet/yangsuite.git
 
 Self-signed Certificate for testing
 -----------------------------------
@@ -46,11 +72,11 @@ lines in the yangsuite/docker/yangsuite/dockerfile, and run:
 
     docker-compose up --build
 
-Access docker with web browser
-------------------------------
+Access Docker Installation with web browser
+-------------------------------------------
 
 - Connect to https://localhost NOTE: You will get a complaint about the certificate if it was generated using "gen_test_certs.sh"
-- Login using default user. You should change this after your first login.
+- Login using default user. You can find credentials in "cat docker-compose.yml" file. You should change this after your first login.
 
 Python Virtualenv Installation
 ------------------------------
@@ -58,22 +84,11 @@ Python Virtualenv Installation
 WARNING: You will not have HTTPS support unless you install a web server like NGINX and frontend it with uwsgi.
 Instructions for that can be found searching online.
 
-- Create a python 3.6, 3.7, or 3.8 virtural environment and activate it.
+- Create a Python 3.6, 3.7, or 3.8 virtural environment and activate it.
 - Type ``pip install yangsuite[core]``
 - You will be prompted to set superuser credentials.
 - Use ctrl-c to stop the yangsuite server
 - Use ``yangsuite`` to start the yangsuite server
-- Connect to http://localhost:8480.
-- Login using user set at install.
-
-Installation with pyATS
------------------------
-
-- Create a python 3.6, 3.7, or 3.8 virtural environment and activate it.
-- Type ``pip install pyats[full]``
-- Type ``pip install yangsuite[core]``
-- You will be prompted to set superuser credentials.
-- Type ``yangsuite`` to start the yangsuite server.
 - Connect to http://localhost:8480.
 - Login using user set at install.
 

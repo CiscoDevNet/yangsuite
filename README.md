@@ -44,6 +44,22 @@ or
 cd yangsuite/docker/ ; docker compose up
 ```
 
+The output should look similar to below
+
+![](./imgs/git_clone_setup.png)
+
+The start_yang_suite.sh will ask to set the username, password, e-mail address, and for the certificate details. The output will look similar to the below, be sure to enter certificate details in the red hilight area
+
+![](./imgs/setup_ys.png)
+
+Once YANG Suite is ready for use the following will be seen
+
+![](./imgs/ys_ready.png)
+
+Now you can access the YANG Suite at http://localhost
+
+
+
 Docker-based YANG Suite Installation
 ------------------------------------
 

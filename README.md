@@ -31,13 +31,17 @@ To use the resources in this repository, you must install Docker on the system w
 
 1. Clone this repository
 
-2. Run start_yang_suite.sh
+2. Run start_yang_suite.sh or, 
 
-3. Access the tool at http://localhost or https://localhost:8443
+3. Run docker compose up if you have already ran the start_yang_suite.sh
+
+4. Access the tool at http://localhost or https://localhost:8443
 
 ```
 git clone https://github.com/CiscoDevNet/yangsuite
 cd yangsuite/docker/ ; ./start_yang_suite.sh
+or
+cd yangsuite/docker/ ; docker compose up
 ```
 
 Docker-based YANG Suite Installation

@@ -119,3 +119,18 @@ Configuring yangsuite Server
 
 - Activate the virtual environment
 - Type ``yangsuite -h``
+
+
+Pre Release Versions
+----------------------------
+Manually specify pre-release version when using pip like in the example below to access the pre release and bug fix versions of yang suite and plugins:
+
+```
+docker container exec -it <yangsuite container ID> bash
+pip install --upgrade --pre yangsuite-devices
+exit
+
+pip
+source <your yangsuite venv>/bin/activate
+pip install --upgrade --pre yangsuite-devices
+```

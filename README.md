@@ -42,6 +42,8 @@ git clone https://github.com/CiscoDevNet/yangsuite
 cd yangsuite/docker/ ; ./start_yang_suite.sh
 or
 cd yangsuite/docker/ ; docker compose up
+    or
+cd yangsuite/docker/ ; docker-compose up
 ```
 
 The output should look similar to below

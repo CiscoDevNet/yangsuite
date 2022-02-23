@@ -6,6 +6,7 @@ services:
       image: yangsuite:latest
       build:
         context: ./yangsuite
+        dockerfile: ./dockerfile
       env_file:
         - ./yangsuite/setup.env
       command: /yangsuite/migrate_and_start.sh
@@ -30,6 +31,7 @@ services:
       image: nginx:latest
       build:
         context: ./nginx
+        dockerfile: ./dockerfile
       depends_on:
         - yangsuite
       ports:
@@ -42,6 +44,7 @@ services:
       image: backup:latest
       build:
         context: ./backup
+        dockerfile: ./dockerfile
       command: ['/code/run_cron.sh']
       depends_on:
         - yangsuite

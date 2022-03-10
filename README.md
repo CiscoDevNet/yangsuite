@@ -39,7 +39,7 @@ To use the resources in this repository, you must install Docker on the system w
 
 ```
 git clone https://github.com/CiscoDevNet/yangsuite
-cd yangsuite/docker/ ; ./start_yang_suite.sh
+cd yangsuite/docker/ ; bash ./start_yang_suite.sh
 or
 cd yangsuite/docker/ ; docker compose up
     or

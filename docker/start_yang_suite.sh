@@ -94,3 +94,5 @@ YS_ADMIN_EMAIL=$ADMIN_EMAIL
 %%
 
 docker-compose up --build
+# Someone should fix this to make it better, do some checking first plz!
+docker compose up --build

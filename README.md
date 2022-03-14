@@ -1,4 +1,4 @@
-Copyright 2020-2021 Cisco Systems, Inc
+Copyright 2022 Cisco Systems, Inc
 
 Cisco YANG Suite
 ==========

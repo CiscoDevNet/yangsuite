@@ -1,0 +1,61 @@
+# Copyright 2020-2021 Cisco Systems, Inc
+
+version: '3'
+services:
+    yangsuite:
+      image: yangsuite:latest
+      build:
+        context: ./yangsuite
+        dockerfile: ./Dockerfile
+      env_file:
+        - ./yangsuite/setup.env
+      command: /yangsuite/migrate_and_start.sh
+      ports:
+        # gNMI insecure port (IOS-XE)
+        - "50052:50052"
+        # gNMI insecure port (NX-OS)
+        - "50051:50051"
+        # gNMI secure port (IOS-XE, NX-OS)
+        - "9339:9339"
+        # gRPC MDT telemetry insecure port (IOS-XE)
+        - "57344:57344"
+        # gRPC MDT telemetry secure port (IOS-XE)
+        - "57345:57345"
+        # RESTCONF
+        - "443:443"
+      volumes:
+        - static-content:/ys-static
+        - uwsgi:/yangsuite/uwsgi
+        - ./ys-data:/ys-data
+    nginx:
+      image: nginx:latest
+      build:
+        context: ./nginx
+        dockerfile: ./Dockerfile
+      depends_on:
+        - yangsuite
+      ports:
+        - "80:80"
+        - "8443:8443"
+      volumes:
+        - static-content:/etc/nginx/html
+        - uwsgi:/var/run/uwsgi
+    backup:
+      image: backup:latest
+      build:
+        context: ./backup
+        dockerfile: ./Dockerfile
+      command: ['/code/run_cron.sh']
+      depends_on:
+        - yangsuite
+      environment:
+        - DATA_DIR=/ysdata
+        - CRON_EXP=${YS_BACKUP_CRON:-*/30 * * * *}
+        - NO_BACKUP=${YS_NO_BACKUP:-false}
+        - MAX_BACKUP=${YS_MAX_BACKUP:-2}
+      volumes:
+        - ./ys-data:/ysdata
+        - ./ys-backup:/backup
+volumes:
+    static-content:
+    uwsgi:

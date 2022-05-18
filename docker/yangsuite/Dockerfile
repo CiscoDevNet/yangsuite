@@ -27,6 +27,7 @@ RUN apt-get update && \
 RUN mkdir -p /yangsuite/uwsgi
 COPY uwsgi.ini /yangsuite/
 COPY migrate_and_start.sh /yangsuite/
+RUN chmod +x /yangsuite/migrate_and_start.sh
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools wheel uwsgi
 

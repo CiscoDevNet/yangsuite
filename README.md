@@ -1,4 +1,4 @@
-Copyright 2020-2021 Cisco Systems, Inc
+Copyright 2022 Cisco Systems, Inc
 
 Cisco YANG Suite
 ==========
@@ -31,14 +31,36 @@ To use the resources in this repository, you must install Docker on the system w
 
 1. Clone this repository
 
-2. Run start_yang_suite.sh
+2. Run start_yang_suite.sh or, 
 
-3. Access the tool at http://localhost or https://localhost:8443
+3. Run docker compose up if you have already ran the start_yang_suite.sh
+
+4. Access the tool at http://localhost or https://localhost:8443
 
 ```
 git clone https://github.com/CiscoDevNet/yangsuite
-cd yangsuite/docker/ ; ./start_yang_suite.sh
+cd yangsuite/docker/ ; bash ./start_yang_suite.sh
+or
+cd yangsuite/docker/ ; docker compose up
+    or
+cd yangsuite/docker/ ; docker-compose up
 ```
+
+The output should look similar to below
+
+![](./imgs/git_clone_setup.png)
+
+The start_yang_suite.sh will ask to set the username, password, e-mail address, and for the certificate details. The output will look similar to the below, be sure to enter certificate details in the red hilight area
+
+![](./imgs/setup_ys.png)
+
+Once YANG Suite is ready for use the following will be seen
+
+![](./imgs/ys_ready.png)
+
+Now you can access the YANG Suite at http://localhost
+
+
 
 Docker-based YANG Suite Installation
 ------------------------------------
@@ -99,3 +121,18 @@ Configuring yangsuite Server
 
 - Activate the virtual environment
 - Type ``yangsuite -h``
+
+
+Pre Release Versions
+----------------------------
+Manually specify pre-release version when using pip like in the example below to access the pre release and bug fix versions of yang suite and plugins:
+
+```
+docker container exec -it <yangsuite container ID> bash
+pip install --upgrade --pre yangsuite-devices
+exit
+
+pip
+source <your yangsuite venv>/bin/activate
+pip install --upgrade --pre yangsuite-devices
+```

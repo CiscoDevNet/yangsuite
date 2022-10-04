@@ -6,7 +6,7 @@ YANG Suite consists of several Django applications with most working independent
 
 The core applications consist of:
 
-- yangsuite - UI routing, central logging, general utility APIs, user and plugin management
+- yangsuite - UI routing, central logging, general utility APIs, google analtics reporting, and user and plugin management
 - yangsuite-devices - Device management
 - yangsuite-filemanager - YANG file and YANG set management
 - yangsuite-yangtree - Converts YANG files to JSON objects for general use
@@ -15,7 +15,7 @@ The core applications consist of:
 Optional plugins consist of:
 
 - yangsuite-coverage - Analysis of YANG files presenting customizable spreadsheets and diffs
-- yangsuite-grpc-telemetry - Model Data Telemetry listener for device telemetry streams
+- yangsuite-grpc-telemetry - Model Driven Telemetry listener for device telemetry streams
 - yangsuite-gnmi - Communicates with devices using gNMI protocol
 - yangsuite-restconf - Communicates with devices using RESTCONF protocol
 

@@ -54,14 +54,14 @@ RUN pip3 install --upgrade setuptools wheel uwsgi
 # RUN  pip3 install --upgrade psycopg2-binary==2.8.6 tzdata
 
 # Installing YANG Suite
-#RUN pip3 install --upgrade --no-cache yangsuite[core]
+RUN pip3 install --upgrade --no-cache yangsuite
 
 # Installing YANG Suite optional free plugins
-#RUN pip3 install --upgrade --no-cache \
-#    yangsuite-grpc-telemetry \
-#    yangsuite-coverage \
-#    yangsuite-gnmi \
-#    yangsuite-restconf
+RUN pip3 install --upgrade --no-cache \
+    yangsuite-grpc-telemetry \
+    yangsuite-coverage \
+    yangsuite-gnmi \
+    yangsuite-restconf
 
 # Uncomment to add another pypi repository to search for here
 #
@@ -70,8 +70,8 @@ RUN pip3 install --upgrade setuptools wheel uwsgi
 
 # Uncomment to install optional plugin or replacement wheels
 #
-COPY *.whl /yangsuite/
-RUN pip3 install --upgrade --no-cache /yangsuite/*.whl
+# COPY *.whl /yangsuite/
+# RUN pip3 install --upgrade --no-cache /yangsuite/*.whl
 
 COPY production.py ${YS_SETTINGS}
 COPY wsgi.py ${YS_DIST}

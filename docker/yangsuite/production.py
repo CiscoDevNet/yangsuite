@@ -22,3 +22,23 @@ STATIC_ROOT = os.getenv('DJANGO_STATIC_ROOT', './ys-static')
 # SESSION_COOKIE_SECURE = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+DATABASE_DEFAULT = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': os.path.join(MEDIA_ROOT, 'db.sqlite3'),
+    'OPTIONS': {
+        'timeout': 180
+    }
+}
+DATABASE_POSTGRESQL = {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'yangsuite_db',
+    'USER': 'ysadmin',
+    'PASSWORD': 'ysadmin',
+    'HOST': 'localhost',
+    'PORT': '5432',
+}
+
+DATABASES = {
+    'default': DATABASE_DEFAULT
+}

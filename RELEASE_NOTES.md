@@ -332,6 +332,11 @@ yangsuite-netconf
 
 - FIX: Creating replay, the RPC well formed XML format is not maintained in the yaml file
 
+1.17.15
+-------
+
+- FIX: RPC reply has double-spacing between tags making it difficult to read
+
 
 yangsuite-restconf
 ==================

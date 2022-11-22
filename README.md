@@ -136,3 +136,13 @@ pip
 source <your yangsuite venv>/bin/activate
 pip install --upgrade --pre yangsuite-devices
 ```
+
+
+[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
+----------------------------
+This PDF document has technical details of all capabilites of the YANG Suite tool, including installation, setup, and use of all plugins and features. It is a very detailed document that can be refered to for using the tool and examples for each plugin.
+
+[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
+
+
+

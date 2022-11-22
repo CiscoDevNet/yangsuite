@@ -101,26 +101,59 @@ Access YANG Suite Docker Install with web browser
 - If port 443 is not available for use on the server, change the port number in the docker-compose.yml file, configure the new restconf port on the Cisco device, and configure the correct restconf port in the YANG Suite Device profile.
 - Login using username set during install.
 
-Python Virtualenv Installation
+Pip installation on Mac
 ------------------------------
 
-WARNING: HTTPS support is not available unless a web server is installed like NGINX and frontended with uwsgi.
-Instructions for that can be found searching online.
+We recommend installing Homebrew to manage the Python installation on your mac.
 
-- Create a Python 3.6, 3.7, or 3.8 virtural environment and activate it.
-- Type ``pip install yangsuite[core]``
-- Use ``yangsuite`` to start the yangsuite server
-- User is prompted to set superuser credentials.
-- Use ctrl-c to stop the yangsuite server
-- Connect to http://localhost:8480.
-- Login using user set at install.
-- Install other plugins using Admin-->Manage plugins page.
+Refer to the HomeBrew website for details on how to install HomeBrew on your mac, or, follow the command below to install homebrew:
 
-Configuring yangsuite Server
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Use brew to install pyenv
+
+```
+brew install pyenv
+```
+
+Once pyenv is installed, install Python version 3.8
+
+```
+pyenv install 3.8
+```
+
+Now that the correct and supported version of Python 3.8 is installed, next create and activate the virtual environment
+
+```
+cd 
+~/.pyenv/versions/3.8.12/bin/python -m venv yangsuitevenv
+source yangsuiteenv/bin/activate
+```
+
+Next install the YANG Suite tool within the virutal evnrionment using pip:
+
+```
+pip install pip wheel setuptools --upgrade
+pip install yangsuite
+```
+
+Now that YANG Suite is installed it can be started up the credentials and settings will be configured on the first run:
+
+```
+yangsuite
+```
+
+Once started the tool can be access on the default port http://localhost:8480
+
+
+
+Re-configuring yangsuite Server
 ----------------------------
 
 - Activate the virtual environment
-- Type ``yangsuite -h``
+- Type yangsuite -h
 
 
 Pre Release Versions

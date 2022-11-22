@@ -23,7 +23,14 @@ DevNet landing page: [developer.cisco.com/yangsuite](https://developer.cisco.com
 
 Documentation: [developer.cisco.com/docs/yangsuite](https://developer.cisco.com/docs/yangsuite)
 
-## Prerequisites
+[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
+----------------------------
+This PDF document has technical details of all capabilites of the YANG Suite tool, including installation, setup, and use of all plugins and features. It is a very detailed document that can be refered to for using the tool and examples for each plugin.
+
+
+
+
+## Prerequisites for Docker
 
 To use the resources in this repository, you must install Docker on the system where you want to run YANG Suite. In addition, since this YANG Suite repository uses Docker Compose, your system needs Docker Compose. Docker Desktop for Mac and Docker Desktop for Windows installations include Compose and you can install those using instructions at https://docs.docker.com/install. For Linux, follow [these specific instructions to install Docker Compose on Linux systems](https://docs.docker.com/compose/install/#install-compose-on-linux-systems).
 
@@ -101,7 +108,7 @@ Access YANG Suite Docker Install with web browser
 - If port 443 is not available for use on the server, change the port number in the docker-compose.yml file, configure the new restconf port on the Cisco device, and configure the correct restconf port in the YANG Suite Device profile.
 - Login using username set during install.
 
-Pip installation on Mac
+Quick Start with PIP Install on MacOS
 ------------------------------
 
 We recommend installing Homebrew to manage the Python installation on your mac.
@@ -171,11 +178,6 @@ pip install --upgrade --pre yangsuite-devices
 ```
 
 
-[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
-----------------------------
-This PDF document has technical details of all capabilites of the YANG Suite tool, including installation, setup, and use of all plugins and features. It is a very detailed document that can be refered to for using the tool and examples for each plugin.
-
-[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
 
 
 

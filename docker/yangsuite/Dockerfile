@@ -49,6 +49,8 @@ COPY migrate_and_start.sh /yangsuite/
 RUN chmod +x /yangsuite/migrate_and_start.sh
 RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade setuptools wheel uwsgi
+# Fixes https://github.com/CiscoDevNet/yangsuite/issues/81
+RUN pip3 install "packaging<22.0"
 
 # For PostgresSQL
 # RUN  pip3 install --upgrade psycopg2-binary==2.8.6 tzdata

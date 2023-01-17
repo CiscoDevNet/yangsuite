@@ -31,11 +31,12 @@ This PDF document has technical details of all capabilites of the YANG Suite too
 
 # YANG Suite Installation: Docker or PIP? You decide
 
-| Feature       | Docker                | PIP          |
-| ------------- | -------------         | -------------|
-| Security      | HTTPS                 | HTTP         |
-<!--- | Ports Used    | 80 forwarded to 8443  | -->
-
+| Feature         | Docker                          | PIP (Python version 3.8)         |
+| -------------   | -------------                   | ------------- |
+| Prerequisites   | Install docker & docker compose | Install Python & PIP|
+| Security        | HTTPS                           | HTTP         |
+| YS GUI Ports    | 80 forwarded to 8443            | 8480 directly (no exposed ports) |
+| Telemetry Ports | 57344 - 57345                   | Any unused & unprivileged TCP port |
 
 ## Prerequisites for Docker
 
@@ -163,7 +164,7 @@ Once started the tool can be access on the default port http://localhost:8480
 See a full example of installing pre-requisites and configuring YANG Suite below:
 ![](imgs/yangsuite-pip-install-short.gif)
 
-PIP install using Linux
+PIP install using Linux in Windows
 ----------------------------
 **NOTE** For Linux to run YANG Suite, a virtual environment is required
 

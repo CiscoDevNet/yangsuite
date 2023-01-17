@@ -167,6 +167,196 @@ PIP install using Linux
 ----------------------------
 **NOTE** For Linux to run YANG Suite, a virtual environment is required
 
+Here is an example installation flow on a Windows machine using Ubuntu 20.04 on Windows Subsystem Linux (WSL)
+
+Install Ubuntu 20.04
+```
+wsl --install Ubuntu-20.04
+
+Installing, this may take a few minutes...
+Please create a default UNIX user account. The username does not need to match your Windows username.
+For more information visit: https://aka.ms/wslusers
+Enter new UNIX username: user
+New password:
+Retype new password:
+passwd: password updated successfully
+Installation successful!
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.15.79.1-microsoft-standard-WSL2 x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Tue Jan 10 15:53:15 PST 2023
+
+  System load:  0.22                Processes:             9
+  Usage of /:   0.1% of 1006.85GB   Users logged in:       0
+  Memory usage: 14%                 IPv4 address for eth0: 172.28.133.196
+  Swap usage:   0%
+
+1 update can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+This message is shown once a day. To disable it please create the
+/home/user/.hushlogin file.
+```
+
+Ensure DNS is set up properly
+```
+wsl -s Ubuntu-20.04
+wsl
+cat /etc/resolv.conf
+```
+
+Validate python3 already part of Ubuntu-20.04 image
+```
+sudo apt update
+sudo apt upgrade
+which python3
+```
+
+Install python3 packages
+```
+sudo apt install python3-pip python3-lxml python3-venv		
+```
+
+Install yangsuite prerequisites for Ubuntu 
+```
+sudo apt install git openssh-client iputils-ping sqlite3 snmp
+```
+
+Create a new directory and virtual environment
+```
+mkdir testing
+cd testing
+mkdir yangsuite
+cd yangsuite
+```
+
+Set Up YANG Suite with setup_yangsuite.sh. Note: Skip docker install and move forward with pip installation method instead
+```
+sudo ./setup_yangsuite.sh
+SKIP													
+python3 -m venv .venv											
+source .venv/bin/activate
+pip install -U pip setuptools wheel
+pip install yangsuite
+```
+
+Install yangsuite plugins
+```
+pip install yangsuite-restconf yangsuite-coverage yangsuite-gnmi yangsuite-grpc-telemetry		
+pip freeze > requirements.txt
+```
+
+Run yangsuite. When doing this for the first time, setup script stored to yangsuite.ini for future runs, see detailed output below
+```
+yangsuite											
+
+**********************************************************************
+Entering interactive configuration mode
+**********************************************************************
+YANG Suite stores user specific data (YANG modules, device profiles, etc.)
+Set new path or use: [] /home/user/testing/yangsuite
+What port number should YANG Suite listen on? [8480]
+**********************************************************************
+YANG Suite can be accessed remotely over the network.
+**********************************************************************
+Allow remote access? [n] y
+**********************************************************************
+Define hosts/IPs that YANG Suite will accept connections as.
+Examples:
+        CSCO-W-PF392JHY.cisco.com
+        127.0.0.1
+        CSCO-W-PF392JHY
+        127.0.1.1
+If the IP is not routable and you are behind NAT, use the public NAT address.
+**********************************************************************
+Enter a hostname, FQDN, or address [127.0.0.1]
+Entries so far: ['0.0.0.0']
+Add another entry? [n]
+**********************************************************************
+Interactive configuration complete
+**********************************************************************
+Save this configuration to
+/home/user/.config/yangsuite/yangsuite.ini
+so YANG Suite can automatically use it next time you start YANG Suite? [y]
+**********************************************************************
+Updating YANG Suite preferences file (/home/user/.config/yangsuite/yangsuite.ini)
+**********************************************************************
+2023-01-10 16:32:42,140 - yangsuite.ysgnmi.gnmi: WARNING: Install yangsuite-testmanager for opfield verification
+2023-01-10 16:32:42,211 - yangsuite.paths: INFO: Creating new 'filename' directory path /home/user/testing/yangsuite/logs/
+Removing database for upgrade.
+No changes detected in app 'yscoverage'
+No changes detected in app 'yangsuite'
+No changes detected in app 'ysdevices'
+No changes detected in app 'ysgnmi'
+No changes detected in app 'ysrestconf'
+Migrations for 'ysyangtree':
+  .venv/lib/python3.8/site-packages/ysyangtree/migrations/0001_initial.py
+    - Create model YangSetJSON
+    - Create model YangSetTree
+No changes detected in app 'ysnetconf'
+No changes detected in app 'ysfilemanager'
+No changes detected in app 'ysgrpctelemetry'
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, django_registration, sessions, ysyangtree
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying django_registration.0001_initial... OK
+  Applying sessions.0001_initial... OK
+  Applying ysyangtree.0001_initial... OK
+**********************************************************************
+Creating static storage directory /home/user/.local/share/yangsuite/static
+**********************************************************************
+
+884 static files copied to '/home/user/.local/share/yangsuite/static'.
+**********************************************************************
+Your input is required to define an admin user
+**********************************************************************
+Username (leave blank to use 'user'): admin							
+Email address: yangsuite@gmail.com
+Password:
+Password (again):
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+**********************************************************************
+YANG Suite data is stored at /home/user/testing/yangsuite. Be sure to back up this directory!
+**********************************************************************
+Performing system checks...
+
+System check identified no issues (0 silenced).
+January 11, 2023 - 00:34:02
+Django version 2.2.28, using settings 'yangsuite.settings.production'
+Starting development server at http://0.0.0.0:8480/
+Quit the server with CONTROL-C.
+```
 
 Re-configuring yangsuite Server
 ----------------------------

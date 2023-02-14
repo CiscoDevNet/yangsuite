@@ -35,7 +35,7 @@ REMOTE=$REPLY
 
 if [ "${REMOTE}" == "y" ]
 then
-    echo -n "Enter FQDN or IP: "
+    echo -n "Enter local host FQDN or IP: "
     read -r
     ALLOWED_HOSTS=$REPLY
 else

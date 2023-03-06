@@ -29,6 +29,19 @@ then
     die
 fi
 
+echo -n "Will you access the system from a remote host? (y/n): "
+read -r
+REMOTE=$REPLY
+
+if [ "${REMOTE}" == "y" ]
+then
+    echo -n "Enter local host FQDN or IP: "
+    read -r
+    ALLOWED_HOSTS=$REPLY
+else
+    ALLOWED_HOSTS="localhost"
+fi
+
 echo -n "email: "
 read -r
 ADMIN_EMAIL=$REPLY
@@ -87,7 +100,7 @@ DJANGO_SETTINGS_MODULE=yangsuite.settings.production
 MEDIA_ROOT=/ys-data/
 STATIC_ROOT=/ys-static/
 DJANGO_STATIC_ROOT=/ys-static/
-DJANGO_ALLOWED_HOSTS=localhost
+DJANGO_ALLOWED_HOSTS=$ALLOWED_HOSTS
 YS_ADMIN_USER=$ADMIN_USER
 YS_ADMIN_PASS=$PASS_ONE
 YS_ADMIN_EMAIL=$ADMIN_EMAIL

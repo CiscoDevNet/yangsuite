@@ -387,6 +387,6 @@ pip install --upgrade --pre yangsuite-devices
 Update all Plugins to Latest Release
 ----------------------------
 ```
-pip3 install --upgrade yangsuite yangsuite-devices yangsuite-testmanager yangsuite-filemanager yangsuite-yangtree yangsuite-coverage yangsuite-gnmi yangsuite-grpc-telemetry yangsuite-netconf yangsuite-restconf yangsuite-testmanager 
+pip3 install --upgrade yangsuite yangsuite-devices yangsuite-filemanager yangsuite-yangtree yangsuite-coverage yangsuite-gnmi yangsuite-grpc-telemetry yangsuite-netconf yangsuite-restconf
 ```
 

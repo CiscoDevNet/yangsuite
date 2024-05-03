@@ -142,8 +142,8 @@ pyenv install 3.8
 Now that the correct and YANG Suite-supported version of Python 3.8 is installed, create and activate the virtual environment
 
 ```
-~/.pyenv/versions/3.8.12/bin/python -m venv yangsuitevenv
-source yangsuiteenv/bin/activate
+~/.pyenv/versions/3.8.19/bin/python -m venv yangsuitevenv
+source yangsuitevenv/bin/activate
 ```
 
 Next, install the YANG Suite tool within the virutal evnrionment using pip:

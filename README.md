@@ -121,6 +121,12 @@ Quick Start with PIP Install on MacOS
 
 We recommend installing Homebrew to manage the Python installation on your mac.
 
+Create a new directory. In the examples below, we'll call this directory `yangsuitevenv`
+
+```
+mkdir yangsuitevenv
+```
+
 Refer to the [HomeBrew website](https://brew.sh) for details on how to install HomeBrew on your Mac, or, follow the command below to install HomeBrew:
 
 ```
@@ -139,11 +145,11 @@ Once pyenv is installed, install Python version 3.8
 pyenv install 3.8
 ```
 
-Now that the correct and YANG Suite-supported version of Python 3.8 is installed, create and activate the virtual environment
+Now that the correct and YANG Suite-supported version of Python 3.8 is installed, create and activate the virtual environment. Note: you may need to change "3.8.12" below with the version of Python 3.8 that you installed
 
 ```
 ~/.pyenv/versions/3.8.12/bin/python -m venv yangsuitevenv
-source yangsuiteenv/bin/activate
+source yangsuitevenv/bin/activate
 ```
 
 Next, install the YANG Suite tool within the virutal evnrionment using pip:

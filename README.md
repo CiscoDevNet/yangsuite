@@ -107,6 +107,26 @@ lines in the yangsuite/docker/yangsuite/dockerfile, and run:
 
     docker-compose up --build
 
+
+Example yangsuite.ini for external access
+-------------------------------------------------
+
+- The "allowed_host" variable sets which IP is allowed in to access the YANG Suite tool. In this example the host 0.0.0.0 is set but really I think only the star ("*") is needed because for this example all and every host should be allowed into the tool to allow it's use.
+ 
+
+```
+[DEFAULT]
+data_path = /home/yangsuite/ys-data
+port = 8480
+allowed_hosts = 0.0.0.0 *
+secret_key = justalongbunchofnumbersandstuffwashereokbyejeremywashereonafridayyo
+static_root = /home/yangsuite/.local/share/yangsuite/static
+settings_module = yangsuite.settings.dev.develop
+eula_agreement = accepted
+dna_advantage = detect
+```
+
+
 Access YANG Suite Docker Install with web browser
 -------------------------------------------------
 

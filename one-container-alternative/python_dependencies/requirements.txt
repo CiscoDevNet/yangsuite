@@ -1,0 +1,10 @@
+pip
+setuptools
+daphne
+twisted[http2,tls]
+wheel
+yangsuite
+yangsuite-coverage
+yangsuite-gnmi
+yangsuite-restconf
+yangsuite-grpc-telemetry

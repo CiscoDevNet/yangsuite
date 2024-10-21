@@ -1,0 +1,9 @@
+pip
+setuptools
+uwsgi
+wheel
+yangsuite
+yangsuite-coverage
+yangsuite-gnmi
+yangsuite-restconf
+yangsuite-grpc-telemetry

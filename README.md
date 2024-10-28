@@ -23,11 +23,10 @@ DevNet YANG Suite landing page: [developer.cisco.com/yangsuite](https://develope
 
 Documentation: [developer.cisco.com/docs/yangsuite](https://developer.cisco.com/docs/yangsuite)
 
-[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
-
 Hands-on [Learning Lab](https://developer.cisco.com/learning/labs/intro-yangsuite/introduction-launching-yang-suite/)
 ![](./imgs/learning_lab.png)
 
+[YANG Suite TDM PDF](https://pubhub.devnetcloud.com/media/yang-suite/docs/YANGSuite%20TDM%20-%20Communities.pdf)
 ----------------------------
 This PDF document has technical details of all capabilites of the YANG Suite tool, including installation, setup, and use of all plugins and features. It is a very detailed document that can be refered to for using the tool and examples for each plugin.
 

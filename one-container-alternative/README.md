@@ -12,11 +12,11 @@ This alternative is intended for _experimentation_ and not as a direct replaceme
 - `nginx` Server removed.
 - You can provide your own certificates; otherwise, a self-signed (dummy) certificate will be used.
 - HTTPs only. Port `8480` used.
-- Container running as non-root user.
 
 ## Limitations
 
 - No Backup cron job.
+- Container running as root. `/usr/local/bin/create_yangtree` had permissions issues. Will fix on a later release.
 
 ## Prerequisites
 

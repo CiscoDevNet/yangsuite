@@ -37,7 +37,7 @@ RUN pip install --upgrade -r /tmp/requirements.txt
 # stage for yangsuite setup
 FROM python_dependencies as app_setup
 
-EXPOSE 443 3000 8080 8086 8443 8480 9339 50051 50052 57344 57345
+EXPOSE 8480 57500 57501
 
 ARG YS_ADMIN_USER=developer
 ARG YS_ADMIN_PASS=developer
@@ -46,7 +46,7 @@ ARG YS_ADMIN_EMAIL=developer@example.com
 ENV DOCKER_RUN=true \
     MEDIA_ROOT=/ys-data/ \
     STATIC_ROOT=/ys-static/ \
-    ALLOWED_HOSTS=localhost \
+    ALLOWED_HOSTS='*' \
     YS_ADMIN_USER=${YS_ADMIN_USER} \
     YS_ADMIN_PASS=${YS_ADMIN_PASS} \
     YS_ADMIN_EMAIL=${YS_ADMIN_EMAIL} \
@@ -81,7 +81,7 @@ RUN groupadd --gid 1000 developer \
     && ./build-assets/create_self_signed_cert.sh \
     && ln -snf /usr/share/zoneinfo/${CONTAINER_TIMEZONE} /etc/localtime \
     && echo ${CONTAINER_TIMEZONE} > /etc/timezone \
-    && YS_DIR=$(pip show yangsuite | grep "^Location"|cut -d" " -f 2)/yangsuite \
+    && YS_DIR=$(pip show yangsuite | grep "^Location"|cut -d" " -f 2)/ \
     && yangsuite \
         --save-settings \
         --configure-only \
@@ -90,15 +90,13 @@ RUN groupadd --gid 1000 developer \
         --allowed-hosts ${ALLOWED_HOSTS} \
         --settings yangsuite.settings.production \
     && chown -R developer:developer \
+        ${YS_DIR} \
         /var/run/ \
         /var/log/ \
         /certificate \
         ${MEDIA_ROOT} \
         ${STATIC_ROOT} \
-        /build-assets/ \
-        ${YS_DIR}
-
-USER developer
+        /build-assets/ 
 
 ENTRYPOINT ["/build-assets/start_environment.sh"]
 CMD tail -f /dev/null 

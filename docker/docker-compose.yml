@@ -54,8 +54,8 @@ services:
         - NO_BACKUP=${YS_NO_BACKUP:-false}
         - MAX_BACKUP=${YS_MAX_BACKUP:-2}
       volumes:
-        - ./ys-data:/ysdata
-        - ./ys-backup:/backup
+        - ./ys-data:/ysdata:z
+        - ./ys-backup:/backup:z
 volumes:
     static-content:
     uwsgi:

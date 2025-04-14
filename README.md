@@ -10,8 +10,8 @@ Provides common library APIs for logging, filesystem access,
 GUI appearance and behavior, and client-server communication.
 
 - Authors:  Members of the Cisco YANG Suite development team.
-- Supports: Python 3.6, Python 3.7, and Python 3.8
-
+- Supports: Python 3.9+ with recommended Python 3.10
+  
 YANG Suite can be installed as a Docker container or through Python
 package management.  Docker-compose is the recommended install.
 
@@ -34,7 +34,7 @@ This PDF document has technical details of all capabilites of the YANG Suite too
 
 # YANG Suite Installation: Docker or PIP? You decide
 
-| Feature         | Docker                          | PIP (Python version 3.8)         |
+| Feature         | Docker                          | PIP (Python version 3.9+ rec: 3.10)         |
 | -------------   | -------------                   | ------------- |
 | Prerequisites   | Install docker & docker compose | Install Python & PIP|
 | Security        | HTTPS                           | HTTP         |
@@ -165,16 +165,16 @@ Use brew to install pyenv
 brew install pyenv
 ```
 
-Once pyenv is installed, install Python version 3.8
+Once pyenv is installed, install Python version 3.10
 
 ```
-pyenv install 3.8
+pyenv install 3.10.0
 ```
 
-Now that the correct and YANG Suite-supported version of Python 3.8 is installed, create and activate the virtual environment. Note: you may need to change "3.8.12" below with the version of Python 3.8 that you installed
+Now that the correct and YANG Suite-supported version of Python 3.10 is installed, create and activate the virtual environment. Note: you may need to change "3.10.0" below with the version of Python 3.10 that you installed
 
 ```
-~/.pyenv/versions/3.8.12/bin/python -m venv yangsuitevenv
+~/.pyenv/versions/3.10.0/bin/python -m venv yangsuitevenv
 source yangsuitevenv/bin/activate
 ```
 

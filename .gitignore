@@ -65,6 +65,3 @@ playground.xcworkspace
 *.swp
 *~
 .DS_Store
-
-# don't commit the user certificates
-one-container-alternative/certificate/

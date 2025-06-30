@@ -67,4 +67,6 @@ playground.xcworkspace
 .DS_Store
 
 # don't commit the user certificates
-one-container-alternative/certificate/
+one-container-alternative/certificate/*.crt
+one-container-alternative/certificate/*.key
+one-container-alternative/certificate/*.pem

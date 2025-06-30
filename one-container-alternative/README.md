@@ -1,92 +1,135 @@
 # one-container-alternative
 
-This is an alternative way to install YANG Suite using only a single container instead of three.
+A single-container alternative to YANG Suite's multi-container setup for experimentation and development.
 
-This alternative is intended for _experimentation_ and not as a direct replacement of the existing YANG Suite Docker implementation.
-
-## Advantages
-
-- Fewer points of failure. One container for all YANG Suite requirements.
-- No user input required. Configuration settings are preset.
-- No Docker Compose needed. Only Docker commands are used.
-- `nginx` Server removed.
-- You can provide your own certificates; otherwise, a self-signed (dummy) certificate will be used.
-- HTTPs only. Port `8480` used.
-
-## Limitations
-
-- No Backup cron job.
-- Container running as root. `/usr/local/bin/create_yangtree` had permissions issues. Will fix on a later release.
-
-## Prerequisites
-
-- `Docker`
-- `Make`
-
-## Build
-
-To start building the container, go to `one-container-alternative` directory first.
-
-```bash
-cd one-container-alternative
-```
+## Quick Start
 
 > [!IMPORTANT]
-> The rest of the commands assume you are executing the commands from inside the `one-container-alternative` directory.
-
-Then run:
+> All commands must be run from the `one-container-alternative` directory, **not** the repository root.
 
 ```bash
+# Navigate to the one-container-alternative directory
+cd one-container-alternative
+
+# Build and run YANG Suite
 make build
-```
-
-## Run
-
-To start YANG Suite and begin using it, run:
-
-```bash
 make run
 ```
 
-Then visit <https://localhost:8480> (assuming that you are running it locally), accept the EULA, and use `developer/developer` to enter YANG Suite.
+Then visit <https://localhost:8480> and login with:
 
-The named volume `yangsuite-one-container-data` is used to store the YANG Suite `ys-data` directory, where settings and data are stored.
+- **Username:** `developer`
+- **Password:** `developer`
 
-You can also do `make stop` and `make start`, to `stop` and `start` the container respectively.
+## Overview
+
+This alternative installation uses only a single container instead of three, making it simpler for experimentation.
+
+### Advantages
+
+- Fewer points of failure - one container for all requirements.
+- No user input required - configuration settings are preset.
+- No Docker/Podman Compose needed - only Docker/Podman commands.
+- HTTPs only on port `8480`
+
+### Limitations
+
+- No backup cron job.
+- Container runs as root (`/usr/local/bin/create_yangtree` had permissions issues).
+- Intended for experimentation, not production.
+
+## Prerequisites
+
+- `Docker` or `Podman` (container runtime).
+- `Make` (build automation tool).
+- 4GB+ available RAM (recommended).
+
+This command creates and starts the container, exposing YANG Suite on port 8480 (HTTPS only) with a persistent volume for your data.
+
+## Managing the Container
+
+You can control the container lifecycle with these commands:
+
+```bash
+make stop    # Stop the running container
+make start   # Start the stopped container
+make rm      # Remove the container (data persists in volume)
+```
 
 ## Using Custom Certificates
 
-You can provide your own SSL certificates by creating a `certificate` directory and placing your files in it. The [container looks](/one-container-alternative/build-assets/pick_certificate.sh#L5) for `.crt` and `.key` files in this directory. If both files are found, they will be used for `HTTPS`. If no user-provided certificates are found, the container [falls back to using self-signed](/one-container-alternative/build-assets/pick_certificate.sh#L21) (dummy) certificates.
+By default, the container uses self-signed certificates. To use your own SSL certificates:
 
-Steps to Use Custom Certificates.
+1. Place **exactly one** `.crt` and **one** `.key` file in the `certificate` directory inside the `one-container-alternative` directory.
+2. Run `make run` - your certificates will be automatically detected and used.
 
-- Create a `certificate` directory (inside the `one-container-alternative` directory).
-- Place your `.crt` and `.key` files in the `certificate` directory.
-- Only one `.crt` and `.key` files are allowed.
-- Ensure that the filenames have the `.crt` and `.key` extensions.
-- Run the container using the `make run` command.
+> [!NOTE]
+> The container automatically detects custom certificates. If none are found, it falls back to self-signed certificates.
 
-## Development
+## Troubleshooting & Logs
 
-The `daphne` server handles HTTP requests, while `twisted` manages secure communications for the YANG Suite front end.
+### "make: command not found" or "No such file or directory"
 
-You can pass the environment variables `YS_ADMIN_USER`, `YS_ADMIN_PASS`, and `YS_ADMIN_EMAIL`, to do so, adjust the `make build` command, so they are set at build time, and pass them as `build-arg`.
-
-## Logs
-
-You can watch YANG Suite Front end logs using:
-
-> [!TIP]
-> This is handy when you run along `run`, for example `make run follow`. Use `Ctrl + C` to stop the logs.
+You're probably in the wrong directory. Make sure you're in `one-container-alternative`:
 
 ```bash
-make follow
+# Check your current directory
+pwd
+
+# If you're in the repository root, navigate to the subdirectory:
+cd one-container-alternative
+
+# Verify you can see the Makefile:
+ls Makefile
 ```
 
-You can watch YANG Suite internal logs using:
+#### Expected directory structure
+
+```text
+yangsuite/                          # Repository root
+├── README.md                       # Main YANG Suite README
+├── docker/                         # Main Docker setup
+└── one-container-alternative/      # ← You should be here
+    ├── Dockerfile
+    ├── Makefile                    # ← This should exist
+    ├── README.md                   # ← This file
+    └── build-assets/
+```
+
+### Viewing Logs
+
+Watch real-time application logs:
 
 ```bash
-make debug
+make follow    # View container logs (Ctrl+C to stop)
 ```
 
-See the other options available in the [Makefile.](./Makefile)
+Access internal YANG Suite logs:
+
+```bash
+make debug     # Monitor internal application logs
+```
+
+Get shell access for debugging:
+
+```bash
+make cli       # Open bash shell inside container
+```
+
+## Data Persistence
+
+Your YANG Suite data is stored in the Docker volume `yangsuite-one-container-data`. This means:
+
+- Settings and configurations persist between container restarts.
+- Data survives container removal (unless you run `make rm-volume`).
+- You can backup/restore data by managing this volume.
+
+## Quick Development Workflow
+
+For development and testing, use this command to rebuild and restart everything:
+
+```bash
+make dev       # Removes container+volume, rebuilds, runs, and follows logs
+```
+
+> [!WARNING] > `make dev` removes all data! Only use for development.

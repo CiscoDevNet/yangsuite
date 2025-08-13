@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 ENV DOCKER_RUN  true
 
 ARG PY=python3
-ARG PY_VER=3.8
+ARG PY_VER=3.9
 ARG YS_DIST=/usr/local/lib/python${PY_VER}/dist-packages/yangsuite/
 ARG YS_SETTINGS=${YS_DIST}/settings/
 
@@ -20,7 +20,12 @@ RUN apt-get update && \
         postgresql \
         openssh-client \
         iputils-ping \
-        python3.8 \
+        libxml2-dev \
+        libxslt-dev \
+        python3.9 \
+        python3.9-venv \
+        python3.9-distutils \
+        python3.9-dev \
         python3-pip \
         gcc \
         libffi-dev \
@@ -31,6 +36,9 @@ RUN apt-get update && \
         && \
     apt-get clean && \
     rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
+
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres`` package when it was ``apt-get installed``
 # USER postgres

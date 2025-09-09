@@ -16,10 +16,59 @@ make build
 make run
 ```
 
-Then visit <https://localhost:8480> and login with:
+Make Build example:
+```
+auto@pod7-xelab:~/yangsuite-main/one-container-alternative$ make build
+Using container runtime: docker
+docker build --target app_setup --platform linux/$(uname -m | sed 's/arm64/arm64/g' | sed 's/x86_64/amd64/g') -t yangsuite-one-container .
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  25.09kB
+Step 1/23 : ARG PY_VERSION=3.10
+Step 2/23 : FROM python:${PY_VERSION} as base
+3.10: Pulling from library/python
+80b7316254b3: Pull complete
+36e4db86de6e: Pull complete
+8ea45766c644: Pull complete
+3cb1455cf185: Pull complete
+013acb959c95: Pull complete
+ee334269ae4f: Pull complete
+3eca4263ed42: Pull complete
+Digest: sha256:4585309097d523698d382a2de388340896e021319b327e2d9c028f3b4c316138
+Status: Downloaded newer image for python:3.10
+ ---> d565b0a5e178
+Step 3/23 : ARG DEBIAN_FRONTEND=noninteractive
+ ---> Running in 58bc7a945aa9
+ ---> Removed intermediate container 58bc7a945aa9
+ ---> 6bacac563a54
+<snip>
+...
+```
+
+Make Run example:
+```
+auto@pod7-xelab:~/yangsuite-main/one-container-alternative$ make run
+Using container runtime: docker
+docker run -itd --name yangsuite-one-container -v ./certificate:/certificate -v yangsuite-one-container-data:/ys-data --memory 4096m --memory-swap 4096m -p 8480:8480 -p 57500:57500 -p 57501:57501 -u root yangsuite-one-container
+ecd184e15e62105ab8664eec4bdc9aca217b46fa06cfbd5063923f847f476f6c
+auto@pod7-xelab:~/yangsuite-main/one-container-alternative$ docker ps
+CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                                                                                              NAMES
+ecd184e15e62   yangsuite-one-container         "/build-assets/start…"   43 seconds ago   Up 42 seconds   0.0.0.0:8480->8480/tcp, :::8480->8480/tcp, 0.0.0.0:57500-57501->57500-57501/tcp, :::57500-57501->57500-57501/tcp   yangsuite-one-container
+```
+
+Then visit <https://localhost:8480> 
+
+Accept the User Agreement
+![YANG Suite User Agreement](imgs/yang-suite-user-agreement.png)
+
+Login with:
 
 - **Username:** `developer`
 - **Password:** `developer`
+
+![YANG Suite Login](imgs/yang-suite-login.png)
 
 ## Overview
 

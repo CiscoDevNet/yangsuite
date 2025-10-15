@@ -76,6 +76,8 @@ To use the resources in this repository, you must install Docker on the system w
 
 A single-container alternative to YANG Suite's previous multi-container setup.
 
+Note: for Linux, Ubuntu 24.04+ is recommended.
+
 ## Quick Start
 
 > [!IMPORTANT]

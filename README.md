@@ -76,7 +76,9 @@ To use the resources in this repository, you must install Docker on the system w
 
 A single-container alternative to YANG Suite's previous multi-container setup.
 
-Note: for Linux, Ubuntu 24.04+ is recommended.
+Notes: 
+- Enusre port 8480, 57500 and 57501 are not in use. If they are, please stop the activitiy on that port or update the Makefile to use different ports in the make run command.
+- For Linux, Ubuntu 24.04+ is recommended.
 
 ## Quick Start
 

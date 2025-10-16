@@ -168,7 +168,7 @@ This alternative installation uses only a single container instead of three, mak
 
 - `Docker` or `Podman` (container runtime).
 - `Make` (build automation tool).
-- 4GB+ available RAM (recommended).
+- 4GB+ available RAM (recommended) Note, when working with large data models such as the native model, often over 2GB of RAM is needed.
 
 This command creates and starts the container, exposing YANG Suite on port 8480 (HTTPS only) with a persistent volume for your data.
 
